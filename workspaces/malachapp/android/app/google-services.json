@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1040286768360",
+    "firebase_url": "https://malachapp-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "malachapp",
+    "storage_bucket": "malachapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1040286768360:android:7d885c11dd6bea6b0c7d5d",
+        "android_client_info": {
+          "package_name": "com.example.malachapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_MQNVID7Ywya5WGOyWWYR5Iub85kcAb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
