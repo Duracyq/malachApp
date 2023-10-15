@@ -1,6 +1,7 @@
 FROM alpine:3.14
+
 # Set up new user
-RUN useradd -ms /bin/bash developer
+RUN adduser -D -s /bin/bash developer
 USER developer
 WORKDIR /home/developer
 
@@ -21,10 +22,9 @@ ENV PATH "$PATH:/home/developer/Android/sdk/platform-tools"
 RUN git clone https://github.com/flutter/flutter.git
 ENV PATH "$PATH:/home/developer/flutter/bin"
 
-# Run basic check to download Dark SDK
+# Run basic check to download Dart SDK
 RUN flutter doctor
 
-
+# Install flutterfire_cli and add firebase_core
 RUN dart pub global activate flutterfire_cli
 RUN flutter pub add firebase_core
-    
