@@ -27,3 +27,4 @@ RUN flutter doctor
 
 RUN dart pub global activate flutterfire_cli
 RUN flutter pub add firebase_core
+    
