@@ -49,7 +49,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1040286768360',
     projectId: 'malachapp',
     authDomain: 'malachapp.firebaseapp.com',
-    databaseURL: 'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'malachapp.appspot.com',
     measurementId: 'G-F4RLGWZF5X',
   );
@@ -59,7 +60,8 @@ class DefaultFirebaseOptions {
     appId: '1:1040286768360:android:7d885c11dd6bea6b0c7d5d',
     messagingSenderId: '1040286768360',
     projectId: 'malachapp',
-    databaseURL: 'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'malachapp.appspot.com',
   );
 
@@ -68,7 +70,8 @@ class DefaultFirebaseOptions {
     appId: '1:1040286768360:ios:9ead8616195970c10c7d5d',
     messagingSenderId: '1040286768360',
     projectId: 'malachapp',
-    databaseURL: 'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'malachapp.appspot.com',
     iosBundleId: 'com.example.malachapp',
   );
@@ -78,7 +81,8 @@ class DefaultFirebaseOptions {
     appId: '1:1040286768360:ios:e7cd7c563f78f20b0c7d5d',
     messagingSenderId: '1040286768360',
     projectId: 'malachapp',
-    databaseURL: 'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'malachapp.appspot.com',
     iosBundleId: 'com.example.malachapp.RunnerTests',
   );
