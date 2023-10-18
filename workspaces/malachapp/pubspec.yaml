@@ -1,5 +1,5 @@
 name: malachapp
-description: A new Flutter project.
+description: malachapp.
 
 publish_to: 'none' 
 
@@ -17,8 +17,8 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   firebase_core: ^2.17.0
-  google_fonts: ^6.1.0
   firebase_auth: ^4.11.0
+  google_fonts: ^6.1.0
   logger: ^2.0.2+1
 
 dev_dependencies:

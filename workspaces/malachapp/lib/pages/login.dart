@@ -1,5 +1,3 @@
-// import 'package:firebase_auth/firebase_auth.dart';
-
 /*
   Ludzie beda dostawali token weryfikacyjny aby grupować chujkow do klasy.
   Login to nazwa emailu
@@ -9,7 +7,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:malachapp/auth/auth_service.dart' as _auth;
+import 'package:malachapp/auth/auth_service.dart' as auth;
 import 'package:malachapp/components/text_field.dart';
 
 class LoginPage extends StatefulWidget {
@@ -22,18 +20,20 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController loginController = TextEditingController();
   final TextEditingController passwController = TextEditingController();
-  _auth.AuthStatus _loginStatus = _auth.AuthStatus.unknown;
+  final auth.AuthService _authService = auth.AuthService();
+  auth.AuthStatus _loginStatus = auth.AuthStatus.unknown;
 
-  Future<void> login() async {
-    try {
-      _loginStatus = await _auth.AuthService.login(
-        login: loginController.text,
-        password: passwController.text
-      );
-    } on _auth.AuthExceptionHandler catch(e) {
-      print(e);
-    }
+  Future<void> performLogin() async {
+  try {
+    _loginStatus = await _authService.login(
+      login: loginController.text,
+      password: passwController.text,
+    );
+  } on auth.AuthExceptionHandler catch (e) {
+    print(e);
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -43,14 +43,14 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.account_circle,
               size: 150,
             ),
-            Text(
+            const Text(
               "Logowanie",
             ),
-            SizedBox(height: 100),
+            const SizedBox(height: 100),
             MyTextField(
                 hintText: "", obscureText: false, controller: loginController),
             const SizedBox(height: 10),
@@ -59,9 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: false,
                 controller: passwController),
             ElevatedButton(
-              onPressed: () {
-                // login();
-              },
+              onPressed: () => performLogin(),
               child: const Text('Login'),
             )
           ],

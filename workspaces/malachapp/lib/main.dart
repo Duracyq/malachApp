@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:malachapp/auth/auth_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,7 +25,7 @@ class _MyAppState extends State<MyApp> {
       debugShowMaterialGrid: false,
       theme: lightMode,
       darkTheme: darkMode,
-      home: LoginPage(),
+      home: FirebaseAuthPage(),
     );
   }
 }
