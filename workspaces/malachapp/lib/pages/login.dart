@@ -1,5 +1,6 @@
-// import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -41,10 +42,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.account_circle,
-              size: 110,
-            ),
+            Container(child: Herb()),
             Text(
               "Logowanie",
               style: GoogleFonts.roboto(
@@ -57,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             SizedBox(
-              height: 30,
+              height: 60,
             ),
             Padding(
               padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
@@ -82,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextButton(
                     onPressed: () {},
                     child: Text(
-                      "Logowanie",
+                      "Zapomniałeś hasła?",
                       style: GoogleFonts.roboto(
                         // Ustawienie czcionki Open Sans
                         textStyle: TextStyle(
@@ -103,7 +101,11 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   // login();
                 },
-                child: const Text('Login'),
+                child: Text(
+                  'Login',
+                  // style:
+                  //     TextStyle(color: Theme.of(context).colorScheme.primary),
+                ),
               ),
             )
           ],

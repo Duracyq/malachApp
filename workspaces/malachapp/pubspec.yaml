@@ -33,5 +33,6 @@ flutter:
 
   assets:
      - assets/herb1.png
+     - assets/herb2.png
   
 
