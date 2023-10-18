@@ -1,6 +1,7 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/text_field.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -42,24 +43,68 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Icon(
               Icons.account_circle,
-              size: 150,
+              size: 110,
             ),
             Text(
               "Logowanie",
+              style: GoogleFonts.roboto(
+                // Ustawienie czcionki Open Sans
+                textStyle: const TextStyle(
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 23,
+                ),
+              ),
             ),
-            SizedBox(height: 100),
-            MyTextField(
-                hintText: "", obscureText: false, controller: loginController),
+            SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
+              child: MyTextField(
+                  hintText: "login",
+                  obscureText: false,
+                  controller: loginController),
+            ),
             const SizedBox(height: 10),
-            MyTextField(
-                hintText: "haslo",
-                obscureText: false,
-                controller: passwController),
-            ElevatedButton(
-              onPressed: () {
-                // login();
-              },
-              child: const Text('Login'),
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12),
+              child: MyTextField(
+                  hintText: "haslo",
+                  obscureText: false,
+                  controller: passwController),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12, left: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      "Logowanie",
+                      style: GoogleFonts.roboto(
+                        // Ustawienie czcionki Open Sans
+                        textStyle: TextStyle(
+                          fontStyle: FontStyle.normal,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  // login();
+                },
+                child: const Text('Login'),
+              ),
             )
           ],
         ),
