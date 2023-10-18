@@ -95,19 +95,25 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              height: 56, // Wysokość textfieldu
               child: ElevatedButton(
                 onPressed: () {
-                  // login();
+                  // Dodaj tu akcje po kliknięciu przycisku
                 },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size.fromHeight(56),
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                ),
                 child: Text(
-                  'Login',
-                  // style:
-                  //     TextStyle(color: Theme.of(context).colorScheme.primary),
+                  'Mój Przycisk',
+                  // style: TextStyle(
+                  //   color: Theme.of(context).colorScheme.onPrimary,
+                  // ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: darkMode,
+      theme: lightMode,
       darkTheme: darkMode,
       home: LoginPage(),
     );
