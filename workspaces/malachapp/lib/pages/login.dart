@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
         password: passwController.text
         );
     } on FirebaseAuthException catch(e) {
+      // showDialog(context:context, builder: (context) => Center(child: AboutDialog(children: [Text(e.message)]),));
       print(e.message);
     } finally {
       Navigator.of(context).pop();
@@ -33,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login Page')),
+      appBar: AppBar(title: const Text('Login Page')),
       body: Center(child: Column(children: [
         TextField(controller: loginController, decoration: const InputDecoration(labelText: 'Login')),
         const SizedBox(height: 10),
@@ -43,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 login();          
               },
-              child: Text('Login'),
+              child: const Text('Login'),
 
         )
         ])

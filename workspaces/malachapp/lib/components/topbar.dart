@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:malachapp/themes/dark_mode.dart';
-import 'package:malachapp/themes/light_mode.dart';
-
 
 class TopBarFb2 extends StatelessWidget {
   final String title;
