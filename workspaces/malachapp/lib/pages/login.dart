@@ -1,5 +1,15 @@
 // import 'package:firebase_auth/firebase_auth.dart';
+
+/*
+  Ludzie beda dostawali token weryfikacyjny aby grupować chujkow do klasy.
+  Login to nazwa emailu
+  Wzór: login@malach.com
+  Passw: Cezar z loginu o przesunieciu +1789
+*/
+
+
 import 'package:flutter/material.dart';
+import 'package:malachapp/auth/auth_service.dart' as _auth;
 import 'package:malachapp/components/text_field.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,25 +22,18 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController loginController = TextEditingController();
   final TextEditingController passwController = TextEditingController();
+  _auth.AuthStatus _loginStatus = _auth.AuthStatus.unknown;
 
-  // void login() async {
-  //   //show loading circle
-  //   showDialog(
-  //       context: context,
-  //       builder: (context) => const Center(
-  //             child: CircularProgressIndicator(),
-  //           ));
-
-  //   try {
-  //     await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //         email: loginController.text, password: passwController.text);
-  //   } on FirebaseAuthException catch (e) {
-  //     // showDialog(context:context, builder: (context) => Center(child: AboutDialog(children: [Text(e.message)]),));
-  //     print(e.message);
-  //   } finally {
-  //     Navigator.of(context).pop();
-  //   }
-  // }
+  Future<void> login() async {
+    try {
+      _loginStatus = await _auth.AuthService.login(
+        login: loginController.text,
+        password: passwController.text
+      );
+    } on _auth.AuthExceptionHandler catch(e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
