@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:malachapp/components/my_button.dart';
+import 'package:malachapp/pages/reset_hasla.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -42,7 +44,10 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(child: Herb()),
+            Container(child: Herb()), //! tu zostaw z tym kontenerem
+            SizedBox(
+              height: 15,
+            ),
             Text(
               "Logowanie",
               style: GoogleFonts.roboto(
@@ -69,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.only(left: 12, right: 12),
               child: MyTextField(
                   hintText: "haslo",
-                  obscureText: false,
+                  obscureText: true,
                   controller: passwController),
             ),
             Padding(
@@ -78,7 +83,12 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ResetHasla()),
+                      );
+                    },
                     child: Text(
                       "Zapomniałeś hasła?",
                       style: GoogleFonts.roboto(
@@ -95,25 +105,33 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              height: 56, // Wysokość textfieldu
-              child: ElevatedButton(
-                onPressed: () {
-                  // Dodaj tu akcje po kliknięciu przycisku
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size.fromHeight(56),
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                ),
-                child: Text(
-                  'Mój Przycisk',
-                  // style: TextStyle(
-                  //   color: Theme.of(context).colorScheme.onPrimary,
-                  // ),
-                ),
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12),
+              child: MyButton(
+                text: 'Zaloguj się',
+                onTap: () {},
               ),
-            ),
+            )
+            //! jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
+            // Container(
+            //   padding: EdgeInsets.symmetric(horizontal: 12),
+            //   height: 56, // Wysokość textfieldu
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       // Dodaj tu akcje po kliknięciu przycisku
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       minimumSize: Size.fromHeight(56),
+            //       backgroundColor: Theme.of(context).colorScheme.secondary,
+            //     ),
+            //     child: Text(
+            //       'Mój Przycisk',
+            //       // style: TextStyle(
+            //       //   color: Theme.of(context).colorScheme.onPrimary,
+            //       // ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
