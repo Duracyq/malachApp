@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart' as auth;
 import 'package:malachapp/components/text_field.dart';
+import 'package:malachapp/pages/resetPassword.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,15 +25,18 @@ class _LoginPageState extends State<LoginPage> {
   auth.AuthStatus _loginStatus = auth.AuthStatus.unknown;
 
   Future<void> performLogin() async {
-  try {
-    _loginStatus = await _authService.login(
-      login: loginController.text,
-      password: passwController.text,
-    );
-  } on auth.AuthExceptionHandler catch (e) {
-    print(e);
+    try {
+      showDialog(context: context, builder: (context) => const Center(child: CircularProgressIndicator(),));
+      _loginStatus = await _authService.login(
+        login: loginController.text,
+        password: passwController.text,
+      );
+    } on auth.AuthExceptionHandler catch (e) {
+      print(e);
+    } finally {
+      Navigator.of(context).pop();
+    }
   }
-}
 
 
   @override
@@ -61,6 +65,15 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: () => performLogin(),
               child: const Text('Login'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Forgot password?'),
+                TextButton(onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ResetPasswordPage())
+                ), child: const Text('Reset your password'))
+              ],
             )
           ],
         ),

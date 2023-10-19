@@ -16,9 +16,10 @@ dependencies:
 
 
   cupertino_icons: ^1.0.2
-  firebase_core: ^2.17.0
+  firebase_core: ^2.18.0
   firebase_auth: ^4.11.0
-  google_fonts: ^6.1.0
+  google_fonts: ^4.0.4
+  firebase_admin: any
   logger: ^2.0.2+1
 
 dev_dependencies:

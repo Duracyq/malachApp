@@ -4,16 +4,8 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-// / Default [FirebaseOptions] for use with your Firebase apps.
-///
-/// Example:
-/// ```dart
-/// import 'firebase_options.dart';
-/// // ...
-/// await Firebase.initializeApp(
-///   options: DefaultFirebaseOptions.currentPlatform,
-/// );
-/// ```
+/// Default [FirebaseOptions] for use with your Firebase apps.
+
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -25,7 +17,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -42,15 +37,13 @@ class DefaultFirebaseOptions {
         );
     }
   }
-
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyDgEyDxI4QWS7oRz8-KuyJ_F6o22BnyjlQ',
     appId: '1:1040286768360:web:e7c69e8dd3c414240c7d5d',
     messagingSenderId: '1040286768360',
     projectId: 'malachapp',
     authDomain: 'malachapp.firebaseapp.com',
-    databaseURL:
-        'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL: 'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'malachapp.appspot.com',
     measurementId: 'G-F4RLGWZF5X',
   );
@@ -60,8 +53,7 @@ class DefaultFirebaseOptions {
     appId: '1:1040286768360:android:7d885c11dd6bea6b0c7d5d',
     messagingSenderId: '1040286768360',
     projectId: 'malachapp',
-    databaseURL:
-        'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL: 'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'malachapp.appspot.com',
   );
 
@@ -70,20 +62,8 @@ class DefaultFirebaseOptions {
     appId: '1:1040286768360:ios:9ead8616195970c10c7d5d',
     messagingSenderId: '1040286768360',
     projectId: 'malachapp',
-    databaseURL:
-        'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL: 'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'malachapp.appspot.com',
     iosBundleId: 'com.example.malachapp',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAyJiLGLzboaVljzeBbqd6v4TlqhFcezM0',
-    appId: '1:1040286768360:ios:e7cd7c563f78f20b0c7d5d',
-    messagingSenderId: '1040286768360',
-    projectId: 'malachapp',
-    databaseURL:
-        'https://malachapp-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'malachapp.appspot.com',
-    iosBundleId: 'com.example.malachapp.RunnerTests',
   );
 }

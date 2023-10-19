@@ -56,6 +56,7 @@ class AuthExceptionHandler {
 class AuthService {
   final _auth = FirebaseAuth.instance;
   AuthStatus _status = AuthStatus.unknown;
+  
   Future<AuthStatus> login({
     required String login,
     required String password,
@@ -68,12 +69,21 @@ class AuthService {
     }
     return _status;
   }
-
+  // Działa, ale nie na kody recyklingowe
   Future<AuthStatus> resetPassword({required String email}) async {
     await _auth
         .sendPasswordResetEmail(email: email)
         .then((value) => _status = AuthStatus.successful)
         .catchError((e) => _status = AuthExceptionHandler.handleAuthException(e));
+    return _status;
+  }
+
+  Future<AuthStatus> signOut() async {
+    try {
+      await _auth.signOut();
+    } on FirebaseAuthException catch(e) {
+      _status = AuthExceptionHandler.handleAuthException(e);
+    }
     return _status;
   }
 }
