@@ -1,15 +1,17 @@
+import 'package:malachapp/auth/auth_service.dart' as auth;
+import 'package:flutter/material.dart';
+import 'package:malachapp/components/herb.dart';
+import 'package:malachapp/components/text_field.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:malachapp/components/my_button.dart';
+import 'package:malachapp/pages/reset_hasla.dart';
+
 /*
   Ludzie beda dostawali token weryfikacyjny aby grupować chujkow do klasy.
   Login to nazwa emailu
   Wzór: login@malach.com
   Passw: Cezar z loginu o przesunieciu +1789
 */
-
-
-import 'package:flutter/material.dart';
-import 'package:malachapp/auth/auth_service.dart' as auth;
-import 'package:malachapp/components/text_field.dart';
-import 'package:malachapp/pages/resetPassword.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -47,34 +49,94 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.account_circle,
-              size: 150,
+            Container(child: Herb()), //! tu zostaw z tym kontenerem
+            SizedBox(
+              height: 15,
             ),
             const Text(
               "Logowanie",
+              style: GoogleFonts.roboto(
+                // Ustawienie czcionki Open Sans
+                textStyle: const TextStyle(
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 23,
+                ),
+              ),
             ),
-            const SizedBox(height: 100),
-            MyTextField(
-                hintText: "", obscureText: false, controller: loginController),
+            SizedBox(
+              height: 60,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
+              child: MyTextField(
+                  hintText: "login",
+                  obscureText: false,
+                  controller: loginController),
+            ),
             const SizedBox(height: 10),
-            MyTextField(
-                hintText: "haslo",
-                obscureText: false,
-                controller: passwController),
-            ElevatedButton(
-              onPressed: () => performLogin(),
-              child: const Text('Login'),
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12),
+              child: MyTextField(
+                  hintText: "haslo",
+                  obscureText: true,
+                  controller: passwController),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Forgot password?'),
-                TextButton(onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const ResetPasswordPage())
-                ), child: const Text('Reset your password'))
-              ],
+            Padding(
+              padding: const EdgeInsets.only(right: 12, left: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ResetHasla()),
+                      );
+                    },
+                    child: Text(
+                      "Zapomniałeś hasła?",
+                      style: GoogleFonts.roboto(
+                        // Ustawienie czcionki Open Sans
+                        textStyle: TextStyle(
+                          fontStyle: FontStyle.normal,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12),
+              child: MyButton(
+                text: 'Zaloguj się',
+                onTap: () {},
+              ),
             )
+            //! jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
+            // Container(
+            //   padding: EdgeInsets.symmetric(horizontal: 12),
+            //   height: 56, // Wysokość textfieldu
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       // Dodaj tu akcje po kliknięciu przycisku
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       minimumSize: Size.fromHeight(56),
+            //       backgroundColor: Theme.of(context).colorScheme.secondary,
+            //     ),
+            //     child: Text(
+            //       'Mój Przycisk',
+            //       // style: TextStyle(
+            //       //   color: Theme.of(context).colorScheme.onPrimary,
+            //       // ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

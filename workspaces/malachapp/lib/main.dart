@@ -3,6 +3,7 @@ import 'package:malachapp/auth/auth_page.dart';
 import 'package:malachapp/firebase_options.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -22,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowMaterialGrid: false,
+      debugShowCheckedModeBanner: false,
       theme: lightMode,
       darkTheme: darkMode,
       home: const FirebaseAuthPage(),
