@@ -24,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController loginController = TextEditingController();
   final TextEditingController passwController = TextEditingController();
   final auth.AuthService _authService = auth.AuthService();
+  // ignore: unused_field
   auth.AuthStatus _loginStatus = auth.AuthStatus.unknown;
 
   Future<void> performLogin() async {
@@ -49,7 +50,8 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Herb(), //! tu zostaw z tym kontenerem
+            // Container(child: const Herb()), //! tu zostaw z tym kontenerem
+            const Herb(), //? nie ma różnicy czy z Container() czy bez 
             const SizedBox(
               height: 15,
             ),
