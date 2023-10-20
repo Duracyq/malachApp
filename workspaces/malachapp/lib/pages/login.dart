@@ -49,11 +49,11 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(child: Herb()), //! tu zostaw z tym kontenerem
-            SizedBox(
+            const Herb(), //! tu zostaw z tym kontenerem
+            const SizedBox(
               height: 15,
             ),
-            const Text(
+            Text(
               "Logowanie",
               style: GoogleFonts.roboto(
                 // Ustawienie czcionki Open Sans
@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 60,
             ),
             Padding(
@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ResetHasla()),
+                        MaterialPageRoute(builder: (context) => const ResetHasla()),
                       );
                     },
                     child: Text(
@@ -114,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.only(left: 12, right: 12),
               child: MyButton(
                 text: 'Zaloguj się',
-                onTap: () {},
+                onTap: () => auth.AuthService().login(login: loginController.text, password: passwController.text),
               ),
             )
             //! jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac

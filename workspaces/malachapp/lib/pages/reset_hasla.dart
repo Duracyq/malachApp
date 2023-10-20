@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:malachapp/components/herb.dart';
+import 'package:malachapp/auth/auth_service.dart';
+// import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/my_button.dart';
@@ -30,11 +31,11 @@ class _ResetHaslaState extends State<ResetHasla> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      icon: Icon(Icons.arrow_back_ios_new_rounded)),
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded)),
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 190,
             ),
             Center(
@@ -52,7 +53,7 @@ class _ResetHaslaState extends State<ResetHasla> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   Text(
@@ -67,7 +68,7 @@ class _ResetHaslaState extends State<ResetHasla> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 25,
                   ),
                   Padding(
@@ -78,14 +79,14 @@ class _ResetHaslaState extends State<ResetHasla> {
                         obscureText: false,
                         controller: mail),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 12, right: 12),
                     child: MyButton(
                       text: 'Wyślij',
-                      onTap: () {},
+                      onTap: () => AuthService().resetPassword(email: mail.text),
                     ),
                   )
                   //! jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
