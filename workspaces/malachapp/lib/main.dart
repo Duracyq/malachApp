@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:malachapp/auth/auth_page.dart';
+import 'package:malachapp/firebase_options.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -23,6 +25,7 @@ class _MyAppState extends State<MyApp> {
       debugShowMaterialGrid: false,
       theme: lightMode,
       darkTheme: darkMode,
+      home: const FirebaseAuthPage(),
     );
   }
 }
