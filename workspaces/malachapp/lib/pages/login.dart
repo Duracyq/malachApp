@@ -1,10 +1,17 @@
-//import 'package:firebase_auth/firebase_auth.dart';
+import 'package:malachapp/auth/auth_service.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/pages/reset_hasla.dart';
+
+/*
+  Ludzie beda dostawali token weryfikacyjny aby grupować chujkow do klasy.
+  Login to nazwa emailu
+  Wzór: login@malach.com
+  Passw: Cezar z loginu o przesunieciu +1789
+*/
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,25 +23,23 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController loginController = TextEditingController();
   final TextEditingController passwController = TextEditingController();
+  final auth.AuthService _authService = auth.AuthService();
+  auth.AuthStatus _loginStatus = auth.AuthStatus.unknown;
 
-  // void login() async {
-  //   //show loading circle
-  //   showDialog(
-  //       context: context,
-  //       builder: (context) => const Center(
-  //             child: CircularProgressIndicator(),
-  //           ));
+  Future<void> performLogin() async {
+    try {
+      showDialog(context: context, builder: (context) => const Center(child: CircularProgressIndicator(),));
+      _loginStatus = await _authService.login(
+        login: loginController.text,
+        password: passwController.text,
+      );
+    } on auth.AuthExceptionHandler catch (e) {
+      print(e);
+    } finally {
+      Navigator.of(context).pop();
+    }
+  }
 
-  //   try {
-  //     await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //         email: loginController.text, password: passwController.text);
-  //   } on FirebaseAuthException catch (e) {
-  //     // showDialog(context:context, builder: (context) => Center(child: AboutDialog(children: [Text(e.message)]),));
-  //     print(e.message);
-  //   } finally {
-  //     Navigator.of(context).pop();
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(
               height: 15,
             ),
-            Text(
+            const Text(
               "Logowanie",
               style: GoogleFonts.roboto(
                 // Ustawienie czcionki Open Sans
