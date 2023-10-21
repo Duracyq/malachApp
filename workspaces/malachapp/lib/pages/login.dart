@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
         password: passwController.text,
       );
     } on auth.AuthExceptionHandler catch (e) {
-      print(e);
+      print(e); //? Daj tutaj dialog, żeby się wyświetlał błąd
     } finally {
       Navigator.of(context).pop();
     }

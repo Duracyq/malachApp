@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:malachapp/auth/admin.dart';
 import 'package:malachapp/auth/auth_service.dart';
 // import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/text_field.dart';
@@ -88,8 +89,10 @@ class _ResetHaslaState extends State<ResetHasla> {
                       text: 'Wyślij',
                       onTap: () => AuthService().resetPassword(email: mail.text),
                     ),
-                  )
-                  //! jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
+                  ),
+                  MyButton(text: 'STWORZ 1000 UŻYTKOWNIKÓW (ADMIN_PANEL)', onTap: () => AuthCreateUser().createUsers()),
+                  
+                  // jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
                   // Container(
                   //   padding: EdgeInsets.symmetric(horizontal: 12),
                   //   height: 56, // Wysokość textfieldu
