@@ -69,7 +69,7 @@ class _AdminPanelState extends State<AdminPanel> {
                   MyButton(text: 'STWORZ 10(na razie) UŻYTKOWNIKÓW (ADMIN_PANEL)', onTap: () => AuthCreateUser().createUsers()),
                   const SizedBox(height: 10),
                   MyTextField(hintText: 'email', controller: decipherController),
-                  MyButton(text: 'Deszyfrowanie', onTap: () => print(AuthCreateUser().deCaesarCipher(decipherController.text))),
+                  MyButton(text: 'Deszyfrowanie', onTap: () => print(AuthCreateUser().passwDecryption(decipherController.text))),
                   
                 ],
               ),
