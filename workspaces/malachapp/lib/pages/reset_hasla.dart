@@ -90,7 +90,6 @@ class _ResetHaslaState extends State<ResetHasla> {
                       onTap: () => AuthService().resetPassword(email: mail.text),
                     ),
                   ),
-                  MyButton(text: 'STWORZ 1000 UŻYTKOWNIKÓW (ADMIN_PANEL)', onTap: () => AuthCreateUser().createUsers()),
                   
                   // jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
                   // Container(
