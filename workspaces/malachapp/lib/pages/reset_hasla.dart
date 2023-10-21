@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:malachapp/auth/admin.dart';
+import 'package:malachapp/auth/admin/admin.dart';
 import 'package:malachapp/auth/auth_service.dart';
 // import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/text_field.dart';
@@ -87,10 +87,11 @@ class _ResetHaslaState extends State<ResetHasla> {
                     padding: const EdgeInsets.only(left: 12, right: 12),
                     child: MyButton(
                       text: 'Wyślij',
-                      onTap: () => AuthService().resetPassword(email: mail.text),
+                      onTap: () =>
+                          AuthService().resetPassword(email: mail.text),
                     ),
                   ),
-                  
+
                   // jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
                   // Container(
                   //   padding: EdgeInsets.symmetric(horizontal: 12),
