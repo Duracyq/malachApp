@@ -22,7 +22,7 @@ class AdminAuthService {
 class AuthCreateUser {
   late String loginName;
   late String email;
-  final int shift = 1789;
+  final int shift = 934892347;
 
   AuthCreateUser() {
     loginName = '0000';
@@ -31,25 +31,33 @@ class AuthCreateUser {
   String formatLoginName(int index) {
     return index.toString().padLeft(4, '0');
   }
-  
+
+  //! najbezpieczniejsza wersja
   String caesarCipher(String text, int shift) {
     StringBuffer result = StringBuffer();
     for (int i = 0; i < text.length; i++) {
       String char = text[i];
-      if (char.contains(RegExp(r'[a-zA-Z]'))) {
+      if (char.contains(RegExp(r'[a-zA-Z0-9]'))) {
         bool isUpperCase = char == char.toUpperCase();
         char = char.toLowerCase();
         int charCode = char.codeUnitAt(0);
         charCode = (charCode - 'a'.codeUnitAt(0) + shift) % 26 + 'a'.codeUnitAt(0);
+        char = String.fromCharCode(charCode);
         if (isUpperCase) {
-          char = String.fromCharCode(charCode).toUpperCase();
-        } else {
-          char = String.fromCharCode(charCode);
+          char = char.toUpperCase();
         }
+      } else {
+        int charCode = char.codeUnitAt(0);
+        charCode = (charCode - '!'.codeUnitAt(0) + shift) % 33 + '!'.codeUnitAt(0);
+        char = String.fromCharCode(charCode);
       }
       result.write(char);
     }
     return result.toString();
+  }
+
+  String deCaesarCipher(String text) {
+    return caesarCipher(text, shift);
   }
   
   final auth = FirebaseAuth.instance;
