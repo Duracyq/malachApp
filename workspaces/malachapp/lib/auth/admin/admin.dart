@@ -37,11 +37,10 @@ class AuthCreateUser {
     String charAtIndex3 = text[3];
 
     if (charAtIndex3.isNotEmpty && RegExp(r'[0-9]').hasMatch(charAtIndex3)) {
-      int numericValue = int.parse(charAtIndex3);
-      int rails = numericValue % 26;
       try {
-        String decTextTemp = RailCyph().railFenceDecrypt(text, rails);
-        decText = CaesarCiph().deCaesarCipher(decTextTemp);
+        String decTextTemp = CaesarCiph().deCaesarCipher(text);
+        decText =  RailCyph().railFenceEncrypt(decTextTemp, 7);
+        print(decText);
       } catch (e) {
         print(e);
       }
