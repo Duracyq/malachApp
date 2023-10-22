@@ -1,26 +1,66 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+import 'package:malachapp/components/herb_topbar.dart';
 
-class TopBarFb2 extends StatelessWidget {
-  final String title;
-  final String upperTitle;
-  const TopBarFb2({required this.title, required this.upperTitle, Key? key})
-      : super(key: key);
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const CustomAppBar({super.key});
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title,
-            style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-                fontWeight: FontWeight.normal)),
-        Text(upperTitle,
-            style: const TextStyle(
-                color: Colors.black, fontSize: 26, fontWeight: FontWeight.bold))
-      ],
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return PreferredSize(
+      preferredSize: Size.fromHeight(300),
+      child: AppBar(
+        title: Container(
+          width: screenWidth,
+          height: 50,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                // Ustawienie drugiego elementu na skraju
+                children: <Widget>[
+                  // Pierwszy element (na środku)
+                  SizedBox(width: 100),
+                  Container(
+                    width: 100, // Dostosuj szerokość według potrzeb
+                    height: 100, // Dostosuj wysokość według potrzeb
+                    color: Colors.blue,
+                    child: Center(child: Herb1()),
+                  ),
+                  // Drugi element (maksymalnie na prawo)
+                  IconButton(onPressed: () {}, icon: Icon(Icons.settings))
+                  //Image.asset('assets/herb1.png'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Ustawienia'),
+      ),
+      body: Center(
+        child: Text('Strona ustawień'),
+      ),
     );
   }
 }
