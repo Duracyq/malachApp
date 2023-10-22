@@ -55,7 +55,7 @@ class AuthCreateUser {
     late var tempShift = shift + text[3].codeUnitAt(0)*43751;
     try {
       createdPasw = CaesarCiph().caesarCipher(text, tempShift.toInt());
-      createdPasw = RailCyph().railFenceEncrypt(text, 7);
+      createdPasw = RailCyph().railFenceEncrypt(createdPasw, 7);
     } catch(e) {
       print(e);
     }
@@ -81,7 +81,7 @@ class AuthCreateUser {
   }
 }
 class RailCyph {
-    // przestawienny szyfr
+  // przestawienny szyfr
   String railFenceEncrypt(String text, int rails) {
   List<String> railFence = List.generate(rails, (i) => '', growable: false);
   int currentRail = 0;
@@ -161,7 +161,6 @@ String railFenceDecrypt(String text, int rails) {
 
   return decryptedText;
 }
-
 // koniec przestawiennego
 }
 

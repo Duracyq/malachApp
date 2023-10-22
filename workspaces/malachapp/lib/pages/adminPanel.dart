@@ -69,10 +69,29 @@ class _AdminPanelState extends State<AdminPanel> {
                   MyButton(text: 'STWORZ 10(na razie) UŻYTKOWNIKÓW (ADMIN_PANEL)', onTap: () => AuthCreateUser().createUsers()),
                   const SizedBox(height: 10),
                   MyTextField(hintText: 'email', controller: decipherController),
-                  MyButton(text: 'Deszyfrowanie', onTap: () => print(AuthCreateUser().passwDecryption(decipherController.text))),
-                  
-                ],
-              ),
+                  MyButton(text: 'Deszyfrowanie', onTap: () {
+                    String result = AuthCreateUser().passwDecryption(decipherController.text);
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Decryption Result'),
+                          content: Text(result),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        );
+                      }
+                    );
+                  }
+                ),
+              ],
+            ),
             ),
           ],
         ),
