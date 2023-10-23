@@ -22,6 +22,7 @@ dependencies:
   firebase_admin: any
   logger: ^2.0.2+1
   curved_navigation_bar: ^1.0.3
+  
 
 dev_dependencies:
   flutter_test:
@@ -36,5 +37,8 @@ flutter:
   assets:
      - assets/herb1.png
      - assets/herb2.png
+
   
+  
+ 
 

@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
       theme: lightMode,
       darkTheme: darkMode,
       home: Scaffold(
+        //extendBodyBehindAppBar: true,
         appBar: CustomAppBar(),
         body: tabs[_currentIndex],
         bottomNavigationBar: CurvedNavigationBar(

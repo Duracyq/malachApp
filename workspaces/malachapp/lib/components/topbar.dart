@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:malachapp/components/herb_topbar.dart';
+import 'package:malachapp/components/herb.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
@@ -17,7 +18,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       preferredSize: Size.fromHeight(300),
       child: AppBar(
         title: Container(
-          width: screenWidth,
           height: 50,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -29,15 +29,37 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 // Ustawienie drugiego elementu na skraju
                 children: <Widget>[
                   // Pierwszy element (na środku)
-                  SizedBox(width: 100),
+                  SizedBox(width: 46),
                   Container(
-                    width: 100, // Dostosuj szerokość według potrzeb
+                    width: 200, // Dostosuj szerokość według potrzeb
                     height: 100, // Dostosuj wysokość według potrzeb
-                    color: Colors.blue,
-                    child: Center(child: Herb1()),
+
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          child: Herb(),
+                          height: 30,
+                        ),
+                        Text(
+                          'M A L A C H  A P P',
+                          style: GoogleFonts.openSans(
+                            // Ustawienie czcionki Open Sans
+                            textStyle: TextStyle(
+                              fontStyle: FontStyle.normal,
+                              fontSize: 20,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                   // Drugi element (maksymalnie na prawo)
-                  IconButton(onPressed: () {}, icon: Icon(Icons.settings))
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.settings),
+                    iconSize: 24,
+                  )
                   //Image.asset('assets/herb1.png'),
                 ],
               ),
