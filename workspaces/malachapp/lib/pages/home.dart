@@ -1,7 +1,8 @@
+import 'package:firebase_admin/firebase_admin.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/topbar.dart';
-import 'package:firebase_storage/firebase_storage.dart' as f_storage;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:malachapp/services/storage_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AuthService auth = AuthService();
+  final Storage storage = Storage();
 
   @override
   Widget build(BuildContext context) {
@@ -28,29 +30,36 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          TopBarFb2(title: 'title', upperTitle: 'upperTitle'),
+          const TopBarFb2(title: 'title', upperTitle: 'upperTitle'),
 
           //? https://www.youtube.com/watch?v=sM-WMcX66FI
-          FutureBuilder<f_storage.ListResults>(
-            future: storage.listFiles(), // Make sure 'storage' is properly initialized
-            builder: (BuildContext context, AsyncSnapshot<f_storage.ListResults> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // While the Future is still running, show a loading indicator or text.
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                // If the Future throws an error, display an error message.
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.hasData) {
-                // If the Future is complete and has data, display it here.
-                final data = snapshot.data;
-                // You can render the data as needed.
-                return Text('Data: $data');
-              } else {
-                // By default, show an empty container.
+          FutureBuilder(
+            future: storage.listFiles(), 
+            builder: (BuildContext context, 
+              AsyncSnapshot<firebase_storage.ListResult> snapshot) {
+                if(snapshot.connectionState == ConnectionState.done && 
+                snapshot.hasData){
+                  return Container(
+                    height: 100,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ElevatedButton(
+                          onPressed: () {},
+                          child: Text(snapshot.data!.items[index].name),
+                        );
+                      } 
+                    ),
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                }
                 return Container();
-              }
-            },
-          ),
+            } )
+          
         ],
       ),
     );
