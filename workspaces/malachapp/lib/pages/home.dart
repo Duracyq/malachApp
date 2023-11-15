@@ -1,8 +1,6 @@
-import 'package:firebase_admin/firebase_admin.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/topbar.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:malachapp/services/storage_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,7 +30,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           const TopBarFb2(title: 'title', upperTitle: 'upperTitle'),
 
-          // https://www.youtube.com/watch?v=sM-WMcX66FI
+          // Retrieving photos from FirebaseStorage 
           FutureBuilder(
             future: storage.getImageUrls(),
             builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
