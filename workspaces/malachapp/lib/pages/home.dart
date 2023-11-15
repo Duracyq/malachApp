@@ -32,34 +32,40 @@ class _HomePageState extends State<HomePage> {
         children: [
           const TopBarFb2(title: 'title', upperTitle: 'upperTitle'),
 
-          //? https://www.youtube.com/watch?v=sM-WMcX66FI
+          // https://www.youtube.com/watch?v=sM-WMcX66FI
           FutureBuilder(
-            future: storage.listFiles(), 
-            builder: (BuildContext context, 
-              AsyncSnapshot<firebase_storage.ListResult> snapshot) {
-                if(snapshot.connectionState == ConnectionState.done && 
-                snapshot.hasData){
-                  return Container(
-                    height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.items.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ElevatedButton(
-                          onPressed: () {},
-                          child: Text(snapshot.data!.items[index].name),
-                        );
-                      } 
-                    ),
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
-                  return const CircularProgressIndicator();
-                }
-                return Container();
-            } )
-          
+            future: storage.getImageUrls(),
+            builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                return SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ElevatedButton(
+                        onPressed: () {
+                          // Handle button press, e.g., open the image
+                        },
+                        child: Image.network(
+                          snapshot.data![index],
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
+                return const CircularProgressIndicator();
+              }
+
+              return Container();
+            },
+          )
         ],
       ),
     );
