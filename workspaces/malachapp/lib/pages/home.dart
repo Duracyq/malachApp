@@ -46,8 +46,8 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (BuildContext context, int index) {
                       return Image.network(
                           snapshot.data![index],
-                          width: 100,
-                          height: 100,
+                          // width: 100,
+                          // height: 100,
                           fit: BoxFit.cover,
                         );
                     },
