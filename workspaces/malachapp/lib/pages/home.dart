@@ -44,12 +44,14 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Image.network(
+                      return Center(
+                        child: Image.network(
                           snapshot.data![index],
                           // width: 100,
                           // height: 100,
                           fit: BoxFit.cover,
-                        );
+                        )
+                      );
                     },
                   ),
                 );
