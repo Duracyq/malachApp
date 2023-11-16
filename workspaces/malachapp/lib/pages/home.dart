@@ -31,59 +31,61 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           const TopBarFb2(title: 'title', upperTitle: 'upperTitle'),
-
-          // Retrieving photos from FirebaseStorage 
-          FutureBuilder(
-            future: storage.getImageUrls(),
-            builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                return SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Center(
-                        child: Image.network(
-                          snapshot.data![index],
-                          // width: 100,
-                          // height: 100,
-                          fit: BoxFit.cover,
-                        )
-                      );
-                    },
-                  ),
-                );
-              }
-              if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
-                return const CircularProgressIndicator();
-              }
-
-              return Container();
-            },
-          ),
-          //text from Firestore Cloud DB
-          StreamBuilder(
-            stream: firebaseFirestore.collection('test').snapshots(),
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              }
-
-              return ListView(
-                children: snapshot.data!.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> document) {
-                  Map<String, dynamic> data = document.data();
-                  return ListTile(
-                    title: Text(data['test']),
+          Center(child: Column(children: [
+            // Retrieving photos from FirebaseStorage 
+            FutureBuilder(
+              future: storage.getImageUrls(),
+              builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                  return SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Center(
+                          child: Image.network(
+                            snapshot.data![index],
+                            // width: 100,
+                            // height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        );
+                      },
+                    ),
                   );
-                }).toList(),
-              );
-            },
+                }
+                if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                }
+
+                return Container();
+              },
+            ),
+            //text from Firestore Cloud DB
+            StreamBuilder(
+              stream: firebaseFirestore.collection('test').snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+
+                return ListView(
+                  children: snapshot.data!.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> document) {
+                    Map<String, dynamic> data = document.data();
+                    return ListTile(
+                      title: Text(data['test']),
+                    );
+                  }).toList(),
+                );
+              },
+            )
+          ]),
           )
         ],
       ),
