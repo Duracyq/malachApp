@@ -1,7 +1,5 @@
 import 'package:firebase_admin/firebase_admin.dart' as admin;
-import 'package:firebase_admin/testing.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:malachapp/auth/auth_service.dart';
 
 // nie działa reset !!
 class AdminAuthService {
