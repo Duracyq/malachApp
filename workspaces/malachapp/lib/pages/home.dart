@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final AuthService auth = AuthService();
   final Storage storage = Storage();
+  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +65,8 @@ class _HomePageState extends State<HomePage> {
           ),
           //text from Firestore Cloud DB
           StreamBuilder(
-            stream: FirebaseFirestore.instance.collection('test').snapshots(),
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            stream: firebaseFirestore.collection('test').snapshots(),
+            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
               if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               }
@@ -75,8 +76,8 @@ class _HomePageState extends State<HomePage> {
               }
 
               return ListView(
-                children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                  Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                children: snapshot.data!.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> document) {
+                  Map<String, dynamic> data = document.data();
                   return ListTile(
                     title: Text(data['test']),
                   );
