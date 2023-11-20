@@ -63,6 +63,8 @@ class _HomePageState extends State<HomePage> {
                 return Container();
               },
             ),
+            const SizedBox(height:  10),
+
             //text from Firestore Cloud DB
             StreamBuilder(
               stream: firebaseFirestore.collection('test').snapshots(),
