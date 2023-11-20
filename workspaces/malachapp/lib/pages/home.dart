@@ -37,7 +37,9 @@ class _HomePageState extends State<HomePage> {
               future: storage.getImageUrls(),
               builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                  return ListView.builder(
+                  return SizedBox(
+                    height: 100,
+                    child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
                       itemCount: snapshot.data!.length,
@@ -51,7 +53,8 @@ class _HomePageState extends State<HomePage> {
                           )
                         );
                       },
-                    );
+                    ),
+                  );
                 }
                 if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
                   return const CircularProgressIndicator();
@@ -60,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                 return Container();
               },
             ),
-            const SizedBox(height:  10),
+            const SizedBox(height:10),
 
             //text from Firestore Cloud DB
             StreamBuilder(
