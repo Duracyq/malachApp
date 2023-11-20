@@ -37,9 +37,7 @@ class _HomePageState extends State<HomePage> {
               future: storage.getImageUrls(),
               builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                  return SizedBox(
-                    height: 100,
-                    child: ListView.builder(
+                  return ListView.builder(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
                       itemCount: snapshot.data!.length,
@@ -53,8 +51,7 @@ class _HomePageState extends State<HomePage> {
                           )
                         );
                       },
-                    ),
-                  );
+                    );
                 }
                 if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
                   return const CircularProgressIndicator();
