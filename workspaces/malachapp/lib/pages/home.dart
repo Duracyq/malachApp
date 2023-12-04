@@ -23,17 +23,19 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize auth, storage, and firebaseFirestore here
+    auth = AuthService();
+    storage = Storage();
+    firebaseFirestore = FirebaseFirestore.instance;
+
+    // Now you can use these initialized values in the tabs list
     tabs = [
       HomeHome(storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
       Container(),
       Container(),
     ];
-
-    auth = AuthService();
-    storage = Storage();
-    firebaseFirestore = FirebaseFirestore.instance;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,17 +83,9 @@ class HomeHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('HOME'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () => auth.signOut(),
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
       body: Column(
         children: [
+          const SizedBox(height:25),
           Center(
             child: Column(
               children: [
@@ -108,10 +102,11 @@ class HomeHome extends StatelessWidget {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (BuildContext context, int index) {
                             return Center(
-                                child: Image.network(
-                              snapshot.data![index],
-                              fit: BoxFit.cover,
-                            ));
+                              child: Image.network(
+                                snapshot.data![index],
+                                fit: BoxFit.cover,
+                              ),
+                            );
                           },
                         ),
                       );
@@ -119,13 +114,12 @@ class HomeHome extends StatelessWidget {
                     if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
                       return const CircularProgressIndicator();
                     }
-
                     return Container();
                   },
                 ),
                 const SizedBox(height: 10),
 
-                //text from Firestore Cloud DB
+                // Text from Firestore Cloud DB
                 StreamBuilder(
                   stream: firebaseFirestore.collection('test').snapshots(),
                   builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
@@ -146,7 +140,7 @@ class HomeHome extends StatelessWidget {
                       }).toList(),
                     );
                   },
-                )
+                ),
               ],
             ),
           )
