@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/topbar.dart';
@@ -12,26 +13,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final AuthService auth = AuthService();
-  final Storage storage = Storage();
-  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  late AuthService auth;
+  late Storage storage;
+  late FirebaseFirestore firebaseFirestore;
 
   int _currentIndex = 0;
+  late List<Widget> tabs;
 
-  final tabs = [
-    HomeHome(storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
-    Container(),
-    Container(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    tabs = [
+      HomeHome(storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
+      Container(),
+      Container(),
+    ];
+
+    auth = AuthService();
+    storage = Storage();
+    firebaseFirestore = FirebaseFirestore.instance;
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: lightMode,
-      darkTheme: darkMode,
+      // theme: lightMode,
+      // darkTheme: darkMode,
       home: Scaffold(
-        appBar: CustomAppBar(),
+        appBar: const CustomAppBar(),
         body: tabs[_currentIndex],
         bottomNavigationBar: CurvedNavigationBar(
           buttonBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -81,7 +92,6 @@ class HomeHome extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const TopBarFb2(title: 'title', upperTitle: 'upperTitle'),
           Center(
             child: Column(
               children: [
