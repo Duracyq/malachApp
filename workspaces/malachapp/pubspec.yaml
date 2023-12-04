@@ -24,6 +24,8 @@ dependencies:
   file_picker: ^6.0.0
   firebase_storage: ^11.3.1
   cloud_firestore: ^4.13.1
+  curved_navigation_bar: ^1.0.3
+
 
 dev_dependencies:
   flutter_test:
@@ -38,5 +40,8 @@ flutter:
   assets:
      - assets/herb1.png
      - assets/herb2.png
+
   
+  
+ 
 
