@@ -21,8 +21,11 @@ dependencies:
   google_fonts: ^4.0.4
   firebase_admin: any
   logger: ^2.0.2+1
+  file_picker: ^6.0.0
+  firebase_storage: ^11.3.1
+  cloud_firestore: ^4.13.1
   curved_navigation_bar: ^1.0.3
-  
+
 
 dev_dependencies:
   flutter_test:
