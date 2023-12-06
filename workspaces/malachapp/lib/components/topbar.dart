@@ -22,7 +22,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+              // color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
