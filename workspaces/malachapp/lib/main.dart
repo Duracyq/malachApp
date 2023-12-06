@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:malachapp/auth/auth_page.dart';
 import 'package:malachapp/firebase_options.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
-import 'package:malachapp/pages/home.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: lightMode,
       darkTheme: darkMode,
-      home: const HomePage(),
+      home: const FirebaseAuthPage(),
     );
   }
 }
