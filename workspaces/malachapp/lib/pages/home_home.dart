@@ -21,6 +21,13 @@ class _HomeHomeState extends State<HomeHome> {
   int current = 0;
   PageController pageController = PageController();
 
+  // final ScrollController _controllerwydarzen = ScrollController();
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _controllerwydarzen.jumpTo(_controllerwydarzen.position.maxScrollExtent);
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -120,21 +127,42 @@ class _HomeHomeState extends State<HomeHome> {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    icons[current],
-                    size: 200,
-                    color: Colors.deepPurpleAccent,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.all(25),
+                    child: Center(
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "${items[current]} Tab Content",
-                    style: GoogleFonts.ubuntu(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 30,
-                        color: Colors.deepPurpleAccent),
-                  ),
+                  // StreamBuilder(
+                  //   stream: FirebaseFirestore.instance
+                  //       .collection('wydarzenia')
+                  //       .orderBy('data')
+                  //       .snapshots(),
+                  //   builder: (context, snapshot) {
+                  //     if (!snapshot.hasData) {
+                  //       return CircularProgressIndicator();
+                  //     }
+
+                  //     var events = snapshot.data.docs;
+
+                  //     return ListView.builder(
+                  //       itemCount: events.length,
+                  //       itemBuilder: (context, index) {
+                  //         var event =
+                  //             events[index].data() as Map<String, dynamic>;
+                  //         return Container();
+                  //       },
+                  //     );
+                  //   },
+                  // )
                 ],
               );
             },
