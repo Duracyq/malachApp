@@ -1,16 +1,55 @@
-# malachapp
+# malachApp
 
-A new Flutter project.
+## Najważniejsze/Podstawowe (Currently Working)
 
-## Getting Started
+- Ankiety SU
+- !!! Posty !!!! (progress)
+- Kalendarz wydarzeń
+- wyszukiwarka nauczycieli( numer ich sali / kiedy są w jakich klasach )
+- Spis kółek / organizacji szkolnych 
+- Tablica ogłoszeń, taka jak na dole w B (countdown do wydarzeń na dole zamiast tych zastępstw) 
+- Sekcja zajęć pozalekcyjnych - powiadomienia dla członków  
+- Publikacja artykułów uczniów przez nauczycieli (“Publikowane w imieniu: {Imie / Anonim}”)
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## 2 tura aktualizacji
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- wytypowanie najlepszego nauczyciela półrocza
+- Wsparcie ( kontakt do nas )
+- zapisywanie się do kółek, organizacji szkolnych
+- Galeria zdjęć
+- Wirtualna wycieczka po szkole(to już istnieje można to chyba tylko zaimplementować)
+- Sondaże ( nie oficjalne, luźne sondaże na różne tematy)
+- Punktacja klas ( myślę że bardzo fajny pomysł )!!!
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+## 3 tura aktualizacji
+
+- Mapa szkoły
+- Zgłoś problem
+- Quizy
+
+
+### Notes
+```
+~ Logowanie za pomocą kodu weryfikacji podanego przez nauczycieli do świadomości uczniów, taka osoba byłaby od razu przydzielana do swojej klasy, ??bez potrzeby ingerencji w RODO??~
+
+~ Konto Anonima (obejście RODO), taka osoba nie mogłaby zapisywać się na wydarzenia poprzez aplikacje, mogłaby brać udział w anonimowych ankietach oraz wyborach szkolnych ~
+
+~prototypowa klasa dla testów~
+```
+```
+Mamy serwery
+silnik database - chuj wie tak szczerze
+Nie mamy
+
+- Auth z Firebase 
+- Strona logowania
+- HomePage
+- Strona Rejestracji
+
+```
+
+
+
+
