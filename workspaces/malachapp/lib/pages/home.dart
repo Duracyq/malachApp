@@ -86,13 +86,13 @@ class HomeHome extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
+          IconButton(icon: const Icon(Icons.power_settings_new_sharp),onPressed: () {
+            auth.signOut();
+          },),
           const SizedBox(height:25),
           Center(
             child: Column(
               children: [
-                IconButton(icon: const Icon(Icons.power_settings_new_sharp),onPressed: () {
-                  auth.signOut();
-                },),
                 // Retrieving photos from FirebaseStorage
                 FutureBuilder(
                   future: storage.getImageUrls(),
