@@ -7,8 +7,6 @@ import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
-import 'dart:ui' as ui;
-
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -118,14 +116,6 @@ class HomeHome extends StatelessWidget {
                               return Center(
                                 child: CachedNetworkImage( // Use CachedNetworkImage instead of Image.network
                                   imageUrl: snapshot.data![index],
-                                  // imageBuilder: (context, imageProvider) => Container(
-                                  //   decoration: BoxDecoration(
-                                  //     image: DecorationImage(
-                                  //       image: imageProvider,
-                                  //       fit: BoxFit.fitWidth,
-                                  //     )
-                                  //   ),
-                                  // ),
                                   placeholder: (context, url) => const CircularProgressIndicator(),
                                   errorWidget: (context, url, error) => const Icon(Icons.error),
                                 ),
