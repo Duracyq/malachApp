@@ -53,3 +53,9 @@ Nie mamy
 
 
 
+## Co teraz robimy?
+### Żabka
+- wygląd postów
+
+### Kajak
+- kreator postów
