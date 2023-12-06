@@ -90,9 +90,12 @@ class HomeHome extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          IconButton(icon: const Icon(Icons.power_settings_new_sharp),onPressed: () {
-            auth.signOut();
-          },),
+          IconButton(
+            icon: const Icon(Icons.power_settings_new_sharp),
+            onPressed: () {
+              auth.signOut();
+            },
+          ),
           const SizedBox(height: 25),
           // Container - the test text is visible :)
           // ignore: sized_box_for_whitespace
@@ -104,8 +107,10 @@ class HomeHome extends StatelessWidget {
                   // Retrieving photos from FirebaseStorage
                   FutureBuilder(
                     future: storage.getImageUrls(),
-                    builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<String>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
                         return SizedBox(
                           height: 100,
                           child: ListView.builder(
@@ -114,39 +119,49 @@ class HomeHome extends StatelessWidget {
                             itemCount: snapshot.data!.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Center(
-                                child: CachedNetworkImage( // Use CachedNetworkImage instead of Image.network
+                                child: CachedNetworkImage(
+                                  // Use CachedNetworkImage instead of Image.network
                                   imageUrl: snapshot.data![index],
-                                  placeholder: (context, url) => const CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+
                                 ),
                               );
                             },
                           ),
                         );
                       }
-                      if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
+                      if (snapshot.connectionState == ConnectionState.waiting ||
+                          !snapshot.hasData) {
                         return const CircularProgressIndicator();
                       }
                       return Container();
                     },
                   ),
                   const SizedBox(height: 10),
-            
+
                   // Text from Firestore Cloud DB
                   StreamBuilder(
                     stream: firebaseFirestore.collection('test').snapshots(),
-                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                            snapshot) {
                       if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       }
-          
+
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
-          
+
                       return Expanded(
                         child: ListView(
-                          children: snapshot.data!.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> document) {
+                          children: snapshot.data!.docs.map(
+                              (QueryDocumentSnapshot<Map<String, dynamic>>
+                                  document) {
                             Map<String, dynamic> data = document.data();
                             return ListTile(
                               title: Text(data['test']),
