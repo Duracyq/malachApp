@@ -9,6 +9,7 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
@@ -89,6 +90,9 @@ class HomeHome extends StatelessWidget {
           Center(
             child: Column(
               children: [
+                IconButton(icon: const Icon(Icons.power_settings_new_sharp),onPressed: () {
+                  auth.signOut();
+                },),
                 // Retrieving photos from FirebaseStorage
                 FutureBuilder(
                   future: storage.getImageUrls(),
