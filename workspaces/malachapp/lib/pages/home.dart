@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -110,9 +111,11 @@ class HomeHome extends StatelessWidget {
                             itemCount: snapshot.data!.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Center(
-                                child: Image.network(
-                                  snapshot.data![index],
+                                child: CachedNetworkImage( // Use CachedNetworkImage instead of Image.network
+                                  imageUrl: snapshot.data![index],
                                   fit: BoxFit.cover,
+                                  placeholder: (context, url) => CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) => Icon(Icons.error),
                                 ),
                               );
                             },
@@ -151,26 +154,6 @@ class HomeHome extends StatelessWidget {
                         );
                       },
                     ),
-                  // test2
-                    // StreamBuilder<QuerySnapshot>(
-                    //   stream: firebaseFirestore.collection('test').snapshots(),
-                    //   builder: (context, snapshot) {
-                    //     List<Row> testWidgets = [];
-                    //     if(snapshot.hasData) {
-                    //       final tests = snapshot.data?.docs.reversed.toList();
-                    //       for( var test in tests! ) {
-                    //         final testWidget = Row(children: [
-                    //           Text(test['test']),
-                    //         ],);
-                    //       } 
-                    //     }
-                    //     return Expanded(
-                    //       child: ListView(
-                    //         children: testWidgets,
-                    //       ),
-                    //     );
-                    //   } 
-                    //   )
                 ],
               ),
             ),
