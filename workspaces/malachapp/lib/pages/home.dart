@@ -7,7 +7,10 @@ import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
+<<<<<<< HEAD
 import 'dart:ui' as ui;
+=======
+>>>>>>> 41f846001ec57f6b812237172455418c23f45ada
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -123,6 +126,7 @@ class HomeHome extends StatelessWidget {
                                 child: CachedNetworkImage(
                                   // Use CachedNetworkImage instead of Image.network
                                   imageUrl: snapshot.data![index],
+<<<<<<< HEAD
                                   // imageBuilder: (context, imageProvider) => Container(
                                   //   decoration: BoxDecoration(
                                   //     image: DecorationImage(
@@ -131,10 +135,17 @@ class HomeHome extends StatelessWidget {
                                   //     )
                                   //   ),
                                   // ),
+=======
+                                  fit: BoxFit.cover,
+>>>>>>> 41f846001ec57f6b812237172455418c23f45ada
                                   placeholder: (context, url) =>
                                       const CircularProgressIndicator(),
                                   errorWidget: (context, url, error) =>
                                       const Icon(Icons.error),
+<<<<<<< HEAD
+=======
+
+>>>>>>> 41f846001ec57f6b812237172455418c23f45ada
                                 ),
                               );
                             },
