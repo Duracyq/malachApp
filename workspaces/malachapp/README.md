@@ -58,4 +58,4 @@ Nie mamy
 - wygląd postów
 
 ### Kajak
-- kreator postów
+- ~~kreator postów~~
