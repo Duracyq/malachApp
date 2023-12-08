@@ -4,6 +4,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/topbar.dart';
+import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
@@ -127,7 +128,6 @@ class HomeHome extends StatelessWidget {
                                       const CircularProgressIndicator(),
                                   errorWidget: (context, url, error) =>
                                       const Icon(Icons.error),
-
                                 ),
                               );
                             },
@@ -142,7 +142,6 @@ class HomeHome extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 10),
-
                   // Text from Firestore Cloud DB
                   StreamBuilder(
                     stream: firebaseFirestore.collection('test').snapshots(),
@@ -177,6 +176,13 @@ class HomeHome extends StatelessWidget {
           )
         ],
       ),
+      
+      // kreator postów
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const CreatorPage())
+        );
+      }),
     );
   }
 }
