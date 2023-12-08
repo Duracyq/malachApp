@@ -123,6 +123,14 @@ class HomeHome extends StatelessWidget {
                                 child: CachedNetworkImage(
                                   // Use CachedNetworkImage instead of Image.network
                                   imageUrl: snapshot.data![index],
+                                  // imageBuilder: (context, imageProvider) => Container(
+                                  //   decoration: BoxDecoration(
+                                  //     image: DecorationImage(
+                                  //       image: imageProvider,
+                                  //       fit: BoxFit.fitWidth,
+                                  //     )
+                                  //   ),
+                                  // ),
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) =>
                                       const CircularProgressIndicator(),
