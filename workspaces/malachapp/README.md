@@ -10,6 +10,7 @@
 - Tablica ogłoszeń, taka jak na dole w B (countdown do wydarzeń na dole zamiast tych zastępstw) 
 - Sekcja zajęć pozalekcyjnych - powiadomienia dla członków  
 - Publikacja artykułów uczniów przez nauczycieli (“Publikowane w imieniu: {Imie / Anonim}”)
+- Propozycje uczniów do Samorządu Uczniowskiego
 
 
 ## 2 tura aktualizacji
@@ -59,3 +60,4 @@ Nie mamy
 
 ### Kajak
 - ~~kreator postów~~
+- kreator Ankiet
