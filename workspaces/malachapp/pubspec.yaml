@@ -1,6 +1,8 @@
 name: malachapp
 description: malachapp.
 
+
+
 publish_to: 'none' 
 
 
@@ -14,7 +16,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-
+  flutter_launcher_icons: ^0.13.1
   cupertino_icons: ^1.0.2
   firebase_core: ^2.18.0
   firebase_auth: ^4.11.0
@@ -28,6 +30,10 @@ dependencies:
   cached_network_image: ^3.3.0
   firebase_app_check: any
 
+flutter_icons:
+  image_path: "assets/icon.png"
+  android: true
+  ios: true
 
 dev_dependencies:
   flutter_test:
