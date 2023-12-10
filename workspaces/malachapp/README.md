@@ -60,3 +60,4 @@ Nie mamy
 
 ### Kajak
 - ~~kreator postów~~
+- kreator Ankiet
