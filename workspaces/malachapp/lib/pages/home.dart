@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/creator.dart';
+import 'package:malachapp/pages/poll_page.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
     tabs = [
       HomeHome(
           storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
-      Container(),
+      const PollPage(),
       Container(),
     ];
   }
