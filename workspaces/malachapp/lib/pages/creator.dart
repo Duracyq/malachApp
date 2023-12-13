@@ -62,7 +62,7 @@ class _CreatorPageState extends State<CreatorPage> {
           ),
 
           // show post contaiment 
-          StreamBuilder(
+        StreamBuilder(
           stream: _postsStream,
           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
