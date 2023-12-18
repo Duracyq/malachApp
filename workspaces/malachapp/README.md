@@ -60,4 +60,5 @@ Nie mamy
 
 ### Kajak
 - ~~kreator postów~~
-- kreator Ankiet
+- ~~kreator Ankiet~~
+- refresh content of the app
