@@ -33,6 +33,7 @@ android {
     }
 
     kotlinOptions {
+
         jvmTarget = '1.8'
     }
 
@@ -45,10 +46,11 @@ android {
         applicationId "com.example.malachapp"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 21
-        targetSdkVersion 33
+        minSdkVersion 21 
+        targetSdkVersion 33  
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        // multiDexEnabled true
     }
 
     buildTypes {
@@ -64,4 +66,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    // implementation 'androidx.multidex:multidex:2.0.1'
+}

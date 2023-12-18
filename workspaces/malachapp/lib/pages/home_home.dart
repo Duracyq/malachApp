@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class HomeHome extends StatefulWidget {
-  const HomeHome({super.key});
+class HomeHomeWidget extends StatefulWidget {
+  const HomeHomeWidget({super.key});
 
   @override
-  State<HomeHome> createState() => _HomeHomeState();
+  State<HomeHomeWidget> createState() => _HomeHomeWidgetState();
 }
 
-class _HomeHomeState extends State<HomeHome> {
+class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   //! Z A K L A D K I
   List<String> items = [
     "Wydarzenia",

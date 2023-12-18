@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/creator.dart';
+import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/poll_page.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -40,7 +41,7 @@ class _HomePageState extends State<HomePage> {
       HomeHome(
           storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
       const PollPage(),
-      Container(),
+      const EventListPage(),
     ];
   }
 
@@ -60,9 +61,9 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Theme.of(context).colorScheme.background,
           height: 49,
           items: const [
-            Icon(Icons.list_outlined),
-            Icon(Icons.list_outlined),
-            Icon(Icons.list_outlined),
+            Icon(Icons.home_rounded),
+            Icon(Icons.poll),
+            Icon(Icons.calendar_month),
           ],
           onTap: (index) {
             setState(() {
@@ -77,11 +78,11 @@ class _HomePageState extends State<HomePage> {
 
 class HomeHome extends StatelessWidget {
   const HomeHome({
-    Key? key,
+    super.key,
     required this.storage,
     required this.firebaseFirestore,
     required this.auth,
-  }) : super(key: key);
+  });
 
   final Storage storage;
   final FirebaseFirestore firebaseFirestore;
