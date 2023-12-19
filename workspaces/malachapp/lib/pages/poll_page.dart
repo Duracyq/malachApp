@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/text_field.dart';
 
 class PollPage extends StatelessWidget {
@@ -27,73 +28,87 @@ class PollPage extends StatelessWidget {
     );
   }
 }
-class PollList extends StatelessWidget {
+class PollList extends StatefulWidget {
   const PollList({super.key});
+
+  @override
+  State<PollList> createState() => _PollListState();
+}
+
+class _PollListState extends State<PollList> {
+  Future<void> _refresh() async {
+    setState(() {
+      FirebaseFirestore.instance.collection('polls').snapshots();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     print('Building PollList widget');
 
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('polls').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (snapshot.hasError) {
-          return Center(
-            child: Text('Error: ${snapshot.error}'),
-          );
-        }
-
-        final polls = snapshot.data!.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return {...data, 'id': doc.id};
-        }).toList();
-
-        print('Number of polls: ${polls.length}');
-
-        if (polls.isEmpty) {
-          print('No polls available');
-          return const Center(
-            child: Text('No polls available.'),
-          );
-        }
-
-        return ListView.builder(
-          itemCount: polls.length,
-          itemBuilder: (context, index) {
-            final doc = polls[index];
-            final question = doc['question'] ?? ''; // Default to an empty string if 'question' is null
-            final options = doc['options'] ?? [];
-            final docId = doc['id'] ?? ''; // Default to an empty string if 'id' is null
-
-            final optionWidgets = (options as List<dynamic>).map<Widget>((option) {
-            final optionData = option as Map<String, dynamic>;
-            final optionText = optionData['text'] ?? '';
-            final voters = optionData['voters'] as List<dynamic>?;
-
-            return VoteButton(
-              pollId: docId,
-              optionIndex: options.indexOf(option),
-              optionText: optionText,
-              voters: voters ?? [], // Ensure 'voters' is a list
+    return ReloadableWidget(
+      onRefresh: _refresh,
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('polls').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
             );
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+      
+          final polls = snapshot.data!.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return {...data, 'id': doc.id};
           }).toList();
-
-
-            return ListTile(
-              title: Text(question),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: optionWidgets,
-              ),
+      
+          print('Number of polls: ${polls.length}');
+      
+          if (polls.isEmpty) {
+            print('No polls available');
+            return const Center(
+              child: Text('No polls available.'),
             );
-          },
-        );
-      },
+          }
+      
+          return ListView.builder(
+            itemCount: polls.length,
+            itemBuilder: (context, index) {
+              final doc = polls[index];
+              final question = doc['question'] ?? ''; // Default to an empty string if 'question' is null
+              final options = doc['options'] ?? [];
+              final docId = doc['id'] ?? ''; // Default to an empty string if 'id' is null
+      
+              final optionWidgets = (options as List<dynamic>).map<Widget>((option) {
+              final optionData = option as Map<String, dynamic>;
+              final optionText = optionData['text'] ?? '';
+              final voters = optionData['voters'] as List<dynamic>?;
+      
+              return VoteButton(
+                pollId: docId,
+                optionIndex: options.indexOf(option),
+                optionText: optionText,
+                voters: voters ?? [], // Ensure 'voters' is a list
+              );
+            }).toList();
+      
+      
+              return ListTile(
+                title: Text(question),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: optionWidgets,
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
+import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
@@ -75,124 +76,140 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-class HomeHome extends StatelessWidget {
+class HomeHome extends StatefulWidget {
   const HomeHome({
-    super.key,
+    Key? key,
     required this.storage,
     required this.firebaseFirestore,
     required this.auth,
-  });
+  }) : super(key: key);
 
   final Storage storage;
   final FirebaseFirestore firebaseFirestore;
   final AuthService auth;
 
   @override
+  State<HomeHome> createState() => _HomeHomeState();
+}
+
+class _HomeHomeState extends State<HomeHome> {
+  late Future<List<String>> imageUrls;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> testData;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initial loading of data
+    imageUrls = widget.storage.getImageUrls();
+    testData = widget.firebaseFirestore.collection('test').snapshots();
+  }
+
+  Future<void> _refresh() async {
+    // Reload data when the user performs a refresh gesture
+    setState(() {
+      imageUrls = widget.storage.getImageUrls();
+      testData = widget.firebaseFirestore.collection('test').snapshots();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.power_settings_new_sharp),
-            onPressed: () {
-              auth.signOut();
-            },
-          ),
-          const SizedBox(height: 25),
-          // Container - the test text is visible :)
-          // ignore: sized_box_for_whitespace
-          Container(
-            height: 300,
-            child: Center(
-              child: Column(
-                children: [
-                  // Retrieving photos from FirebaseStorage
-                  FutureBuilder(
-                    future: storage.getImageUrls(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<String>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        return SizedBox(
-                          height: 100,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Center(
-                                child: CachedNetworkImage(
-                                  // Use CachedNetworkImage instead of Image.network
-                                  imageUrl: snapshot.data![index],
-                                  // imageBuilder: (context, imageProvider) => Container(
-                                  //   decoration: BoxDecoration(
-                                  //     image: DecorationImage(
-                                  //       image: imageProvider,
-                                  //       fit: BoxFit.fitWidth,
-                                  //     )
-                                  //   ),
-                                  // ),
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) =>
-                                      const CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                ),
+      body: ReloadableWidget(
+        onRefresh: _refresh,
+        child: Column(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.power_settings_new_sharp),
+              onPressed: () {
+                widget.auth.signOut();
+              },
+            ),
+            const SizedBox(height: 25),
+            Container(
+              height: 300,
+              child: Center(
+                child: Column(
+                  children: [
+                    FutureBuilder(
+                      future: widget.storage.getImageUrls(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<String>> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            snapshot.hasData) {
+                          return SizedBox(
+                            height: 100,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Center(
+                                  child: CachedNetworkImage(
+                                    imageUrl: snapshot.data![index],
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        if (snapshot.connectionState == ConnectionState.waiting ||
+                            !snapshot.hasData) {
+                          return const CircularProgressIndicator();
+                        }
+                        return Container();
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    StreamBuilder(
+                      stream: widget.firebaseFirestore
+                          .collection('test')
+                          .snapshots(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                              snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        }
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+
+                        return Expanded(
+                          child: ListView(
+                            children: snapshot.data!.docs
+                                .map(
+                                    (QueryDocumentSnapshot<Map<String, dynamic>>
+                                        document) {
+                              Map<String, dynamic> data = document.data();
+                              return ListTile(
+                                title: Text(data['test']),
                               );
-                            },
+                            }).toList(),
                           ),
                         );
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting ||
-                          !snapshot.hasData) {
-                        return const CircularProgressIndicator();
-                      }
-                      return Container();
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  // Text from Firestore Cloud DB
-                  StreamBuilder(
-                    stream: firebaseFirestore.collection('test').snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                            snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      return Expanded(
-                        child: ListView(
-                          children: snapshot.data!.docs.map(
-                              (QueryDocumentSnapshot<Map<String, dynamic>>
-                                  document) {
-                            Map<String, dynamic> data = document.data();
-                            return ListTile(
-                              title: Text(data['test']),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
-      
-      // kreator postów
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const CreatorPage())
-        );
-      }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const CreatorPage()));
+        },
+      ),
     );
   }
 }
