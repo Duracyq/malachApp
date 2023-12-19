@@ -69,6 +69,7 @@ class _HomePageState extends State<HomePage> {
           controller: _pageController,
           children: tabs,
           onPageChanged: (index) {
+            // swipe pages
             setState(() {
               _currentIndex = index;
               _bottomNavBarKey.currentState?.setPage(index);
@@ -86,6 +87,7 @@ class _HomePageState extends State<HomePage> {
             Icon(Icons.poll),
             Icon(Icons.calendar_month),
           ],
+          // swipe pages animation and BottomBar state change
           key: _bottomNavBarKey,
           onTap: (index) {
             setState(() {
@@ -129,7 +131,7 @@ class _HomeHomeState extends State<HomeHome> {
     imageUrls = widget.storage.getImageUrls();
     testData = widget.firebaseFirestore.collection('test').snapshots();
   }
-
+  // refreshing the content
   Future<void> _refresh() async {
     // Reload data when the user performs a refresh gesture
     setState(() {
@@ -152,7 +154,7 @@ class _HomeHomeState extends State<HomeHome> {
               },
             ),
             const SizedBox(height: 25),
-            Container(
+            SizedBox(
               height: 300,
               child: Center(
                 child: Column(
