@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
@@ -8,6 +9,7 @@ import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/poll_page.dart';
+import 'package:malachapp/services/fb_storage_loader.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
@@ -159,40 +161,7 @@ class _HomeHomeState extends State<HomeHome> {
               child: Center(
                 child: Column(
                   children: [
-                    FutureBuilder(
-                      future: widget.storage.getImageUrls(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<String>> snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            snapshot.hasData) {
-                          return SizedBox(
-                            height: 100,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              shrinkWrap: true,
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Center(
-                                  child: CachedNetworkImage(
-                                    imageUrl: snapshot.data![index],
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) =>
-                                        const CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        }
-                        if (snapshot.connectionState == ConnectionState.waiting ||
-                            !snapshot.hasData) {
-                          return const CircularProgressIndicator();
-                        }
-                        return Container();
-                      },
-                    ),
+                    StorageLoader(storage: widget.storage),
                     const SizedBox(height: 10),
                     StreamBuilder(
                       stream: widget.firebaseFirestore
