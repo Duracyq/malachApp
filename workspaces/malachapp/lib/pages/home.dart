@@ -27,6 +27,8 @@ class _HomePageState extends State<HomePage> {
 
   int _currentIndex = 0;
   late List<Widget> tabs;
+  late PageController _pageController;
+  late GlobalKey<CurvedNavigationBarState> _bottomNavBarKey;
 
   @override
   void initState() {
@@ -36,6 +38,9 @@ class _HomePageState extends State<HomePage> {
     auth = AuthService();
     storage = Storage();
     firebaseFirestore = FirebaseFirestore.instance;
+
+    _pageController = PageController(initialPage: _currentIndex);
+    _bottomNavBarKey = GlobalKey(); 
 
     // Now you can use these initialized values in the tabs list
     tabs = [
@@ -47,6 +52,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -54,7 +65,16 @@ class _HomePageState extends State<HomePage> {
       darkTheme: darkMode,
       home: Scaffold(
         appBar: const CustomAppBar(),
-        body: tabs[_currentIndex],
+        body: PageView(
+          controller: _pageController,
+          children: tabs,
+          onPageChanged: (index) {
+            setState(() {
+              _currentIndex = index;
+              _bottomNavBarKey.currentState?.setPage(index);
+            });
+          },
+        ),
         bottomNavigationBar: CurvedNavigationBar(
           buttonBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
           animationDuration: const Duration(milliseconds: 200),
@@ -66,9 +86,15 @@ class _HomePageState extends State<HomePage> {
             Icon(Icons.poll),
             Icon(Icons.calendar_month),
           ],
+          key: _bottomNavBarKey,
           onTap: (index) {
             setState(() {
               _currentIndex = index;
+              _pageController.animateToPage(
+                index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
             });
           },
         ),
