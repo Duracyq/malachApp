@@ -130,14 +130,14 @@ class _HomeHomeState extends State<HomeHome> {
   void initState() {
     super.initState();
     // Initial loading of data
-    imageUrls = widget.storage.getImageUrls();
+    imageUrls = widget.storage.getImageUrls('test');
     testData = widget.firebaseFirestore.collection('test').snapshots();
   }
   // refreshing the content
   Future<void> _refresh() async {
     // Reload data when the user performs a refresh gesture
     setState(() {
-      imageUrls = widget.storage.getImageUrls();
+      imageUrls = widget.storage.getImageUrls('test');
       testData = widget.firebaseFirestore.collection('test').snapshots();
     });
   }
@@ -161,7 +161,7 @@ class _HomeHomeState extends State<HomeHome> {
               child: Center(
                 child: Column(
                   children: [
-                    StorageLoader(storage: widget.storage),
+                    StorageLoader(storage: widget.storage, uri: 'test'),
                     const SizedBox(height: 10),
                     StreamBuilder(
                       stream: widget.firebaseFirestore
