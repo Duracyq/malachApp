@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,7 +28,7 @@ class PollPage extends StatelessWidget {
   }
 }
 class PollList extends StatelessWidget {
-  const PollList({Key? key}) : super(key: key);
+  const PollList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -104,12 +106,12 @@ class VoteButton extends StatefulWidget {
   final List<dynamic> voters;
 
   const VoteButton({
-    Key? key,
+    super.key,
     required this.pollId,
     required this.optionIndex,
     required this.optionText,
     required this.voters,
-  }) : super(key: key);
+  });
 
   @override
   _VoteButtonState createState() => _VoteButtonState();
