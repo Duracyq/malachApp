@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/admin/admin.dart';
 import 'package:malachapp/auth/auth_service.dart';
+import 'package:malachapp/components/text.dart';
 // import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,36 +63,44 @@ class _AdminPanelState extends State<AdminPanel> {
                   Padding(
                     padding: const EdgeInsets.only(left: 12, right: 12),
                     child: MyButton(
-                      text: 'Wyślij',
-                      onTap: () => AuthService().resetPassword(email: mail.text),
+                      myText: MyText(text: "Wyslij", fontSize: 40),
+                      onTap: () =>
+                          AuthService().resetPassword(email: mail.text),
                     ),
                   ),
-                  MyButton(text: 'STWORZ 10(na razie) UŻYTKOWNIKÓW (ADMIN_PANEL)', onTap: () => AuthCreateUser().createUsers()),
+                  MyButton(
+                      myText: MyText(
+                          text:
+                              'STWORZ 10(na razie) UŻYTKOWNIKÓW (ADMIN_PANEL)',
+                          fontSize: 40),
+                      onTap: () => AuthCreateUser().createUsers()),
                   const SizedBox(height: 10),
-                  MyTextField(hintText: 'email', controller: decipherController),
-                  MyButton(text: 'Deszyfrowanie', onTap: () {
-                    String result = AuthCreateUser().passwDecryption(decipherController.text);
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Decryption Result'),
-                          content: Text(result),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Close'),
-                            ),
-                          ],
-                        );
-                      }
-                    );
-                  }
-                ),
-              ],
-            ),
+                  MyTextField(
+                      hintText: 'email', controller: decipherController),
+                  MyButton(
+                      myText: MyText(text: 'Deszyfrowanie', fontSize: 40),
+                      onTap: () {
+                        String result = AuthCreateUser()
+                            .passwDecryption(decipherController.text);
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Decryption Result'),
+                                content: Text(result),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Close'),
+                                  ),
+                                ],
+                              );
+                            });
+                      }),
+                ],
+              ),
             ),
           ],
         ),
@@ -99,4 +108,3 @@ class _AdminPanelState extends State<AdminPanel> {
     );
   }
 }
-

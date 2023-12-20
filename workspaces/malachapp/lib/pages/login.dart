@@ -1,6 +1,7 @@
 import 'package:malachapp/auth/auth_service.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/herb.dart';
+import 'package:malachapp/components/text.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/my_button.dart';
@@ -124,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12),
                 child: MyButton(
-                  text: 'Zaloguj się',
+                  myText: MyText(text: 'Zaloguj się', fontSize: 40),
                   onTap: () => auth.AuthService().login(
                       login: loginController.text,
                       password: passwController.text),

@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/pages/adminPanel.dart';
 
+import 'package:malachapp/components/text.dart';
+
 class ResetHasla extends StatefulWidget {
   const ResetHasla({super.key});
 
@@ -86,14 +88,15 @@ class _ResetHaslaState extends State<ResetHasla> {
                   Padding(
                     padding: const EdgeInsets.only(left: 12, right: 12),
                     child: MyButton(
-                      text: 'Wyślij',
+                      myText: MyText(text: "Wyślij", fontSize: 40),
                       onTap: () =>
                           AuthService().resetPassword(email: mail.text),
                     ),
                   ),
-                  MyButton(text: '(ADMIN_PANEL)', onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const AdminPanel()))
-                  ),
+                  MyButton(
+                      myText: MyText(text: '(ADMIN_PANEL)', fontSize: 40),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const AdminPanel()))),
 
                   // jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
                   // Container(

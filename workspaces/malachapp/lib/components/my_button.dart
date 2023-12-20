@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:malachapp/components/text.dart';
 
 class MyButton extends StatelessWidget {
-  final String text;
-  const MyButton({super.key, required this.text, required this.onTap});
+  final MyText myText;
   final void Function()? onTap;
+
+  const MyButton({Key? key, required this.myText, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +17,13 @@ class MyButton extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(12),
         ),
-        padding: EdgeInsets.all(25),
+        padding: EdgeInsets.all(15),
         child: Center(
-          child: Text(
-            text,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          child: MyText(
+            text: myText.text,
+            fontSize: myText.fontSize,
+            textColor: myText.textColor,
+            underline: myText.underline,
           ),
         ),
       ),
