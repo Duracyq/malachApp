@@ -1,7 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
@@ -108,11 +106,11 @@ class _HomePageState extends State<HomePage> {
 }
 class HomeHome extends StatefulWidget {
   const HomeHome({
-    Key? key,
+    super.key,
     required this.storage,
     required this.firebaseFirestore,
     required this.auth,
-  }) : super(key: key);
+  });
 
   final Storage storage;
   final FirebaseFirestore firebaseFirestore;
