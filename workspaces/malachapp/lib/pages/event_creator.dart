@@ -2,27 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EventCreatorPage extends StatefulWidget {
-  const EventCreatorPage({super.key});
+  const EventCreatorPage({Key? key}) : super(key: key);
 
   @override
   _EventCreatorPageState createState() => _EventCreatorPageState();
 }
 
 class _EventCreatorPageState extends State<EventCreatorPage> {
-  final TextEditingController dateController = TextEditingController();
-  final TextEditingController monthController = TextEditingController();
-  final TextEditingController yearController = TextEditingController();
+  DateTime? selectedDate;
+
   final TextEditingController descriptionController = TextEditingController();
   bool isEnrollAvailable = false;
 
   Future<void> _addEvent() async {
     await FirebaseFirestore.instance.collection('events').add({
-      'date': dateController.text,
-      'month': monthController.text,
-      'year': yearController.text,
+      'date': selectedDate?.day,
+      'month': selectedDate?.month,
+      'year': selectedDate?.year,
       'description': descriptionController.text,
       'isEnrollAvailable': isEnrollAvailable,
     });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
   }
 
   @override
@@ -36,17 +50,11 @@ class _EventCreatorPageState extends State<EventCreatorPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: dateController,
-              decoration: const InputDecoration(labelText: 'Date'),
-            ),
-            TextField(
-              controller: monthController,
-              decoration: const InputDecoration(labelText: 'Month'),
-            ),
-            TextField(
-              controller: yearController,
-              decoration: const InputDecoration(labelText: 'Year'),
+            ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: Text(selectedDate != null
+                  ? 'Selected Date: ${selectedDate!.toLocal()}'
+                  : 'Select Date'),
             ),
             TextField(
               controller: descriptionController,

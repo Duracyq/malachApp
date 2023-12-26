@@ -1,56 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/event_creator.dart';
 
-class EventListPage extends StatelessWidget {
+class EventListPage extends StatefulWidget {
   const EventListPage({super.key});
 
   @override
+  State<EventListPage> createState() => _EventListPageState();
+}
+
+class _EventListPageState extends State<EventListPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+  Future<void> _refresh() async {
+    setState(() {
+      FirebaseFirestore.instance.collection('events').snapshots();
+    });
+  }
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Event List'),
-      ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('events').snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          }
-
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Text('No events found');
-          }
-
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              var event = snapshot.data!.docs[index];
-              return ListTile(
-                title: Text(event['description']),
-                onTap: () {
-                  // Navigate to EventPage with eventId
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EventPage(eventId: event.id),
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const EventCreatorPage())
+    return ReloadableWidget(
+      onRefresh: _refresh,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Event List'),
+        ),
+        body: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('events').snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+      
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+      
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Text('No events found');
+            }
+      
+            return ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                var event = snapshot.data!.docs[index];
+                return ListTile(
+                  title: Text(event['description']),
+                  onTap: () {
+                    // Navigate to EventPage with eventId
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EventPage(eventId: event.id),
+                      ),
+                    );
+                  },
+                );
+              },
             );
-          }, child: const Icon(Icons.post_add_rounded),),
+          },
+        ),
+        floatingActionButton: FloatingActionButton(onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const EventCreatorPage())
+              );
+            }, child: const Icon(Icons.post_add_rounded),),
+      ),
     );
   }
 }
