@@ -4,10 +4,12 @@ import 'package:malachapp/components/herb.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({super.key});
+  CustomAppBar({super.key});
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -20,16 +22,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Container(
           height: 50,
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
             child: Container(
               // color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
 
                 // Ustawienie drugiego elementu na skraju
                 children: <Widget>[
                   // Pierwszy element (na środku)
-                  SizedBox(width: 46),
+                  SizedBox(width: 60),
                   Container(
                     width: 200, // Dostosuj szerokość według potrzeb
                     height: 100, // Dostosuj wysokość według potrzeb
@@ -55,11 +57,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   // Drugi element (maksymalnie na prawo)
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.settings),
-                    iconSize: 24,
-                  )
+                  // IconButton(
+                  //   onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  //   icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                  //   alignment: Alignment.topLeft,
+                  // )
                   //Image.asset('assets/herb1.png'),
                 ],
               ),

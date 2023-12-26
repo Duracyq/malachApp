@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
+import 'package:malachapp/components/drawer.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/creator.dart';
@@ -29,6 +30,8 @@ class _HomePageState extends State<HomePage> {
   late List<Widget> tabs;
   late PageController _pageController;
   late GlobalKey<CurvedNavigationBarState> _bottomNavBarKey;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 
   @override
   void initState() {
@@ -64,7 +67,10 @@ class _HomePageState extends State<HomePage> {
       theme: lightMode,
       darkTheme: darkMode,
       home: Scaffold(
-        appBar: const CustomAppBar(),
+        key: _scaffoldKey,
+        appBar: CustomAppBar(),
+        drawer: null,
+        endDrawer: CustomDrawer(),
         body: PageView(
           controller: _pageController,
           children: tabs,
