@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
+  const CustomDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -31,8 +33,8 @@ class CustomDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text('Profile'),
+              leading: const Icon(Icons.account_circle),
+              title: const Text('Profile'),
               onTap: () {
                 // Update the state of the app
                 // Then close the drawer
@@ -40,8 +42,8 @@ class CustomDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
               onTap: () {
                 // Update the state of the app
                 // Then close the drawer
