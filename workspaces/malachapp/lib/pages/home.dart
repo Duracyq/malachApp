@@ -10,6 +10,7 @@ import 'package:malachapp/pages/event_page.dart';
 // import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/poll_page.dart';
 import 'package:malachapp/services/fb_storage_loader.dart';
+// import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
@@ -97,7 +98,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class HomeHome extends StatefulWidget {
-  const HomeHome({
+  HomeHome({
     super.key,
     required this.storage,
     required this.firebaseFirestore,
@@ -115,6 +116,7 @@ class HomeHome extends StatefulWidget {
 class _HomeHomeState extends State<HomeHome> {
   late Future<List<String>> imageUrls;
   late Stream<QuerySnapshot<Map<String, dynamic>>> testData;
+  // final notificationService = NotificationService();
 
   @override
   void initState() {
@@ -178,6 +180,15 @@ class _HomeHomeState extends State<HomeHome> {
                         );
                       },
                     ),
+                    // ElevatedButton(
+                    //     onPressed: () {
+                    //       notificationService.showNotification(
+                    //         title: 'New Notification',
+                    //         body: 'This is a notification message.',
+                    //       );
+                    //     },
+                    //     child: Text('Show Notification'),
+                    //   ),
                   ],
                 ),
               ),

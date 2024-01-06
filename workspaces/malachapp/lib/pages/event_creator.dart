@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:malachapp/auth/admin/firebase_api.dart';
 
 class EventCreatorPage extends StatefulWidget {
   const EventCreatorPage({Key? key}) : super(key: key);
@@ -21,6 +22,10 @@ class _EventCreatorPageState extends State<EventCreatorPage> {
       'year': selectedDate?.year,
       'description': descriptionController.text,
       'isEnrollAvailable': isEnrollAvailable,
+    }).then((eventDocument) {
+      if(eventDocument.id.isNotEmpty) {
+        FirebaseApi().initNotifications();
+      }
     });
   }
 
