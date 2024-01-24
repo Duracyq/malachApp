@@ -6,7 +6,7 @@ MalachApp is an application created specifically for students and teachers, aimi
 ### SU Surveys
 - Participate in surveys organized by the Student Council.
 
-### Posts !!!!
+### Posts
 - Share information, communicate with other students through posts.
 
 ### Events Calendar
@@ -28,9 +28,6 @@ MalachApp is an application created specifically for students and teachers, aimi
 - Teachers can publish students' articles on their behalf.
 
 ## 2nd Update Round
-### Selection of the Best Teacher of the Semester
-- Vote for the best teacher in each category.
-
 ### Support (Contact Us)
 - Use the available contact information to seek support when needed.
 
@@ -45,19 +42,9 @@ MalachApp is an application created specifically for students and teachers, aimi
 
 ### Polls
 - Participate in unofficial polls on various topics.
-
-### Class Points
-- Track class points and compete with others.
-
 ## 3rd Update Round
-### School Map
-- View the school map to navigate the premises easily.
-
 ### Report a Problem
 - Quickly report problems in the school using the dedicated feature.
-
-### Quizzes
-- Test your knowledge with quizzes available in the application.
 
 ## Login with Verification Code
 - Thanks to the verification code provided by teachers, students can log in without the need for interference with GDPR.
