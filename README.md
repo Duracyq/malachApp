@@ -6,7 +6,7 @@ MalachApp is an application created specifically for students and teachers, aimi
 ### SU Surveys
 - Participate in surveys organized by the Student Council.
 
-### Posts !!!!
+### Posts
 - Share information, communicate with other students through posts.
 
 ### Events Calendar
