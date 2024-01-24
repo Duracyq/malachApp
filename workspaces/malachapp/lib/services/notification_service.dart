@@ -9,8 +9,10 @@ class NotificationService {
   Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
+
     final InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
+
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -32,8 +34,10 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
     );
+
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
+
     await _flutterLocalNotificationsPlugin.show(
       0,
       title,
@@ -41,6 +45,4 @@ class NotificationService {
       platformChannelSpecifics,
     );
   }
-
-  
 }
