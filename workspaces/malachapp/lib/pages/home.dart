@@ -7,8 +7,10 @@ import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
+// import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/poll_page.dart';
 import 'package:malachapp/services/fb_storage_loader.dart';
+// import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
@@ -28,7 +30,6 @@ class _HomePageState extends State<HomePage> {
 
   int _currentIndex = 0;
   late List<Widget> tabs;
-  late PageController _pageController;
   late GlobalKey<CurvedNavigationBarState> _bottomNavBarKey;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -42,13 +43,11 @@ class _HomePageState extends State<HomePage> {
     storage = Storage();
     firebaseFirestore = FirebaseFirestore.instance;
 
-    _pageController = PageController(initialPage: _currentIndex);
     _bottomNavBarKey = GlobalKey(); 
 
     // Now you can use these initialized values in the tabs list
     tabs = [
-      HomeHome(
-          storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
+      HomeHome(storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
       const PollPage(),
       const EventListPage(),
     ];
@@ -56,7 +55,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _pageController.dispose();
     super.dispose();
   }
 
@@ -70,17 +68,10 @@ class _HomePageState extends State<HomePage> {
         key: _scaffoldKey,
         appBar: CustomAppBar(),
         drawer: null,
-        endDrawer: CustomDrawer(),
-        body: PageView(
-          controller: _pageController,
+        endDrawer: const CustomDrawer(),
+        body: IndexedStack(
+          index: _currentIndex,
           children: tabs,
-          onPageChanged: (index) {
-            // swipe pages
-            setState(() {
-              _currentIndex = index;
-              _bottomNavBarKey.currentState?.setPage(index);
-            });
-          },
         ),
         bottomNavigationBar: CurvedNavigationBar(
           buttonBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -98,11 +89,6 @@ class _HomePageState extends State<HomePage> {
           onTap: (index) {
             setState(() {
               _currentIndex = index;
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
             });
           },
         ),
@@ -110,8 +96,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 class HomeHome extends StatefulWidget {
-  const HomeHome({
+  HomeHome({
     super.key,
     required this.storage,
     required this.firebaseFirestore,
@@ -129,6 +116,7 @@ class HomeHome extends StatefulWidget {
 class _HomeHomeState extends State<HomeHome> {
   late Future<List<String>> imageUrls;
   late Stream<QuerySnapshot<Map<String, dynamic>>> testData;
+  // final notificationService = NotificationService();
 
   @override
   void initState() {
@@ -153,12 +141,6 @@ class _HomeHomeState extends State<HomeHome> {
         onRefresh: _refresh,
         child: Column(
           children: [
-            IconButton(
-              icon: const Icon(Icons.power_settings_new_sharp),
-              onPressed: () {
-                widget.auth.signOut();
-              },
-            ),
             const SizedBox(height: 25),
             SizedBox(
               height: 300,
@@ -198,6 +180,15 @@ class _HomeHomeState extends State<HomeHome> {
                         );
                       },
                     ),
+                    // ElevatedButton(
+                    //     onPressed: () {
+                    //       notificationService.showNotification(
+                    //         title: 'New Notification',
+                    //         body: 'This is a notification message.',
+                    //       );
+                    //     },
+                    //     child: Text('Show Notification'),
+                    //   ),
                   ],
                 ),
               ),

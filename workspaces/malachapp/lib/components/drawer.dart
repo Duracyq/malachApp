@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:malachapp/auth/auth_service.dart';
+import 'package:malachapp/components/topbar.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -45,11 +47,13 @@ class CustomDrawer extends StatelessWidget {
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
               onTap: () {
-                // Update the state of the app
-                // Then close the drawer
-                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: ((context) => SettingsPage()))
+                );
               },
             ),
+            SizedBox(height: 50),
+            IconButton(onPressed: () => AuthService().signOut(), icon: Icon(Icons.power_settings_new_rounded))
           ],
         ),
       ),
