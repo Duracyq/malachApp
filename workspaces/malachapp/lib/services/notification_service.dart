@@ -87,7 +87,7 @@ Future<void> backgroundMessageHandler(RemoteMessage message) async {
   try {
     final Map<String, dynamic> fcmPayload = {
       'notification': {
-        'title': 'Your Notification Title',
+        'title': 'UWAGA!',
         'body': message,
       },
       'data': {
