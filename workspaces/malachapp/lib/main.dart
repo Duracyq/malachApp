@@ -7,13 +7,13 @@ import 'package:malachapp/firebase_options.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:malachapp/pages/poll_page.dart';
-// import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
-final navKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,30 +25,30 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  // final NotificationService _notificationService = NotificationService();
   @override
   Widget build(BuildContext context) {
-
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: lightMode,
-      darkTheme: darkMode,
-      home: ChangeNotifierProvider(
+    return ChangeNotifierProvider<UserNotificationPreferences>(
         create: (context) => UserNotificationPreferences(),
-        child: const FirebaseAuthPage()),
-      navigatorKey: navKey,
-      routes: ({
-        '/event':(context) => const EventListPage(),
-        '/polls':(context) => const PollList(),
+      child: MaterialApp(
+        navigatorKey: navKey,
+        scaffoldMessengerKey: scaffoldMessengerKey,
+        debugShowCheckedModeBanner: false,
+        theme: lightMode,
+        darkTheme: darkMode,
+        home:  const FirebaseAuthPage(),
+      routes: {
+        '/event': (context) => const EventListPage(),
+        '/polls': (context) => const PollList(),
         '/notifications': (context) => NotificationsSubscriptionPage(),
-      }),
+      },
+      ),
     );
   }
 }

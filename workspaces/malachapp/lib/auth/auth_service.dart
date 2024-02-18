@@ -1,4 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:malachapp/main.dart';
+import 'package:malachapp/pages/notification_subs_page.dart';
+import 'package:malachapp/services/notification_service.dart';
+import 'package:malachapp/services/subscribe_to_noti.dart';
 
 enum AuthStatus {
   successful,
@@ -6,6 +12,7 @@ enum AuthStatus {
   emailAlreadyExists,
   invalidEmail,
   weakPassword,
+  firstLogin,
   unknown,
 }
 
@@ -56,15 +63,56 @@ class AuthExceptionHandler {
 class AuthService {
   final _auth = FirebaseAuth.instance;
   AuthStatus _status = AuthStatus.unknown;
-  
+
+  // Define a GlobalKey for NavigatorState
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   Future<AuthStatus> login({
     required String login,
     required String password,
   }) async {
     try {
       await _auth.signInWithEmailAndPassword(email: login, password: password);
+      bool isFirstLogin = _auth.currentUser?.metadata.creationTime == _auth.currentUser?.metadata.lastSignInTime; // Update this condition as per your logic
+
+      if (true && navKey.currentContext != null) {
+        SubscribeNotifications().subscribe('polls');
+        SubscribeNotifications().subscribe('events');
+        SubscribeNotifications().subscribe('posts');
+        
+        // Show a dialog
+        await showDialog(
+          context: navKey.currentContext!, // Use navigator key context
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Welcome!'),
+              content: Text(
+                'It seems like you are logging in from a new device. '
+                'Would you like to set up your notification subscriptions?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(), // Close dialog
+                  child: Text('Later'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Use navigatorKey to navigate
+                    Navigator.of(context).pushNamed(
+                      '/notifications'
+                    );
+                    
+                  },
+                  child: Text('Setup Subscriptions'),
+                ),
+              ],
+            );
+          },
+        );
+      }
       _status = AuthStatus.successful;
-    } on  FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e) {
       _status = AuthExceptionHandler.handleAuthException(e);
     }
     return _status;
@@ -87,3 +135,46 @@ class AuthService {
     return _status;
   }
 }
+
+
+class UserSettingsService {
+  final _auth = FirebaseAuth.instance;
+
+  Future<void> handleFirstLoginSubscriptions(BuildContext context) async {
+    if (_auth.currentUser != null) {
+      // Check if this is the first login from a new device
+      if (_auth.currentUser!.metadata.creationTime ==
+          _auth.currentUser!.metadata.lastSignInTime) {
+        // Show a dialog to ask the user for subscriptions
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Welcome!'),
+              content: Text(
+                'It seems like you are logging in from a new device. '
+                'Would you like to set up your notification subscriptions?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text('Later'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Navigate to the subscription page
+                    Navigator.pushNamed(context, '/notifications');
+                  },
+                  child: Text('Setup Subscriptions'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+}
+

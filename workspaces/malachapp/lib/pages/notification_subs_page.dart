@@ -1,43 +1,51 @@
-import 'dart:convert';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/subscribe_to_noti.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+// Update NotificationsSubscriptionPage to include a debug button
 class NotificationsSubscriptionPage extends StatefulWidget {
   @override
-  _NotificationsSubscriptionPageState createState() =>
-      _NotificationsSubscriptionPageState();
+  _NotificationsSubscriptionPageState createState() => _NotificationsSubscriptionPageState();
 }
 
-class _NotificationsSubscriptionPageState
-    extends State<NotificationsSubscriptionPage> {
-  final SubscribeNotifications _subscribeNotifications =
-      SubscribeNotifications();
+class _NotificationsSubscriptionPageState extends State<NotificationsSubscriptionPage> {
+  final SubscribeNotifications _subscribeNotifications = SubscribeNotifications();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications Subscription'),
+        title: const Text('Notifications Subscription'),
       ),
       body: Column(
         children: [
           _buildSubscriptionTile('polls'),
           _buildSubscriptionTile('events'),
           _buildSubscriptionTile('posts'),
-          _buildSubscriptionTile('all'),
-          SizedBox(height: 50),
-          ListTile(
-            title: Text('Send Notification to polls'),
-            onTap: () {
-              NotificationService().sendFCMMessage('polls');
-            },
-          )
+          const SizedBox(height: 50),
+          //admin privliges
+          _buildSendingTile('polls'),
+          _buildSendingTile('events'),
+          _buildSendingTile('posts')
+          
         ],
       ),
+    );
+  }
+
+  Widget _buildSendingTile(String topic) {
+    if(FirebaseAuth.instance.currentUser?.displayName != '00011@malach.com'){
+      return SizedBox();
+    }
+    return ListTile(
+            title: Text('Send Notification to $topic'),
+            onTap: () {
+              NotificationService().sendFCMMessage(topic);
+      }
     );
   }
 
@@ -48,7 +56,7 @@ class _NotificationsSubscriptionPageState
     return ListTile(
       title: Text('Subscribe to $topic'),
       onTap: () => _toggleSubscription(topic, !isSubscribed),
-      trailing: isSubscribed ? Icon(Icons.check) : null,
+      trailing: isSubscribed ? null : const Icon(Icons.check),
     );
   }
 
@@ -80,9 +88,9 @@ class _NotificationsSubscriptionPageState
     }
   }
 }
-
 class UserNotificationPreferences with ChangeNotifier {
   static const String _prefKey = 'notification_preferences';
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   // Store user's notification preferences locally
   Map<String, bool> _subscriptions = {'polls': false, 'events': false, 'posts': false, 'all': false};
@@ -107,12 +115,11 @@ class UserNotificationPreferences with ChangeNotifier {
   }
 
   Future<void> _loadPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, dynamic> savedPreferences = {
-      'polls': prefs.getBool('polls') ?? false,
-      'events': prefs.getBool('events') ?? false,
-      'posts': prefs.getBool('posts') ?? false,
-      'all': prefs.getBool('all') ?? false,
+      'polls': await _secureStorage.read(key: 'polls') == 'true',
+      'events': await _secureStorage.read(key: 'events') == 'true',
+      'posts': await _secureStorage.read(key: 'posts') == 'true',
+      'all': await _secureStorage.read(key: 'all') == 'true',
     };
 
     _subscriptions = savedPreferences.cast<String, bool>();
@@ -120,23 +127,8 @@ class UserNotificationPreferences with ChangeNotifier {
   }
 
   Future<void> _savePreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    SharedPreferencesHelper.setNotificationPreferences(_subscriptions.values.toList(), _prefKey);
-  }
-}
-
-class SharedPreferencesHelper {
-  static Future<List<bool>> getNotificationPreferences(String _prefKey) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String jsonString = prefs.getString(_prefKey) ?? '[]';
-
-    List<dynamic> jsonList = json.decode(jsonString);
-    return jsonList.map((value) => value as bool).toList();
-  }
-
-  static Future<void> setNotificationPreferences(List<bool> preferences, String _prefKey) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String jsonString = json.encode(preferences);
-    prefs.setString(_prefKey, jsonString);
+    for (var entry in _subscriptions.entries) {
+      await _secureStorage.write(key: entry.key, value: entry.value.toString());
+    }
   }
 }
