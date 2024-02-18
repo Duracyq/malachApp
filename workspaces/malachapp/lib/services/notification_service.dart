@@ -1,10 +1,26 @@
+/// notification_service.dart
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
+  static final NotificationService _instance = NotificationService._internal();
+
+  factory NotificationService() => _instance;
+
+  NotificationService._internal();
+
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  // Add a variable to store the FCM registration token
+  String? _fcmToken;
+
+  // Getter method to retrieve the FCM registration token
+  String? get fcmToken => _fcmToken;
 
   Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -15,14 +31,35 @@ class NotificationService {
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
+    // Retrieve the FCM registration token when the app starts
+    _fcmToken = await _firebaseMessaging.getToken();
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.data.isNotEmpty) {
+        print('Message data payload: ${message.data}');
+      }
+
       showNotification(
         title: message.notification?.title ?? '',
         body: message.notification?.body ?? '',
       );
     });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('Notification tapped!');
+    });
+    FirebaseMessaging.onBackgroundMessage(backgroundMessageHandler);
   }
 
+Future<void> backgroundMessageHandler(RemoteMessage message) async {
+  print('Handling a background message: ${message.messageId}');
+  // Implement your logic to handle the FCM message when the app is in the background
+  // For example, you can schedule a local notification here
+  showNotification(
+    title: message.notification?.title ?? '',
+    body: message.notification?.body ?? '',
+  );
+}
   Future<void> showNotification({
     required String title,
     required String body,
@@ -44,5 +81,66 @@ class NotificationService {
       body,
       platformChannelSpecifics,
     );
+  }
+
+  Future<void> sendFCMMessage(String message) async {
+    try {
+      final Map<String, dynamic> fcmPayload = {
+        'notification': {
+          'title': 'Your Notification Title',
+          'body': message,
+        },
+        'data': {
+          'message': message,
+        },
+        'priority': 'high',
+        'to': '/topics/all',
+      };
+
+      final String jsonPayload = jsonEncode(fcmPayload);
+      const String serverKey = 'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
+
+      final http.Response response = await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $serverKey',
+        },
+        body: jsonPayload,
+      );
+
+      if (response.statusCode == 200) {
+        print('FCM message sent successfully: $message');
+      } else {
+        print('Failed to send FCM message. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error sending FCM message: $error');
+      throw error;
+    }
+  }
+
+  Future<void> requestNotificationPermission() async {
+    PermissionStatus status = await Permission.notification.status;
+
+    if (status.isDenied) {
+      // Permission is denied
+      PermissionStatus result = await Permission.notification.request();
+
+      if (result.isGranted) {
+        // Permission granted
+        print('Notification permission granted');
+      } else {
+        // Permission denied
+        print('Notification permission denied');
+        // You may want to show a dialog or redirect the user to app settings
+        // to enable notifications for a better user experience.
+        // For example:
+        // showNotificationPermissionDeniedDialog();
+      }
+    } else {
+      // Permission is already granted
+      print('Notification permission already granted');
+    }
   }
 }

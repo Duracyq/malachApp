@@ -31,6 +31,9 @@ dependencies:
   firebase_app_check: any
   flutter_local_notifications: ^16.3.0
   firebase_messaging: ^14.7.10
+  provider: ^6.1.1
+  permission_handler: ^11.3.0
+  http: ^0.13.6
 
 flutter_icons:
   image_path: "assets/icon.png"
