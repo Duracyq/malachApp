@@ -7,9 +7,12 @@ import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
+import 'package:malachapp/pages/message_broadcast_page.dart';
 // import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/poll_page.dart';
+import 'package:malachapp/pages/send_message_page.dart';
 import 'package:malachapp/services/fb_storage_loader.dart';
+import 'package:malachapp/services/notification_service.dart';
 // import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
@@ -170,6 +173,17 @@ class _HomeHomeState extends State<HomeHome> {
               child: Center(
                 child: Column(
                   children: [
+                    TextButton(onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => MessageBroadcastPage())
+                    ), child: const Text("Send Message Page")),
+                    // Example usage in a Flutter widget
+                    TextButton(
+                      onPressed: () async {
+                        await NotificationService().requestNotificationPermission();
+                      },
+                      child: Text('Request Notification Permission'),
+                    ),
+
                     StorageLoader(storage: widget.storage, uri: 'test'),
                     const SizedBox(height: 10),
                     StreamBuilder(
