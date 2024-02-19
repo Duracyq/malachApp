@@ -128,6 +128,54 @@ class NotificationService {
       throw error;
     }
   }
+}
+
+  Future<void> sendPersonalisedFCMMessage(
+    String message,
+    String topic,
+    String title)
+  async {
+    try {
+      final Map<String, dynamic> fcmPayload = {
+        'notification': {
+          'title': title,
+          'body': message,
+        },
+        'data': {
+          'message': message,
+        },
+        'priority': 'high',
+        'to': '/topics/$topic',
+      };
+
+      final String jsonPayload = jsonEncode(fcmPayload);
+
+      try {
+        final String serverKey = 'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
+
+        final http.Response response = await http.post(
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $serverKey',
+          },
+          body: jsonPayload
+        );
+
+        if (response.statusCode == 200) {
+          print('FCM message sent successfully: $message');
+        } else {
+          print('Failed to send FCM message. Status code: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error getting or sending FCM server key $e');
+        rethrow;
+      }
+    } catch (e) {
+      print('Error sending personalised FCM message $e');
+      rethrow;
+    }
+  }
 
   // Future<String> getServerKey() async {
   //   // Initialize Firebase Admin with your credentials

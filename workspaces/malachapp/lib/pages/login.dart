@@ -126,8 +126,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: MyButton(
                   text: 'Zaloguj się',
                   onTap: () => auth.AuthService().login(
-                      login: loginController.text,
-                      password: passwController.text),
+                    login: loginController.text,
+                    password: passwController.text,
+                  ),
                 ),
               )
               //! jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
