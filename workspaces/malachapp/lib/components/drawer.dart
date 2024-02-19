@@ -3,7 +3,9 @@ import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/herb_topbar.dart';
 import 'package:malachapp/components/topbar.dart';
+import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:malachapp/pages/settings_page.dart';
+
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -57,6 +59,8 @@ class CustomDrawer extends StatelessWidget {
               title: const Text('Settings'),
               onTap: () {
                 Navigator.of(context).push(
+               //   MaterialPageRoute(builder: (context) => NotificationsSubscriptionPage())
+               // );
                     MaterialPageRoute(builder: ((context) => SettingsPage())));
               },
             ),
