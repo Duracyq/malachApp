@@ -9,6 +9,8 @@ import 'package:malachapp/pages/poll_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:malachapp/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 final navKey = GlobalKey<NavigatorState>();
 
@@ -16,7 +18,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseAppCheck.instance.activate();
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => ThemeProvider(), child: const MyApp()));
   await FirebaseApi().initNotifications();
 }
 
@@ -31,16 +34,15 @@ class _MyAppState extends State<MyApp> {
   // final NotificationService _notificationService = NotificationService();
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: lightMode,
+      theme: Provider.of<ThemeProvider>(context).themeData,
       darkTheme: darkMode,
       home: const FirebaseAuthPage(),
       navigatorKey: navKey,
       routes: ({
-        '/event':(context) => const EventListPage(),
-        '/polls':(context) => const PollList(),
+        '/event': (context) => const EventListPage(),
+        '/polls': (context) => const PollList(),
       }),
     );
   }

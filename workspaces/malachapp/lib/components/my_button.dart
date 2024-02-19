@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:malachapp/themes/theme_provider.dart';
 
 class MyButton extends StatelessWidget {
   final String text;
