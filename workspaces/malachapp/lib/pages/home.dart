@@ -15,7 +15,8 @@ import 'package:malachapp/services/notification_service.dart';
 // import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/storage_service.dart';
 import 'package:malachapp/themes/dark_mode.dart';
-import 'package:malachapp/themes/light_mode.dart';
+import 'package:malachapp/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,7 +36,6 @@ class _HomePageState extends State<HomePage> {
   late GlobalKey<CurvedNavigationBarState> _bottomNavBarKey;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
   @override
   void initState() {
     super.initState();
@@ -45,11 +45,12 @@ class _HomePageState extends State<HomePage> {
     storage = Storage();
     firebaseFirestore = FirebaseFirestore.instance;
 
-    _bottomNavBarKey = GlobalKey(); 
+    _bottomNavBarKey = GlobalKey();
 
     // Now you can use these initialized values in the tabs list
     tabs = [
-      HomeHome(storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
+      HomeHome(
+          storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
       const PollPage(),
       const EventListPage(),
     ];
@@ -64,36 +65,57 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: lightMode,
-      darkTheme: darkMode,
+      theme: Provider.of<ThemeProvider>(context).themeData,
       home: Scaffold(
         key: _scaffoldKey,
         appBar: CustomAppBar(),
         drawer: null,
-        endDrawer: const CustomDrawer(),
+        endDrawer: CustomDrawer(),
         body: IndexedStack(
           index: _currentIndex,
           children: tabs,
         ),
-        bottomNavigationBar: CurvedNavigationBar(
-          buttonBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          animationDuration: const Duration(milliseconds: 200),
-          color: Theme.of(context).colorScheme.secondary,
-          backgroundColor: Theme.of(context).colorScheme.background,
-          height: 49,
-          items: const [
-            Icon(Icons.home_rounded),
-            Icon(Icons.poll),
-            Icon(Icons.calendar_month),
-          ],
-          // swipe pages animation and BottomBar state change
-          key: _bottomNavBarKey,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
+        bottomNavigationBar: Consumer<ThemeProvider>(
+          builder: (context, themeProvider, _) => CurvedNavigationBar(
+            animationDuration: const Duration(milliseconds: 200),
+            color: themeProvider.themeData
+                .primaryColor, // Ustaw kolor elementów nawigacji na podstawie aktualnego motywu
+            backgroundColor: themeProvider.themeData.colorScheme
+                .background, // Ustaw kolor tła na podstawie aktualnego motywu
+            height: 49,
+            items: const [
+              Icon(Icons.home_rounded),
+              Icon(Icons.poll),
+              Icon(Icons.calendar_month),
+            ],
+            key: _bottomNavBarKey,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
         ),
+
+        // bottomNavigationBar: CurvedNavigationBar(
+        //   //buttonBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        //   animationDuration: const Duration(milliseconds: 200),
+        //   color: Theme.of(context).colorScheme.secondary,
+        //   backgroundColor: Theme.of(context).colorScheme.background,
+        //   height: 49,
+        //   items: const [
+        //     Icon(Icons.home_rounded),
+        //     Icon(Icons.poll),
+        //     Icon(Icons.calendar_month),
+        //   ],
+        //   // swipe pages animation and BottomBar state change
+        //   key: _bottomNavBarKey,
+        //   onTap: (index) {
+        //     setState(() {
+        //       _currentIndex = index;
+        //     });
+        //   },
+        // ),
       ),
     );
   }
@@ -127,6 +149,7 @@ class _HomeHomeState extends State<HomeHome> {
     imageUrls = widget.storage.getImageUrls('test');
     testData = widget.firebaseFirestore.collection('test').snapshots();
   }
+
   // refreshing the content
   Future<void> _refresh() async {
     // Reload data when the user performs a refresh gesture
@@ -180,10 +203,9 @@ class _HomeHomeState extends State<HomeHome> {
 
                         return Expanded(
                           child: ListView(
-                            children: snapshot.data!.docs
-                                .map(
-                                    (QueryDocumentSnapshot<Map<String, dynamic>>
-                                        document) {
+                            children: snapshot.data!.docs.map(
+                                (QueryDocumentSnapshot<Map<String, dynamic>>
+                                    document) {
                               Map<String, dynamic> data = document.data();
                               return ListTile(
                                 title: Text(data['test']),

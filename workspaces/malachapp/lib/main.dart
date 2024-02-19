@@ -10,6 +10,7 @@ import 'package:malachapp/pages/poll_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
@@ -21,7 +22,8 @@ void main() async {
   await FirebaseAppCheck.instance.activate();
   runApp(const MyApp());
   await FirebaseApi().initNotifications();
-  FirebaseMessaging.instance.subscribeToTopic('all'); //this provides the app with global broadcast notifications
+  FirebaseMessaging.instance.subscribeToTopic(
+      'all'); //this provides the app with global broadcast notifications
 }
 
 class MyApp extends StatefulWidget {
@@ -40,7 +42,7 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: navKey,
         scaffoldMessengerKey: scaffoldMessengerKey,
         debugShowCheckedModeBanner: false,
-        theme: lightMode,
+        theme: Provider.of<ThemeProvider>(context).themeData,
         darkTheme: darkMode,
         home:  const FirebaseAuthPage(),
       routes: {

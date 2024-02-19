@@ -21,7 +21,7 @@ class NotificationService {
 
   // Getter method to retrieve the FCM registration token
   String? get fcmToken => _fcmToken;
-  
+
   Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
@@ -51,15 +51,16 @@ class NotificationService {
     FirebaseMessaging.onBackgroundMessage(backgroundMessageHandler);
   }
 
-Future<void> backgroundMessageHandler(RemoteMessage message) async {
-  print('Handling a background message: ${message.messageId}');
-  // Implement your logic to handle the FCM message when the app is in the background
-  // For example, you can schedule a local notification here
-  showNotification(
-    title: message.notification?.title ?? '',
-    body: message.notification?.body ?? '',
-  );
-}
+  Future<void> backgroundMessageHandler(RemoteMessage message) async {
+    print('Handling a background message: ${message.messageId}');
+    // Implement your logic to handle the FCM message when the app is in the background
+    // For example, you can schedule a local notification here
+    showNotification(
+      title: message.notification?.title ?? '',
+      body: message.notification?.body ?? '',
+    );
+  }
+
   Future<void> showNotification({
     required String title,
     required String body,
@@ -84,45 +85,48 @@ Future<void> backgroundMessageHandler(RemoteMessage message) async {
   }
 
   Future<void> sendFCMMessage(String message) async {
-  try {
-    final Map<String, dynamic> fcmPayload = {
-      'notification': {
-        'title': 'UWAGA!',
-        'body': message,
-      },
-      'data': {
-        'message': message,
-      },
-      'priority': 'high',
-      'to': '/topics/all',
-    };
-
-    final String jsonPayload = jsonEncode(fcmPayload);
-
     try {
-      final String serverKey = 'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
-      
-      final http.Response response = await http.post(
-        Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $serverKey',
+      final Map<String, dynamic> fcmPayload = {
+        'notification': {
+          'title': 'UWAGA!',
+          'body': message,
         },
-        body: jsonPayload,
-      );
+        'data': {
+          'message': message,
+        },
+        'priority': 'high',
+        'to': '/topics/all',
+      };
 
-      if (response.statusCode == 200) {
-        print('FCM message sent successfully: $message');
-      } else {
-        print('Failed to send FCM message. Status code: ${response.statusCode}');
+      final String jsonPayload = jsonEncode(fcmPayload);
+
+      try {
+        final String serverKey =
+            'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
+
+        final http.Response response = await http.post(
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $serverKey',
+          },
+          body: jsonPayload,
+        );
+
+        if (response.statusCode == 200) {
+          print('FCM message sent successfully: $message');
+        } else {
+          print(
+              'Failed to send FCM message. Status code: ${response.statusCode}');
+        }
+      } catch (error) {
+        print('Error getting or sending FCM server key: $error');
+        throw error;
       }
     } catch (error) {
-      print('Error getting or sending FCM server key: $error');
+      print('Error sending FCM message: $error');
       throw error;
     }
-  } catch (error) {
-    print('Error sending FCM message: $error');
-    throw error;
   }
 }
 
@@ -196,8 +200,6 @@ Future<void> backgroundMessageHandler(RemoteMessage message) async {
   //     throw Exception('Failed to retrieve FCM server key');
   //   }
   // }
-
-
 
   Future<void> requestNotificationPermission() async {
     PermissionStatus status = await Permission.notification.status;

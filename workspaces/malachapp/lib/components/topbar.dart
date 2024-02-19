@@ -72,19 +72,3 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Ustawienia'),
-      ),
-      body: Center(
-        child: Text('Strona ustawień'),
-      ),
-    );
-  }
-}

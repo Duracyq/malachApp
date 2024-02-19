@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
+import 'package:malachapp/components/herb.dart';
+import 'package:malachapp/components/herb_topbar.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
+import 'package:malachapp/pages/settings_page.dart';
+
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -9,23 +13,29 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 3.5, 0, 3.5),
+      //margin: const EdgeInsets.fromLTRB(0, 3.5, 0, 3.5),
       child: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.brown[300],
-              ),
-              child: const Text(
-                'Drawer Header',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+                decoration: BoxDecoration(shape: BoxShape.circle
+                    //color: Colors.brown[300],
+
+                    ),
+                child: Container(
+                  child: Herb(),
+                  height: 30,
+                )
+                // child: const Text(
+                //   'Drawer Header',
+                //   style: TextStyle(
+                //     //color: Colors.white,
+                //     fontSize: 24,
+                //   ),
+                // ),
                 ),
-              ),
-            ),
+            SizedBox(height: 8),
             ListTile(
               leading: const Icon(Icons.message),
               title: const Text('Messages'),
@@ -49,12 +59,15 @@ class CustomDrawer extends StatelessWidget {
               title: const Text('Settings'),
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => NotificationsSubscriptionPage())
-                );
+               //   MaterialPageRoute(builder: (context) => NotificationsSubscriptionPage())
+               // );
+                    MaterialPageRoute(builder: ((context) => SettingsPage())));
               },
             ),
             SizedBox(height: 50),
-            IconButton(onPressed: () => AuthService().signOut(), icon: Icon(Icons.power_settings_new_rounded))
+            IconButton(
+                onPressed: () => AuthService().signOut(),
+                icon: Icon(Icons.power_settings_new_rounded))
           ],
         ),
       ),
