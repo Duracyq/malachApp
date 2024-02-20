@@ -20,7 +20,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseAppCheck.instance.activate();
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp()
+  ));
   await FirebaseApi().initNotifications();
   FirebaseMessaging.instance.subscribeToTopic(
       'all'); //this provides the app with global broadcast notifications
