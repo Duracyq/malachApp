@@ -129,50 +129,50 @@ class NotificationService {
     }
   }
 
-Future<void> sendPersonalisedFCMMessage(
-    String message, String topic, String title) async {
-  try {
-    final Map<String, dynamic> fcmPayload = {
-      'notification': {
-        'title': title,
-        'body': message,
-      },
-      'data': {
-        'message': message,
-      },
-      'priority': 'high',
-      'to': '/topics/$topic',
-    };
-
-    final String jsonPayload = jsonEncode(fcmPayload);
-
+  Future<void> sendPersonalisedFCMMessage(
+      String message, String topic, String title) async {
     try {
-      final String serverKey =
-          'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
+      final Map<String, dynamic> fcmPayload = {
+        'notification': {
+          'title': title,
+          'body': message,
+        },
+        'data': {
+          'message': message,
+        },
+        'priority': 'high',
+        'to': '/topics/$topic',
+      };
 
-      final http.Response response =
-          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-              headers: <String, String>{
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer $serverKey',
-              },
-              body: jsonPayload);
+      final String jsonPayload = jsonEncode(fcmPayload);
 
-      if (response.statusCode == 200) {
-        print('FCM message sent successfully: $message');
-      } else {
-        print(
-            'Failed to send FCM message. Status code: ${response.statusCode}');
+      try {
+        final String serverKey =
+            'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
+
+        final http.Response response =
+            await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+                headers: <String, String>{
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer $serverKey',
+                },
+                body: jsonPayload);
+
+        if (response.statusCode == 200) {
+          print('FCM message sent successfully: $message');
+        } else {
+          print(
+              'Failed to send FCM message. Status code: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error getting or sending FCM server key $e');
+        rethrow;
       }
     } catch (e) {
-      print('Error getting or sending FCM server key $e');
+      print('Error sending personalised FCM message $e');
       rethrow;
     }
-  } catch (e) {
-    print('Error sending personalised FCM message $e');
-    rethrow;
   }
-}
 
 // Future<String> getServerKey() async {
 //   // Initialize Firebase Admin with your credentials
@@ -198,26 +198,27 @@ Future<void> sendPersonalisedFCMMessage(
 //   }
 // }
 
-Future<void> requestNotificationPermission() async {
-  PermissionStatus status = await Permission.notification.status;
+  Future<void> requestNotificationPermission() async {
+    PermissionStatus status = await Permission.notification.status;
 
-  if (status.isDenied) {
-    // Permission is denied
-    PermissionStatus result = await Permission.notification.request();
+    if (status.isDenied) {
+      // Permission is denied
+      PermissionStatus result = await Permission.notification.request();
 
-    if (result.isGranted) {
-      // Permission granted
-      print('Notification permission granted');
+      if (result.isGranted) {
+        // Permission granted
+        print('Notification permission granted');
+      } else {
+        // Permission denied
+        print('Notification permission denied');
+        // You may want to show a dialog or redirect the user to app settings
+        // to enable notifications for a better user experience.
+        // For example:
+        // showNotificationPermissionDeniedDialog();
+      }
     } else {
-      // Permission denied
-      print('Notification permission denied');
-      // You may want to show a dialog or redirect the user to app settings
-      // to enable notifications for a better user experience.
-      // For example:
-      // showNotificationPermissionDeniedDialog();
+      // Permission is already granted
+      print('Notification permission already granted');
     }
-  } else {
-    // Permission is already granted
-    print('Notification permission already granted');
   }
 }
