@@ -130,98 +130,95 @@ class NotificationService {
   }
 }
 
-  Future<void> sendPersonalisedFCMMessage(
-    String message,
-    String topic,
-    String title)
-  async {
+Future<void> sendPersonalisedFCMMessage(
+    String message, String topic, String title) async {
+  try {
+    final Map<String, dynamic> fcmPayload = {
+      'notification': {
+        'title': title,
+        'body': message,
+      },
+      'data': {
+        'message': message,
+      },
+      'priority': 'high',
+      'to': '/topics/$topic',
+    };
+
+    final String jsonPayload = jsonEncode(fcmPayload);
+
     try {
-      final Map<String, dynamic> fcmPayload = {
-        'notification': {
-          'title': title,
-          'body': message,
-        },
-        'data': {
-          'message': message,
-        },
-        'priority': 'high',
-        'to': '/topics/$topic',
-      };
+      final String serverKey =
+          'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
 
-      final String jsonPayload = jsonEncode(fcmPayload);
+      final http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $serverKey',
+              },
+              body: jsonPayload);
 
-      try {
-        final String serverKey = 'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
-
-        final http.Response response = await http.post(
-          Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $serverKey',
-          },
-          body: jsonPayload
-        );
-
-        if (response.statusCode == 200) {
-          print('FCM message sent successfully: $message');
-        } else {
-          print('Failed to send FCM message. Status code: ${response.statusCode}');
-        }
-      } catch (e) {
-        print('Error getting or sending FCM server key $e');
-        rethrow;
+      if (response.statusCode == 200) {
+        print('FCM message sent successfully: $message');
+      } else {
+        print(
+            'Failed to send FCM message. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error sending personalised FCM message $e');
+      print('Error getting or sending FCM server key $e');
       rethrow;
     }
+  } catch (e) {
+    print('Error sending personalised FCM message $e');
+    rethrow;
   }
+}
 
-  // Future<String> getServerKey() async {
-  //   // Initialize Firebase Admin with your credentials
-  //   const String path = 'lib/auth/admin/9a5ko-35eeb1e303.json';
-  //   final admin = FirebaseAdmin.instance;
-  //   final app = await admin.initializeApp(
-  //     AppOptions(
-  //       credential: admin.certFromPath(path),
-  //     ),
-  //   );
-  //   print('Current working directory: ${Directory.current}');
+// Future<String> getServerKey() async {
+//   // Initialize Firebase Admin with your credentials
+//   const String path = 'lib/auth/admin/9a5ko-35eeb1e303.json';
+//   final admin = FirebaseAdmin.instance;
+//   final app = await admin.initializeApp(
+//     AppOptions(
+//       credential: admin.certFromPath(path),
+//     ),
+//   );
+//   print('Current working directory: ${Directory.current}');
 
-  //   // Retrieve the FCM server key from the service account credentials
-  //   final Map<String, dynamic>? credentials =
-  //       app.options.credential as Map<String, dynamic>?;
+//   // Retrieve the FCM server key from the service account credentials
+//   final Map<String, dynamic>? credentials =
+//       app.options.credential as Map<String, dynamic>?;
 
-  //   if (credentials != null && credentials.containsKey('private_key')) {
-  //     final String privateKey = credentials['private_key'] as String;
-  //     // You may need to format the privateKey if it includes line breaks or other characters
-  //     return privateKey;
-  //   } else {
-  //     throw Exception('Failed to retrieve FCM server key');
-  //   }
-  // }
+//   if (credentials != null && credentials.containsKey('private_key')) {
+//     final String privateKey = credentials['private_key'] as String;
+//     // You may need to format the privateKey if it includes line breaks or other characters
+//     return privateKey;
+//   } else {
+//     throw Exception('Failed to retrieve FCM server key');
+//   }
+// }
 
-  Future<void> requestNotificationPermission() async {
-    PermissionStatus status = await Permission.notification.status;
+Future<void> requestNotificationPermission() async {
+  PermissionStatus status = await Permission.notification.status;
 
-    if (status.isDenied) {
-      // Permission is denied
-      PermissionStatus result = await Permission.notification.request();
+  if (status.isDenied) {
+    // Permission is denied
+    PermissionStatus result = await Permission.notification.request();
 
-      if (result.isGranted) {
-        // Permission granted
-        print('Notification permission granted');
-      } else {
-        // Permission denied
-        print('Notification permission denied');
-        // You may want to show a dialog or redirect the user to app settings
-        // to enable notifications for a better user experience.
-        // For example:
-        // showNotificationPermissionDeniedDialog();
-      }
+    if (result.isGranted) {
+      // Permission granted
+      print('Notification permission granted');
     } else {
-      // Permission is already granted
-      print('Notification permission already granted');
+      // Permission denied
+      print('Notification permission denied');
+      // You may want to show a dialog or redirect the user to app settings
+      // to enable notifications for a better user experience.
+      // For example:
+      // showNotificationPermissionDeniedDialog();
     }
+  } else {
+    // Permission is already granted
+    print('Notification permission already granted');
   }
 }

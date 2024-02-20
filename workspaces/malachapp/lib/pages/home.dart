@@ -172,13 +172,16 @@ class _HomeHomeState extends State<HomeHome> {
               child: Center(
                 child: Column(
                   children: [
-                    TextButton(onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => MessageBroadcastPage())
-                    ), child: const Text("Send Message Page")),
+                    TextButton(
+                        onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => MessageBroadcastPage())),
+                        child: const Text("Send Message Page")),
                     // Example usage in a Flutter widget
                     TextButton(
                       onPressed: () async {
-                        await NotificationService().requestNotificationPermission();
+                        await NotificationService()
+                            .requestNotificationPermission();
                       },
                       child: Text('Request Notification Permission'),
                     ),
