@@ -128,7 +128,6 @@ class NotificationService {
       throw error;
     }
   }
-}
 
   Future<void> sendPersonalisedFCMMessage(
     String message,
