@@ -15,11 +15,13 @@ class _EventListPageState extends State<EventListPage> {
   void initState() {
     super.initState();
   }
+
   Future<void> _refresh() async {
     setState(() {
       FirebaseFirestore.instance.collection('events').snapshots();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return ReloadableWidget(
@@ -34,15 +36,15 @@ class _EventListPageState extends State<EventListPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
             }
-      
+
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             }
-      
+
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return const Text('No events found');
             }
-      
+
             return ListView.builder(
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
@@ -63,11 +65,13 @@ class _EventListPageState extends State<EventListPage> {
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const EventCreatorPage())
-              );
-            }, child: const Icon(Icons.post_add_rounded),),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const EventCreatorPage()));
+          },
+          child: const Icon(Icons.post_add_rounded),
+        ),
       ),
     );
   }
@@ -117,7 +121,8 @@ class EventPage extends StatelessWidget {
               children: [
                 Text(
                   '${data['date']} ${data['month']} ${data['year']}',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -136,9 +141,10 @@ class EventPage extends StatelessWidget {
               ],
             ),
           ),
-          
         );
       },
     );
   }
 }
+// tytuł, krotki opis, zdjecie, data;
+
