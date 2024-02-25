@@ -14,7 +14,6 @@ import 'package:malachapp/services/fb_storage_loader.dart';
 import 'package:malachapp/services/notification_service.dart';
 // import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/storage_service.dart';
-import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -172,13 +171,16 @@ class _HomeHomeState extends State<HomeHome> {
               child: Center(
                 child: Column(
                   children: [
-                    TextButton(onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => MessageBroadcastPage())
-                    ), child: const Text("Send Message Page")),
+                    TextButton(
+                        onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => MessageBroadcastPage())),
+                        child: const Text("Send Message Page")),
                     // Example usage in a Flutter widget
                     TextButton(
                       onPressed: () async {
-                        await NotificationService().requestNotificationPermission();
+                        await NotificationService()
+                            .requestNotificationPermission();
                       },
                       child: Text('Request Notification Permission'),
                     ),

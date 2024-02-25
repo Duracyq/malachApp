@@ -75,7 +75,7 @@ class AuthService {
       await _auth.signInWithEmailAndPassword(email: login, password: password);
       bool isFirstLogin = _auth.currentUser?.metadata.creationTime == _auth.currentUser?.metadata.lastSignInTime; // Update this condition as per your logic
 
-      if (true && navKey.currentContext != null) {
+      if (isFirstLogin && navKey.currentContext != null) {
         SubscribeNotifications().subscribe('polls');
         SubscribeNotifications().subscribe('events');
         SubscribeNotifications().subscribe('posts');

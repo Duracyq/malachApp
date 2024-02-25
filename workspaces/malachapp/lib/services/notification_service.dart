@@ -26,7 +26,7 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
 
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -101,8 +101,8 @@ class NotificationService {
       final String jsonPayload = jsonEncode(fcmPayload);
 
       try {
-        final String serverKey =
-            'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
+        const String serverKey =
+            'AAAA8jXsXOg:APA91bG0D8EQZxoTEFSJNOc2nzMjgh7IVTG4jMaQUNSGvctwQcvkoeZ23jkX_95Lrr1xfYZKE9QshjCSJ3C9LbMZL_Nj_eJeXFxVlIZWAALZjZ3Vl_bQwHP8TVVTVN_r5YcrR91mGZUi'; // Replace with your FCM server key
 
         final http.Response response = await http.post(
           Uri.parse('https://fcm.googleapis.com/fcm/send'),
@@ -128,13 +128,9 @@ class NotificationService {
       throw error;
     }
   }
-}
 
   Future<void> sendPersonalisedFCMMessage(
-    String message,
-    String topic,
-    String title)
-  async {
+      String message, String topic, String title) async {
     try {
       final Map<String, dynamic> fcmPayload = {
         'notification': {
@@ -151,21 +147,21 @@ class NotificationService {
       final String jsonPayload = jsonEncode(fcmPayload);
 
       try {
-        final String serverKey = 'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
-
-        final http.Response response = await http.post(
-          Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $serverKey',
-          },
-          body: jsonPayload
-        );
+        const String serverKey = 'AAAA8jXsXOg:APA91bG0D8EQZxoTEFSJNOc2nzMjgh7IVTG4jMaQUNSGvctwQcvkoeZ23jkX_95Lrr1xfYZKE9QshjCSJ3C9LbMZL_Nj_eJeXFxVlIZWAALZjZ3Vl_bQwHP8TVVTVN_r5YcrR91mGZUi'; // Replace with your FCM server key
+        
+        final http.Response response =
+            await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+                headers: <String, String>{
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer $serverKey',
+                },
+                body: jsonPayload);
 
         if (response.statusCode == 200) {
           print('FCM message sent successfully: $message');
         } else {
-          print('Failed to send FCM message. Status code: ${response.statusCode}');
+          print(
+              'Failed to send FCM message. Status code: ${response.statusCode}');
         }
       } catch (e) {
         print('Error getting or sending FCM server key $e');
@@ -177,29 +173,29 @@ class NotificationService {
     }
   }
 
-  // Future<String> getServerKey() async {
-  //   // Initialize Firebase Admin with your credentials
-  //   const String path = 'lib/auth/admin/9a5ko-35eeb1e303.json';
-  //   final admin = FirebaseAdmin.instance;
-  //   final app = await admin.initializeApp(
-  //     AppOptions(
-  //       credential: admin.certFromPath(path),
-  //     ),
-  //   );
-  //   print('Current working directory: ${Directory.current}');
+// Future<String> getServerKey() async {
+//   // Initialize Firebase Admin with your credentials
+//   const String path = 'lib/auth/admin/9a5ko-35eeb1e303.json';
+//   final admin = FirebaseAdmin.instance;
+//   final app = await admin.initializeApp(
+//     AppOptions(
+//       credential: admin.certFromPath(path),
+//     ),
+//   );
+//   print('Current working directory: ${Directory.current}');
 
-  //   // Retrieve the FCM server key from the service account credentials
-  //   final Map<String, dynamic>? credentials =
-  //       app.options.credential as Map<String, dynamic>?;
+//   // Retrieve the FCM server key from the service account credentials
+//   final Map<String, dynamic>? credentials =
+//       app.options.credential as Map<String, dynamic>?;
 
-  //   if (credentials != null && credentials.containsKey('private_key')) {
-  //     final String privateKey = credentials['private_key'] as String;
-  //     // You may need to format the privateKey if it includes line breaks or other characters
-  //     return privateKey;
-  //   } else {
-  //     throw Exception('Failed to retrieve FCM server key');
-  //   }
-  // }
+//   if (credentials != null && credentials.containsKey('private_key')) {
+//     final String privateKey = credentials['private_key'] as String;
+//     // You may need to format the privateKey if it includes line breaks or other characters
+//     return privateKey;
+//   } else {
+//     throw Exception('Failed to retrieve FCM server key');
+//   }
+// }
 
   Future<void> requestNotificationPermission() async {
     PermissionStatus status = await Permission.notification.status;
