@@ -54,6 +54,10 @@ flutter:
   assets:
      - assets/herb1.png
      - assets/herb2.png
+     - assets/zd1.jpg
+     - assets/zd2.jpg
+     - assets/zd3.jpg
+     
 
   
   

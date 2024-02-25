@@ -28,7 +28,7 @@ class _EventListPageState extends State<EventListPage> {
       onRefresh: _refresh,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Event List'),
+          title: const Text('Lista wydarzeń'),
         ),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('events').snapshots(),

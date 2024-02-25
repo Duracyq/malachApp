@@ -10,6 +10,7 @@ import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
+import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/message_broadcast_page.dart';
 // import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/poll_page.dart';
@@ -51,8 +52,9 @@ class _HomePageState extends State<HomePage> {
 
     // Now you can use these initialized values in the tabs list
     tabs = [
-      HomeHome(
-          storage: storage, firebaseFirestore: firebaseFirestore, auth: auth),
+      HomeHomeWidget(
+          // storage: storage, firebaseFirestore: firebaseFirestore, auth: auth
+          ),
       const PollPage(),
       const EventListPage(),
     ];
@@ -126,209 +128,207 @@ class _HomePageState extends State<HomePage> {
 class HomeHome extends StatefulWidget {
   HomeHome({
     super.key,
-    required this.storage,
-    required this.firebaseFirestore,
-    required this.auth,
+    // required this.storage,
+    // required this.firebaseFirestore,
+    // required this.auth,
   });
 
-  final Storage storage;
-  final FirebaseFirestore firebaseFirestore;
-  final AuthService auth;
+  // final Storage storage;
+  // final FirebaseFirestore firebaseFirestore;
+  // final AuthService auth;
 
   @override
   State<HomeHome> createState() => _HomeHomeState();
 }
 
 class _HomeHomeState extends State<HomeHome> {
-  late Future<List<String>> imageUrls;
-  late Stream<QuerySnapshot<Map<String, dynamic>>> testData;
-  late PageController _pageController;
-  int totalPage = 4;
+  // late Future<List<String>> imageUrls;
+  // late Stream<QuerySnapshot<Map<String, dynamic>>> testData;
+  // late PageController _pageController;
+  // int totalPage = 4;
 
   @override
-  void initState() {
-    super.initState();
-    // Initial loading of data
-    imageUrls = widget.storage.getImageUrls('test');
-    testData = widget.firebaseFirestore.collection('test').snapshots();
+  // void initState() {
+  // super.initState()
+  // Initial loading of data
+  // imageUrls = widget.storage.getImageUrls('test');
+  // testData = widget.firebaseFirestore.collection('test').snapshots();
 
-    _pageController = PageController(
-      initialPage: 0,
-    )..addListener(_onScroll);
-  }
+  // _pageController = PageController(
+  //   initialPage: 0,
+  //   ..addListener(_onScroll);
+  // }
 
 // refreshing the content
-  Future<void> _refresh() async {
-    // Reload data when the user performs a refresh gesture
-    setState(() {
-      imageUrls = widget.storage.getImageUrls('test');
-      testData = widget.firebaseFirestore.collection('test').snapshots();
-    });
-  }
+  // Future<void> _refresh() async {
+  // Reload data when the user performs a refresh gesture
+  //   setState(() {
+  //     imageUrls = widget.storage.getImageUrls('test');
+  //     testData = widget.firebaseFirestore.collection('test').snapshots();
+  //   });
+  // }
 
-  void _onScroll() {}
+  // void _onScroll() {}
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _pageController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: ReloadableWidget(
-        onRefresh: _refresh,
-        child: Column(
-          children: [
-            // const SizedBox(height: 15),
-            Column(
-              children: [
-                // StorageLoader(storage: widget.storage, uri: 'test'),
-                // const SizedBox(height: 10),
-                // StreamBuilder(
-                //   stream: widget.firebaseFirestore
-                //       .collection('test')
-                //       .snapshots(),
-                //   builder: (BuildContext context,
-                //       AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                //           snapshot) {
-                //     if (snapshot.hasError) {
-                //       return Text('Error: ${snapshot.error}');
-                //     }
+      body: Column(
+        children: [
+          // const SizedBox(height: 15),
+          Column(
+            children: [
+              // StorageLoader(storage: widget.storage, uri: 'test'),
+              // const SizedBox(height: 10),
+              // StreamBuilder(
+              //   stream: widget.firebaseFirestore
+              //       .collection('test')
+              //       .snapshots(),
+              //   builder: (BuildContext context,
+              //       AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+              //           snapshot) {
+              //     if (snapshot.hasError) {
+              //       return Text('Error: ${snapshot.error}');
+              //     }
 
-                //     if (snapshot.connectionState ==
-                //         ConnectionState.waiting) {
-                //       return const CircularProgressIndicator();
-                //     }
+              //     if (snapshot.connectionState ==
+              //         ConnectionState.waiting) {
+              //       return const CircularProgressIndicator();
+              //     }
 
-                //     return Expanded(
-                //       child: ListView(
-                //         children: snapshot.data!.docs.map(
-                //             (QueryDocumentSnapshot<Map<String, dynamic>>
-                //                 document) {
-                //           Map<String, dynamic> data = document.data();
-                //           return ListTile(
-                //             title: Text(data['test']),
-                //           );
-                //         }).toList(),
-                //       ),
-                //     );
-                //   },
-                // ),
-                // ElevatedButton(
-                //     onPressed: () {
-                //       notificationService.showNotification(
-                //         title: 'New Notification',
-                //         body: 'This is a notification message.',
-                //       );
-                //     },
-                //     child: Text('Show Notification'),
-                //   ),
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: SizedBox(
-                    width: screenWidth,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const MyText(
-                            text: "Dołącz do naszej szkolnej społeczności!",
-                            rozmiar: 16,
-                            waga: FontWeight.w400),
-                        Row(
-                          children: [
-                            const MyText(
-                                text: "Witaj ",
-                                rozmiar: 26,
-                                waga: FontWeight.w700),
-                            Text(
-                              "Amelka",
-                              style: GoogleFonts.nunito(
-                                textStyle: const TextStyle(
-                                    fontFamily: 'Nunito',
-                                    fontStyle: FontStyle.normal,
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w700),
-                              ),
+              //     return Expanded(
+              //       child: ListView(
+              //         children: snapshot.data!.docs.map(
+              //             (QueryDocumentSnapshot<Map<String, dynamic>>
+              //                 document) {
+              //           Map<String, dynamic> data = document.data();
+              //           return ListTile(
+              //             title: Text(data['test']),
+              //           );
+              //         }).toList(),
+              //       ),
+              //     );
+              //   },
+              // ),
+              // ElevatedButton(
+              //     onPressed: () {
+              //       notificationService.showNotification(
+              //         title: 'New Notification',
+              //         body: 'This is a notification message.',
+              //       );
+              //     },
+              //     child: Text('Show Notification'),
+              //   ),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: SizedBox(
+                  width: screenWidth,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const MyText(
+                          text: "Dołącz do naszej szkolnej społeczności!",
+                          rozmiar: 16,
+                          waga: FontWeight.w400),
+                      Row(
+                        children: [
+                          const MyText(
+                              text: "Witaj ",
+                              rozmiar: 26,
+                              waga: FontWeight.w700),
+                          Text(
+                            "Amelka",
+                            style: GoogleFonts.nunito(
+                              textStyle: const TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w700),
                             ),
-                            Text(
-                              "!",
-                              style: GoogleFonts.nunito(
-                                textStyle: const TextStyle(
-                                    fontFamily: 'Nunito',
-                                    fontStyle: FontStyle.normal,
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                            )
-                          ],
-                        )
-                      ],
-                    ),
+                          ),
+                          Text(
+                            "!",
+                            style: GoogleFonts.nunito(
+                              textStyle: const TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('wydarzenia')
-                        .snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Wystąpił błąd');
-                      }
+              ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('wydarzenia')
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Wystąpił błąd');
+                    }
 
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Text("Ładowanie...");
-                      }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Text("Ładowanie...");
+                    }
 
-                      return ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: snapshot.data!.docs
-                            .map((DocumentSnapshot document) {
-                          return Card(
-                            child: Column(
-                              children: <Widget>[
-                                CachedNetworkImage(
-                                  imageUrl: document.data()!['glowne_zdjecie'],
-                                  placeholder: (context, url) =>
-                                      CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      Icon(Icons.error),
-                                ),
-                                ListTile(
-                                  title: Text(document.data()['nazwa']),
-                                  subtitle: Text(document.data()['opis']),
-                                ),
-                                Wrap(
-                                  children: document
-                                      .data()['reszta_zdjec']
-                                      .map<Widget>((url) {
-                                    return CachedNetworkImage(
-                                      imageUrl: url,
-                                      placeholder: (context, url) =>
-                                          CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(Icons.error),
-                                    );
-                                  }).toList(),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  ),
-                )
-              ],
-            ),
-          ],
-        ),
+                    return ListView(
+                      scrollDirection: Axis.horizontal,
+                      children:
+                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                        return Card(
+                          child: Column(
+                            children: <Widget>[
+                              // CachedNetworkImage(
+                              //   //imageUrl: document.data()!['glowne_zdjecie'],
+                              //   placeholder: (context, url) =>
+                              //       CircularProgressIndicator(),
+                              //   errorWidget: (context, url, error) =>
+                              //       Icon(Icons.error),
+                              // ),
+                              // ListTile(
+                              //   title: Text(document.data()['nazwa']),
+                              //   subtitle: Text(document.data()['opis']),
+                              // ),
+                              // Wrap(
+                              //   children: document
+                              //       .data()['reszta_zdjec']
+                              //       .map<Widget>((url) {
+                              //     return CachedNetworkImage(
+                              //       imageUrl: url,
+                              //       placeholder: (context, url) =>
+                              //           CircularProgressIndicator(),
+                              //       errorWidget: (context, url, error) =>
+                              //           Icon(Icons.error),
+                              //     );
+                              //   }).toList(),
+                              // ),
+                            ],
+                          ),
+                          color: Colors.white,
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+              )
+            ],
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
