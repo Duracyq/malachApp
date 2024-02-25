@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/auth/auth_service.dart';
@@ -254,6 +255,65 @@ class _HomeHomeState extends State<HomeHome> {
                                   fontSize: 26,
                                   fontWeight: FontWeight.w700),
                             ),
+// =======
+//       body: ReloadableWidget(
+//         onRefresh: _refresh,
+//         child: Column(
+//           children: [
+//             const SizedBox(height: 25),
+//             SizedBox(
+//               height: 300,
+//               child: Center(
+//                 child: Column(
+//                   children: [
+//                     // limit user
+//                     if(FirebaseAuth.instance.currentUser?.email == "00011@malach.com") 
+//                       Column(
+//                         children: [
+//                           TextButton(
+//                               onPressed: () => Navigator.of(context).push(
+//                                   MaterialPageRoute(
+//                                       builder: (context) => MessageBroadcastPage())),
+//                               child: const Text("Send Message Page")),
+//                           TextButton(
+//                             onPressed: () async {
+//                               await NotificationService()
+//                                   .requestNotificationPermission();
+//                             },
+//                             child: const Text('Request Notification Permission'),
+//                           ),
+//                         ],
+//                       ),
+//                       // Example usage in a Flutter widget
+//                     StorageLoader(storage: widget.storage, uri: 'test'),
+//                     const SizedBox(height: 10),
+//                     StreamBuilder(
+//                       stream: widget.firebaseFirestore
+//                           .collection('test')
+//                           .snapshots(),
+//                       builder: (BuildContext context,
+//                           AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+//                               snapshot) {
+//                         if (snapshot.hasError) {
+//                           return Text('Error: ${snapshot.error}');
+//                         }
+
+//                         if (snapshot.connectionState ==
+//                             ConnectionState.waiting) {
+//                           return const CircularProgressIndicator();
+//                         }
+
+//                         return Expanded(
+//                           child: ListView(
+//                             children: snapshot.data!.docs.map(
+//                                 (QueryDocumentSnapshot<Map<String, dynamic>>
+//                                     document) {
+//                               Map<String, dynamic> data = document.data();
+//                               return ListTile(
+//                                 title: Text(data['test']),
+//                               );
+//                             }).toList(),
+// >>>>>>> main
                           ),
                           Text(
                             "!",
@@ -330,12 +390,13 @@ class _HomeHomeState extends State<HomeHome> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
+        ? FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const CreatorPage()));
         },
-      ),
+      ) : null,
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:malachapp/auth/admin/firebase_api.dart';
+import 'package:malachapp/services/notification_service.dart';
 
 class EventCreatorPage extends StatefulWidget {
   const EventCreatorPage({Key? key}) : super(key: key);
@@ -82,6 +83,7 @@ class _EventCreatorPageState extends State<EventCreatorPage> {
             ElevatedButton(
               onPressed: () async {
                 await _addEvent();
+                await NotificationService().sendPersonalisedFCMMessage("See if you've got something for yourself!", 'events', 'New Event has just dropped!');
                 Navigator.pop(context); // Go back to the previous screen after adding the event
               },
               child: const Text('Create Event'),

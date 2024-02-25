@@ -37,7 +37,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
 
 flutter_icons:
-  image_path: "assets/icon.png"
+  image_path: "assets/favicon.png"
   android: true
   ios: true
 
@@ -57,7 +57,7 @@ flutter:
      - assets/zd1.jpg
      - assets/zd2.jpg
      - assets/zd3.jpg
-     
+     - assets/favicon.png
 
   
   

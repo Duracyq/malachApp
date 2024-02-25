@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/pages/message_broadcast_page.dart';
+import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:provider/provider.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:malachapp/themes/dark_mode.dart';
@@ -54,18 +55,26 @@ class _SettingsPageState extends State<SettingsPage> {
                 )
               ],
             ),
-            //
-            TextButton(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => MessageBroadcastPage())),
-                child: const Text("Send Message Page")),
-            // Example usage in a Flutter widget
-            TextButton(
-              onPressed: () async {
-                await NotificationService().requestNotificationPermission();
-              },
-              child: Text('Request Notification Permission'),
-            ),
+// <<<<<<< zabka_nie_umie_w_gita
+//             //
+//             TextButton(
+//                 onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+//                     builder: (context) => MessageBroadcastPage())),
+//                 child: const Text("Send Message Page")),
+//             // Example usage in a Flutter widget
+//             TextButton(
+//               onPressed: () async {
+//                 await NotificationService().requestNotificationPermission();
+//               },
+//               child: Text('Request Notification Permission'),
+//             ),
+// =======
+            ListTile(
+              title: Text('Notifications'),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: ((context) => NotificationsSubscriptionPage()))
+              ),
+            )
           ],
         ),
       ),

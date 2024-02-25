@@ -26,7 +26,7 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
 
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -101,8 +101,8 @@ class NotificationService {
       final String jsonPayload = jsonEncode(fcmPayload);
 
       try {
-        final String serverKey =
-            'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
+        const String serverKey =
+            'AAAA8jXsXOg:APA91bG0D8EQZxoTEFSJNOc2nzMjgh7IVTG4jMaQUNSGvctwQcvkoeZ23jkX_95Lrr1xfYZKE9QshjCSJ3C9LbMZL_Nj_eJeXFxVlIZWAALZjZ3Vl_bQwHP8TVVTVN_r5YcrR91mGZUi'; // Replace with your FCM server key
 
         final http.Response response = await http.post(
           Uri.parse('https://fcm.googleapis.com/fcm/send'),
@@ -147,9 +147,8 @@ class NotificationService {
       final String jsonPayload = jsonEncode(fcmPayload);
 
       try {
-        final String serverKey =
-            'AAAA8jXsXOg:APA91bGpQxZ0GQwmDZGpuOpYz9SBCwrSd3F1i5p1A91YQZ2Tao26FOZ76q5ZkJzSm3_ovsfWV5Xhs3fT0FziEMalX1bS3O_s_rk-XgMe0lonFajMsedM-dSZ7BSpVs81TQTjyBKElwTs'; // Replace with your FCM server key
-
+        const String serverKey = 'AAAA8jXsXOg:APA91bG0D8EQZxoTEFSJNOc2nzMjgh7IVTG4jMaQUNSGvctwQcvkoeZ23jkX_95Lrr1xfYZKE9QshjCSJ3C9LbMZL_Nj_eJeXFxVlIZWAALZjZ3Vl_bQwHP8TVVTVN_r5YcrR91mGZUi'; // Replace with your FCM server key
+        
         final http.Response response =
             await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
                 headers: <String, String>{

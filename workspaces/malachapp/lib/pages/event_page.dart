@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:malachapp/auth/auth_page.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/event_creator.dart';
 
@@ -65,13 +67,12 @@ class _EventListPageState extends State<EventListPage> {
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const EventCreatorPage()));
-          },
-          child: const Icon(Icons.post_add_rounded),
-        ),
+        floatingActionButton: FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
+        ? FloatingActionButton(onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const EventCreatorPage())
+              );
+            }, child: const Icon(Icons.post_add_rounded),) : null,
       ),
     );
   }
