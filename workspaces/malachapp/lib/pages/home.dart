@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/drawer.dart';
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage> {
         key: _scaffoldKey,
         appBar: CustomAppBar(),
         drawer: null,
-        endDrawer: CustomDrawer(),
+        endDrawer: const CustomDrawer(),
         body: IndexedStack(
           index: _currentIndex,
           children: tabs,
@@ -171,20 +172,25 @@ class _HomeHomeState extends State<HomeHome> {
               child: Center(
                 child: Column(
                   children: [
-                    TextButton(
-                        onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => MessageBroadcastPage())),
-                        child: const Text("Send Message Page")),
-                    // Example usage in a Flutter widget
-                    TextButton(
-                      onPressed: () async {
-                        await NotificationService()
-                            .requestNotificationPermission();
-                      },
-                      child: Text('Request Notification Permission'),
-                    ),
-
+                    // limit user
+                    if(FirebaseAuth.instance.currentUser?.email == "00011@malach.com") 
+                      Column(
+                        children: [
+                          TextButton(
+                              onPressed: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => MessageBroadcastPage())),
+                              child: const Text("Send Message Page")),
+                          TextButton(
+                            onPressed: () async {
+                              await NotificationService()
+                                  .requestNotificationPermission();
+                            },
+                            child: const Text('Request Notification Permission'),
+                          ),
+                        ],
+                      ),
+                      // Example usage in a Flutter widget
                     StorageLoader(storage: widget.storage, uri: 'test'),
                     const SizedBox(height: 10),
                     StreamBuilder(
@@ -233,12 +239,13 @@ class _HomeHomeState extends State<HomeHome> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
+        ? FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const CreatorPage()));
         },
-      ),
+      ) : null,
     );
   }
 }

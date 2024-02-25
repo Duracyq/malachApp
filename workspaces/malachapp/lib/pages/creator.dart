@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/text_field.dart';
+import 'package:malachapp/services/notification_service.dart';
 
 class CreatorPage extends StatefulWidget {
   const CreatorPage({super.key});
@@ -41,7 +43,8 @@ class _CreatorPageState extends State<CreatorPage> {
                     'title': titleController.text,
                     'desc': descController.text,
                   });
-
+                  // send notification
+                  await NotificationService().sendPersonalisedFCMMessage('Go check it out!', 'posts', 'New Post has just arrived!');
                   // Clear the text fields after adding data
                   titleController.clear();
                   descController.clear();

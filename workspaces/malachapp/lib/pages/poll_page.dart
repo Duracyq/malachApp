@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/text_field.dart';
+import 'package:malachapp/services/notification_service.dart';
 
 class PollPage extends StatelessWidget {
   const PollPage({Key? key}) : super(key: key);
@@ -16,7 +17,8 @@ class PollPage extends StatelessWidget {
         title: const Text('Upcoming Polls'),
       ),
       body: const PollList(),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
+      ? FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
@@ -24,7 +26,7 @@ class PollPage extends StatelessWidget {
           );
         },
         child: const Icon(Icons.add),
-      ),
+      ) : null
     );
   }
 }
@@ -326,6 +328,8 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                     for (var controller in optionControllers) {
                       controller.clear();
                     }
+
+                    await NotificationService().sendPersonalisedFCMMessage('Go and make your vote count!', 'polls', 'New Poll has just arrived');
                   } catch (e) {
                     print(e);
                   }
