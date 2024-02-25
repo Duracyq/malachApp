@@ -77,6 +77,7 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/my_button.dart';
+import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:provider/provider.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:malachapp/themes/dark_mode.dart';
@@ -123,6 +124,12 @@ class SettingsPage extends StatelessWidget {
                 )
               ],
             ),
+            ListTile(
+              title: Text('Notifications'),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: ((context) => NotificationsSubscriptionPage()))
+              ),
+            )
           ],
         ),
       ),
