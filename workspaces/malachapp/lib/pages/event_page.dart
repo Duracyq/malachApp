@@ -17,18 +17,20 @@ class _EventListPageState extends State<EventListPage> {
   void initState() {
     super.initState();
   }
+
   Future<void> _refresh() async {
     setState(() {
       FirebaseFirestore.instance.collection('events').snapshots();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return ReloadableWidget(
       onRefresh: _refresh,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Event List'),
+          title: const Text('Lista wydarzeń'),
         ),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('events').snapshots(),
@@ -36,15 +38,15 @@ class _EventListPageState extends State<EventListPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
             }
-      
+
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             }
-      
+
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return const Text('No events found');
             }
-      
+
             return ListView.builder(
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
@@ -120,7 +122,8 @@ class EventPage extends StatelessWidget {
               children: [
                 Text(
                   '${data['date']} ${data['month']} ${data['year']}',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -139,9 +142,10 @@ class EventPage extends StatelessWidget {
               ],
             ),
           ),
-          
         );
       },
     );
   }
 }
+// tytuł, krotki opis, zdjecie, data;
+
