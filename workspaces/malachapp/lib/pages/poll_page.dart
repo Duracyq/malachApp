@@ -16,7 +16,8 @@ class PollPage extends StatelessWidget {
         title: const Text('Upcoming Polls'),
       ),
       body: const PollList(),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
+      ? FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
@@ -24,7 +25,7 @@ class PollPage extends StatelessWidget {
           );
         },
         child: const Icon(Icons.add),
-      ),
+      ) : null
     );
   }
 }
