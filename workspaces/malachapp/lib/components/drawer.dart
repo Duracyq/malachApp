@@ -3,6 +3,7 @@ import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/components/herb_topbar.dart';
 import 'package:malachapp/components/topbar.dart';
+import 'package:malachapp/pages/messaging_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:malachapp/pages/settings_page.dart';
 
@@ -40,9 +41,10 @@ class CustomDrawer extends StatelessWidget {
               leading: const Icon(Icons.message),
               title: const Text('Messages'),
               onTap: () {
-                // Update the state of the app
-                // Then close the drawer
-                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => MessagingPage(groupId: 'BrHkbwqGH0Fzp1zPbIgc'))
+                );
+                // Navigator.pop(context);
               },
             ),
             ListTile(

@@ -6,6 +6,7 @@ import 'package:malachapp/auth/admin/firebase_api.dart';
 import 'package:malachapp/auth/auth_page.dart';
 import 'package:malachapp/firebase_options.dart';
 import 'package:malachapp/pages/event_page.dart';
+import 'package:malachapp/pages/messaging_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:malachapp/pages/poll_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
@@ -56,6 +57,7 @@ class _MyAppState extends State<MyApp> {
           '/event': (context) => const EventListPage(),
           '/polls': (context) => const PollList(),
           '/notifications': (context) => NotificationsSubscriptionPage(),
+          '/messages_page': (context) => MessagingPage(groupId: '',),
         },
       ),
     );
