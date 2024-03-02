@@ -20,13 +20,13 @@ class CustomDrawer extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-                decoration: BoxDecoration(shape: BoxShape.circle
+                decoration: const BoxDecoration(shape: BoxShape.circle
                     //color: Colors.brown[300],
 
                     ),
                 child: Container(
-                  child: Herb(),
                   height: 30,
+                  child: const Herb(),
                 )
                 // child: const Text(
                 //   'Drawer Header',
@@ -36,13 +36,15 @@ class CustomDrawer extends StatelessWidget {
                 //   ),
                 // ),
                 ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             ListTile(
               leading: const Icon(Icons.message),
               title: const Text('Messages'),
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => MessagingPage(groupId: 'BrHkbwqGH0Fzp1zPbIgc'))
+                  //BrHkbwqGH0Fzp1zPbIgc
+                  // MessagingPage(groupId: 'EHi1zf3LgyvIQdHACwmw')
+                  MaterialPageRoute(builder: (context) => GroupPage())
                 );
                 // Navigator.pop(context);
               },
@@ -63,13 +65,13 @@ class CustomDrawer extends StatelessWidget {
                 Navigator.of(context).push(
                //   MaterialPageRoute(builder: (context) => NotificationsSubscriptionPage())
                // );
-                    MaterialPageRoute(builder: ((context) => SettingsPage())));
+                    MaterialPageRoute(builder: ((context) => const SettingsPage())));
               },
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
             IconButton(
                 onPressed: () => AuthService().signOut(),
-                icon: Icon(Icons.power_settings_new_rounded))
+                icon: const Icon(Icons.power_settings_new_rounded))
           ],
         ),
       ),

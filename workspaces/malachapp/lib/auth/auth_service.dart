@@ -127,10 +127,10 @@ class AuthService {
     return _status;
   }
 
-  Future<bool> isAdmin(User user) async {
+  Future<bool> isAdmin(User? user) async {
     final res = await FirebaseFirestore.instance
         .collection('admins')
-        .doc(user.email)
+        .doc('CcEYLsqPT31By3zjzEKg')
         .get();
     return res.exists;
   }
