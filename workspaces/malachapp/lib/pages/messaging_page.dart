@@ -37,7 +37,7 @@ class _MessagingPageState extends State<MessagingPage> {
                   .collection('groups')
                   .doc(widget.groupId)
                   .collection('messages')
-                  .orderBy('timestamp', descending: false)
+                  .orderBy('timestamp', descending: true)
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
