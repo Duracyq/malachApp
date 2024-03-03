@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
-import 'package:malachapp/pages/add_group.dart';
+import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/services/group_service.dart';
 
 class MessagingPage extends StatefulWidget {
@@ -21,61 +20,94 @@ class _MessagingPageState extends State<MessagingPage> {
   final GroupService _groupService = GroupService();
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthService _authService = AuthService();
+
+  Future<bool> isAdminAsync() async {
+    User? user = _auth.currentUser;
+    if(user != null) {
+      return await _authService.isAdmin(user);
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Group Messaging"),
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: StreamBuilder(
-              // Use StreamBuilder to listen for real-time updates
-              stream: _db
-                  .collection('groups')
-                  .doc(widget.groupId)
-                  .collection('messages')
-                  .orderBy('timestamp', descending: true)
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-                return ListView(
-                  children: snapshot.data!.docs.map((message) {
-                    return ListTile(
-                      title: Text(message['text']),
-                      subtitle: Text(message['sender']),
-                    );
-                  }).toList(),
-                );
-              },
-            ),
+    return FutureBuilder(
+      future: isAdminAsync(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        bool isAdmin = snapshot.data ?? false;
+      
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("Group Messaging"),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _messageController,
-              decoration: InputDecoration(
-                labelText: "Send a message...",
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () async {
-                    if (_messageController.text.isNotEmpty) {
-                      await _groupService.sendMessage(
-                        widget.groupId,
-                        _messageController.text,
-                        _auth.currentUser!.email!,
-                      );
-                      _messageController.clear();
-                    }
+          body: Column(
+            children: <Widget>[
+              Expanded(
+                child: StreamBuilder(
+                  // Use StreamBuilder to listen for real-time updates
+                  stream: _db
+                      .collection('groups')
+                      .doc(widget.groupId)
+                      .collection('messages')
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                    return ListView(
+                      children: snapshot.data!.docs.map((message) {
+                        return ListTile(
+                          title: Text(message['text']),
+                          subtitle: Text(message['sender']),
+                        );
+                      }).toList(),
+                    );
                   },
                 ),
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _messageController,
+                  decoration: InputDecoration(
+                    labelText: "Send a message...",
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: () async {
+                        if (_messageController.text.isNotEmpty) {
+                          await _groupService.sendMessage(
+                            widget.groupId,
+                            _messageController.text,
+                            _auth.currentUser!.email!,
+                          );
+                          _messageController.clear();
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+          floatingActionButton: Visibility(
+            visible: isAdmin,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const AddMemberPage()),
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+          )
+        );
+      }
     );
   }
 }
@@ -121,7 +153,7 @@ class _GroupPageState extends State<GroupPage> {
       future: isAdminAsync(),
       builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(
+        return const Center(
           child: CircularProgressIndicator(),
         );
       }
@@ -130,7 +162,7 @@ class _GroupPageState extends State<GroupPage> {
       
       return Scaffold(
         appBar: AppBar(
-          title: Text('Group Page'),
+          title: const Text('Group Page'),
         ),
         body: Container(
           child: ReloadableWidget(
@@ -143,7 +175,7 @@ class _GroupPageState extends State<GroupPage> {
               stream: _db.collection('groups').snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
@@ -158,7 +190,7 @@ class _GroupPageState extends State<GroupPage> {
                 }).toList();
       
                 if (groups.isEmpty) {
-                  return Center(child: Text('No groups available...'));
+                  return const Center(child: Text('No groups available...'));
                 }
       
                 return ListView.builder(
@@ -167,8 +199,8 @@ class _GroupPageState extends State<GroupPage> {
                     final doc = groups[index];
       
                     return Container(
-                      padding: EdgeInsets.all(10),
-                      margin: EdgeInsets.symmetric(vertical: 7),
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.symmetric(vertical: 7),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10),
@@ -179,7 +211,7 @@ class _GroupPageState extends State<GroupPage> {
                           ListTile(
                             title: Text(
                               doc['groupTitle'],
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -203,7 +235,7 @@ class _GroupPageState extends State<GroupPage> {
         floatingActionButton:  isAdmin
             ? FloatingActionButton(
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: ((context) => AddGroupPage())),
+                  MaterialPageRoute(builder: ((context) => const AddGroupPage())),
                 ),
               )
             : null,

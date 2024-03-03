@@ -156,7 +156,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/MyText.dart';
-import 'package:malachapp/pages/add_group.dart';
+import 'package:malachapp/pages/add_group_page.dart';
 
 class HomeHomeWidget extends StatefulWidget {
   const HomeHomeWidget({Key? key}) : super(key: key);

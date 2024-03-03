@@ -20,7 +20,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Group'),
+        title: const Text('Add Group'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,7 +29,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
           children: [
             TextField(
               controller: groupTitleController,
-              decoration: InputDecoration(labelText: 'Group Title'),
+              decoration: const InputDecoration(labelText: 'Group Title'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -37,26 +37,13 @@ class _AddGroupPageState extends State<AddGroupPage> {
                 bool isAdmin = await _authService.isAdmin(_auth.currentUser!);
 
                 if (isAdmin) {
-                  // Logic to add the group to the database
-                  // Use _questionController.text, _optionController1.text, _optionController2.text
-                  // to get the values entered by the admin and add them to the database
-
-                  // Example:
-                  // await _db.collection('groups').add({
-                  //   'question': _questionController.text,
-                  //   'options': [
-                  //     _optionController1.text,
-                  //     _optionController2.text,
-                  //   ],
-                  // });
-
                   await _db.collection('groups').add({
                     'groupTitle': groupTitleController.text,
                   });
 
                   // Show a success message or navigate back to the group page
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Group added successfully!'),
                     ),
                   );
@@ -64,16 +51,59 @@ class _AddGroupPageState extends State<AddGroupPage> {
                 } else {
                   // Show a message if the user is not an admin
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('You do not have permission to add groups.'),
                     ),
                   );
                 }
               },
-              child: Text('Add Group'),
+              child: const Text('Add Group'),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+
+class AddMemberPage extends StatefulWidget {
+  const AddMemberPage({super.key});
+
+  @override
+  State<AddMemberPage> createState() => _AddMemberPageState();
+}
+
+class _AddMemberPageState extends State<AddMemberPage> {
+  TextEditingController memberEmailController = TextEditingController();
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Member'),
+      ),
+      body: Center(
+        child: Column(
+          children:[
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'Enter member email',
+              ),
+              controller: memberEmailController,
+            ),
+            IconButton(
+              onPressed: () {
+                _db.collection('groups').doc('groupID').update({
+                  'members': FieldValue.arrayUnion([memberEmailController.text]),
+                });
+              },
+              icon: const Icon(Icons.add),
+            ),
+          ] 
+        )
       ),
     );
   }

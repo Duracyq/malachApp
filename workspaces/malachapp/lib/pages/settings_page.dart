@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/my_button.dart';
-import 'package:malachapp/pages/add_group.dart';
+import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/pages/message_broadcast_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:provider/provider.dart';
