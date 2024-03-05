@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
+import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/services/group_service.dart';
@@ -24,7 +25,7 @@ class _MessagingPageState extends State<MessagingPage> {
 
   Future<bool> isAdminAsync() async {
     User? user = _auth.currentUser;
-    if(user != null) {
+    if (user != null) {
       return await _authService.isAdmin(user);
     }
     return false;
@@ -42,10 +43,44 @@ class _MessagingPageState extends State<MessagingPage> {
         }
 
         bool isAdmin = snapshot.data ?? false;
-      
+
         return Scaffold(
           appBar: AppBar(
             title: const Text("Group Messaging"),
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Visibility(
+                  visible: isAdmin,
+                  child: IconButton(
+                    icon: const Icon(Icons.person_add),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const AddMemberPage(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            var begin = Offset(1.0, 0.0);
+                            var end = Offset.zero;
+                            var curve = Curves.ease;
+
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              )
+            ],
           ),
           body: Column(
             children: <Widget>[
@@ -59,26 +94,88 @@ class _MessagingPageState extends State<MessagingPage> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                    if (!snapshot.hasData)
+                      return const Center(child: CircularProgressIndicator());
                     return ListView(
                       children: snapshot.data!.docs.map((message) {
-                        return ListTile(
-                          title: Text(message['text']),
-                          subtitle: Text(message['sender']),
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment
+                                .start, // aligns the children at the start
+                            children: [
+                              CircleAvatar(
+                                child: Icon(Icons.person),
+                              ),
+                              SizedBox(
+                                  width:
+                                      10), // add some space between the avatar and the text
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment
+                                      .start, // aligns the text to the start
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          message['sender'],
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors
+                                                  .grey), // smaller, grey text
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          "12:00", // replace with your message time
+                                          style: TextStyle(
+                                              fontSize: 12, color: Colors.grey),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(message['text']),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       }).toList(),
                     );
                   },
                 ),
               ),
-              Padding(
+              Container(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _messageController,
-                  decoration: InputDecoration(
-                    labelText: "Send a message...",
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.send),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: GestureDetector(
+                      onTap: () {
+                        FocusScope.of(context).unfocus();
+                      },
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: "Send a message...",
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.only(left: 20),
+                        ),
+                      ),
+                    )),
+                    IconButton(
+                      icon: const Icon(Icons.send, color: Colors.blue),
                       onPressed: () async {
                         if (_messageController.text.isNotEmpty) {
                           await _groupService.sendMessage(
@@ -90,24 +187,13 @@ class _MessagingPageState extends State<MessagingPage> {
                         }
                       },
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],
           ),
-          floatingActionButton: Visibility(
-            visible: isAdmin,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const AddMemberPage()),
-                );
-              },
-              child: const Icon(Icons.add),
-            ),
-          )
         );
-      }
+      },
     );
   }
 }
@@ -125,16 +211,17 @@ class _GroupPageState extends State<GroupPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   Future<String> _groupIDGetter(String groupTitle) async {
     try {
-      QuerySnapshot querySnapshot = await _db.collection('groups')
-        .where('groupTitle', isEqualTo: groupTitle)
-        .limit(1)
-        .get();
+      QuerySnapshot querySnapshot = await _db
+          .collection('groups')
+          .where('groupTitle', isEqualTo: groupTitle)
+          .limit(1)
+          .get();
 
-      if(querySnapshot.docs.isNotEmpty) {
+      if (querySnapshot.docs.isNotEmpty) {
         String groupId = querySnapshot.docs.first.id;
         return groupId;
       }
-    }catch(e){
+    } catch (e) {
       print(e);
     }
     return '';
@@ -142,106 +229,129 @@ class _GroupPageState extends State<GroupPage> {
 
   Future<bool> isAdminAsync() async {
     User? user = _auth.currentUser;
-    if(user != null) {
+    if (user != null) {
       return await _authService.isAdmin(user);
     }
     return false;
   }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-      future: isAdminAsync(),
-      builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      }
+        future: isAdminAsync(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-      bool isAdmin = snapshot.data ?? false; 
-      
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Group Page'),
-        ),
-        body: Container(
-          child: ReloadableWidget(
-            onRefresh: () async {
-              setState(() {
-                // Refresh logic here
-              });
-            },
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _db.collection('groups').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                }
-                final groups = snapshot.data!.docs.map((doc) {
-                  final data = doc.data() as Map<String, dynamic>;
-                  return {...data, 'groupTitle': data['groupTitle'] ?? 'No title'};
-                }).toList();
-      
-                if (groups.isEmpty) {
-                  return const Center(child: Text('No groups available...'));
-                }
-      
-                return ListView.builder(
-                  itemCount: groups.length,
-                  itemBuilder: (context, index) {
-                    final doc = groups[index];
-      
-                    return Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 7),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            title: Text(
-                              doc['groupTitle'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
+          bool isAdmin = snapshot.data ?? false;
+
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Group Page'),
+            ),
+            body: Container(
+              padding: const EdgeInsets.fromLTRB(
+                  12.0, 20.0, 12.0, 0.0), // Dodaj odstęp od góry
+              child: ReloadableWidget(
+                onRefresh: () async {
+                  setState(() {
+                    // Refresh logic here
+                  });
+                },
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: _db.collection('groups').snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    }
+                    final groups = snapshot.data!.docs.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return {
+                        ...data,
+                        'groupTitle': data['groupTitle'] ?? 'No title'
+                      };
+                    }).toList();
+
+                    if (groups.isEmpty) {
+                      return const Center(
+                          child: Text('No groups available...'));
+                    }
+                    return ListView.builder(
+                      itemCount: groups.length,
+                      itemBuilder: (context, index) {
+                        final doc = groups[index];
+
+                        return Container(
+                          padding:
+                              const EdgeInsets.all(10), // Zwiększ padding do 10
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 5,
+                              horizontal: 10), // Dodaj margines poziomy
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(
+                                15), // Zwiększ promień zaokrąglenia
+                            boxShadow: [
+                              // Dodaj cień
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: Offset(0, 3),
                               ),
-                            ),
-                            onTap: () async {
-                              String groupId = await _groupIDGetter(doc['groupTitle']);
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => MessagingPage(groupId: groupId))
-                              );
-                            },
+                            ],
                           ),
-                        ],
-                      ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                title: MyText(
+                                    text: doc['groupTitle'],
+                                    rozmiar: 18,
+                                    waga: FontWeight.bold),
+                                // title: Text(
+                                //   ,
+                                //   style: const TextStyle(
+                                //     fontWeight: FontWeight.bold,
+                                //     fontSize: 18,
+                                //   ),
+                                // ),
+                                onTap: () async {
+                                  String groupId =
+                                      await _groupIDGetter(doc['groupTitle']);
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          MessagingPage(groupId: groupId)));
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     );
                   },
-                );
-              },
-            ),
-          ),
-        ),
-        floatingActionButton:  isAdmin
-            ? FloatingActionButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: ((context) => const AddGroupPage())),
                 ),
-              )
-            : null,
-      );
-      }
-    );
+              ),
+            ),
+            floatingActionButton: isAdmin
+                ? FloatingActionButton(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: ((context) => const AddGroupPage())),
+                    ),
+                  )
+                : null,
+          );
+        });
   }
-
 }
