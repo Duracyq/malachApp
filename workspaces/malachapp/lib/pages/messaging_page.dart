@@ -62,7 +62,7 @@ class _MessagingPageState extends State<MessagingPage> {
                                   const AddMemberPage(),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
-                            var begin = Offset(1.0, 0.0);
+                            var begin = const Offset(1.0, 0.0);
                             var end = Offset.zero;
                             var curve = Curves.ease;
 
@@ -104,10 +104,10 @@ class _MessagingPageState extends State<MessagingPage> {
                             crossAxisAlignment: CrossAxisAlignment
                                 .start, // aligns the children at the start
                             children: [
-                              CircleAvatar(
+                              const CircleAvatar(
                                 child: Icon(Icons.person),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                   width:
                                       10), // add some space between the avatar and the text
                               Expanded(
@@ -119,15 +119,15 @@ class _MessagingPageState extends State<MessagingPage> {
                                       children: [
                                         Text(
                                           message['sender'],
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors
                                                   .grey), // smaller, grey text
                                         ),
-                                        Spacer(),
+                                        const Spacer(),
                                         Text(
-                                          "12:00", // replace with your message time
-                                          style: TextStyle(
+                                          message['timestamp'], // replace with your message time
+                                          style: const TextStyle(
                                               fontSize: 12, color: Colors.grey),
                                         ),
                                       ],
@@ -154,7 +154,7 @@ class _MessagingPageState extends State<MessagingPage> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -167,7 +167,7 @@ class _MessagingPageState extends State<MessagingPage> {
                       },
                       child: TextField(
                         controller: _messageController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Send a message...",
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.only(left: 20),
@@ -307,7 +307,7 @@ class _GroupPageState extends State<GroupPage> {
                                 color: Colors.grey.withOpacity(0.5),
                                 spreadRadius: 5,
                                 blurRadius: 7,
-                                offset: Offset(0, 3),
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),

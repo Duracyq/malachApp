@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
+import 'package:malachapp/components/text_field.dart';
 
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage({super.key});
@@ -27,9 +28,9 @@ class _AddGroupPageState extends State<AddGroupPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
+            MyTextField(
               controller: groupTitleController,
-              decoration: const InputDecoration(labelText: 'Group Title'),
+              hintText: 'Group Title',
             ),
             ElevatedButton(
               onPressed: () async {
