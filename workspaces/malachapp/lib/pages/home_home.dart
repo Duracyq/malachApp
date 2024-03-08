@@ -187,7 +187,7 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
         Container(
           width: screenWidth - 20,
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: Theme.of(context).colorScheme.onSecondary,
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(
                   10), // Ustawienie promienia zaokrąglenia tylko dla lewego dolnego rogu
