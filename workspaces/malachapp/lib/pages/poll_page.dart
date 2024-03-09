@@ -51,7 +51,7 @@ class _PollListState extends State<PollList> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       color: Colors.black12,
       alignment: Alignment.bottomCenter,
       child: ReloadableWidget(
@@ -119,7 +119,7 @@ class _PollListState extends State<PollList> {
             //   },
             // );
             return ListView.builder(
-              padding: EdgeInsets.all(5),
+              padding: const EdgeInsets.all(5),
               itemCount: polls.length,
               itemBuilder: (context, index) {
                 final doc = polls[index];
@@ -145,8 +145,8 @@ class _PollListState extends State<PollList> {
 
                 return Container(
                   // Dodany kontener zawierający pytanie i odpowiedzi
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.symmetric(vertical: 7),
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.symmetric(vertical: 7),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -157,13 +157,13 @@ class _PollListState extends State<PollList> {
                       Center(
                         child: Text(
                           question,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                           ),
                         ),
                       ),
-                      SizedBox(height: 40),
+                      const SizedBox(height: 40),
                       Container(
                         height: 80,
                         width: screenWidth - 40, // dowolna wartość wysokości
@@ -216,8 +216,8 @@ class _VoteButtonState extends State<VoteButton> {
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
       width: 160,
-      padding: EdgeInsets.all(0),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(0),
+      decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Center(
@@ -313,7 +313,7 @@ class _VoteButtonState extends State<VoteButton> {
               child: Text(
                 widget.optionText,
                 style:
-                    TextStyle(color: Colors.black), // Set text color to black
+                    const TextStyle(color: Colors.black), // Set text color to black
               ),
             ),
           ],
