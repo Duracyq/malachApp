@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/subscribe_to_noti.dart';
 import 'package:provider/provider.dart';
@@ -75,21 +74,21 @@ class _NotificationsSubscriptionPageState extends State<NotificationsSubscriptio
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              '${subscribe ? 'Subscribed to' : 'Unsubscribed from'} $topic notifications'),
+              '${!subscribe ? 'Subscribed to' : 'Unsubscribed from'} $topic notifications'),
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'Failed to ${subscribe ? 'subscribe to' : 'unsubscribe from'} $topic notifications'),
+              'Failed to ${!subscribe ? 'subscribe to' : 'unsubscribe from'} $topic notifications'),
         ),
       );
     }
   }
 }
 class UserNotificationPreferences with ChangeNotifier {
-  static const String _prefKey = 'notification_preferences';
+  // static const String _prefKey = 'notification_preferences';
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   // Store user's notification preferences locally
