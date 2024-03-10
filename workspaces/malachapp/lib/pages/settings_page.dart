@@ -63,31 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Switch(
-                          value: Provider.of<ThemeProvider>(context).themeData ==
-                              darkMode,
-                          activeColor: const Color.fromARGB(255, 139, 139, 139),
-                          onChanged: (value) {
-                            Provider.of<ThemeProvider>(context, listen: false)
-                                .toggleTheme();
-                          },
-                        ),
-                      ),
-                      Text(
-                        'Motyw',
-                        style: GoogleFonts.cinzel(
-                          textStyle: const TextStyle(
-                            fontStyle: FontStyle.normal,
-                            fontSize: 18,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
+                  
                   ListTile(
                     title: const Text('Notifications Settings'),
                     onTap: () => Navigator.of(context).push(
