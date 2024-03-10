@@ -119,7 +119,9 @@ class _MessagingPageState extends State<MessagingPage> {
                                     Row(
                                       children: [
                                         Text(
-                                          message['sender'],
+                                            message['sendersNickname'] != null
+                                                ? "${message['sendersNickname'].split('@')[0]} (${message['sender'].split('@')[0]})"
+                                                : message['sender'],
                                           style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors
@@ -185,7 +187,7 @@ class _MessagingPageState extends State<MessagingPage> {
                           await _groupService.sendMessage(
                             widget.groupId,
                             _messageController.text,
-                            _auth.currentUser!.email!,
+                            _auth.currentUser!.email!
                           );
                           _messageController.clear();
                         }
