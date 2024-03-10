@@ -20,13 +20,11 @@ class _ProfilePageState extends State<ProfilePage> {
   String _newTitle = '';
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
-  String? _email;
   String? userId;
 
   @override
   void initState() {
     super.initState();
-    _email = auth.currentUser?.email;
     userId = auth.currentUser?.uid;
   }
 

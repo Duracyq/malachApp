@@ -153,6 +153,8 @@
 //                     //* zawartosc kontenera
 import 'dart:ffi';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/MyText.dart';
@@ -174,6 +176,52 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   // ];
   int current = 0;
   PageController pageController = PageController();
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  String? userId;
+
+  Future<String?> fetchNickname(String userId) async {
+    try {
+      final snapshot = await _db.collection('users').doc(userId).get();
+      if (snapshot.exists) {
+        var data = snapshot.data();
+        if (data != null && data.containsKey('nickname') && data['nickname'] is String) {
+          print("Nickname fetched successfully: ${data['nickname']}");
+          return data['nickname'] as String;
+        }
+      }
+    } catch (e) {
+      print("Error fetching nickname: $e");
+    }
+    return null;
+  }
+
+  Widget buildNickname(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: fetchNickname(userId!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Show a loading indicator while waiting for the nickname
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // Show an error message if fetching the nickname failed
+          return Text('Error fetching nickname');
+        } else {
+          // The nickname has been fetched successfully
+          final nickname = snapshot.data;
+          return Text('$nickname',
+              style: GoogleFonts.nunito(
+                textStyle: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontStyle: FontStyle.normal,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700),
+            ));
+        }
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -211,16 +259,17 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                     children: [
                       const MyText(
                           text: "Witaj ", rozmiar: 26, waga: FontWeight.w700),
-                      Text(
-                        "Wiktor",
-                        style: GoogleFonts.nunito(
-                          textStyle: const TextStyle(
-                              fontFamily: 'Nunito',
-                              fontStyle: FontStyle.normal,
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ),
+                      // Text(
+                      //   nickname ?? '',
+                      //   style: GoogleFonts.nunito(
+                      //     textStyle: const TextStyle(
+                      //         fontFamily: 'Nunito',
+                      //         fontStyle: FontStyle.normal,
+                      //         fontSize: 26,
+                      //         fontWeight: FontWeight.w700),
+                      //   ),
+                      // ),
+                      buildNickname(context),
                       Text(
                         "!",
                         style: GoogleFonts.nunito(
