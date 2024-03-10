@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:malachapp/services/set_user.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +18,17 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _gdprConfirmed = false;
   bool _vulgularConfirmation = false;
   String _newTitle = '';
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  String? _email;
+  String? userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _email = auth.currentUser?.email;
+    userId = auth.currentUser?.uid;
+  }
 
   /// Updates the user's nickname.
   void _updateNickname(String newNickname) {
@@ -51,16 +65,36 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   /// Saves the user's profile information.
-  void _saveProfile() {
+  Future<void> _saveProfile() async {
     if (_gdprConfirmed && _vulgularConfirmation) {
       // Save the user's nickname and email to the collection
       // with the current user's email
       // Add your code here to save the data to the database
+
+      // if(!(await setUser())) {
+      //   _db.collection('users').doc(userId).update({
+      //     'nickname': _nickname,
+      //   });
+      // } 
+      await setUser().then((value) {
+        if (value) {
+          _db.collection('users').doc(userId).set({
+            'nickname': _nickname,
+          }, SetOptions(merge: true));
+        } else {
+          _db.collection('users').doc(userId).update({
+            'nickname': _nickname,
+          });
+        }
+      });
       print('Nickname: $_nickname');
       print('GDPR Confirmed: $_gdprConfirmed');
       print('Vulgular Confirmation: $_vulgularConfirmation');
     } else {
-      String consequence = _gdprConfirmed ? 'vulgular' : _vulgularConfirmation ? 'GDPR' : 'GDPR and vulgular';
+      String consequence = _gdprConfirmed ? 'vulgular' 
+        : _vulgularConfirmation 
+          ? 'GDPR' 
+          : 'GDPR and vulgular';
       showDialog(
         context: context,
         builder: (BuildContext context) {

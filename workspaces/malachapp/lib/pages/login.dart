@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:malachapp/auth/auth_service.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/herb.dart';
@@ -5,6 +7,7 @@ import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/pages/reset_hasla.dart';
+import 'package:malachapp/services/set_user.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/light_mode.dart';
 /*
@@ -30,21 +33,31 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> performLogin() async {
     try {
+      print('Before login');
       showDialog(
-          context: context,
-          builder: (context) => const Center(
-                child: CircularProgressIndicator(),
-              ));
-      _loginStatus = await _authService.login(
+        context: context,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+      await _authService.login(
         login: loginController.text,
         password: passwController.text,
       );
+      print('After login');
+      // await setUser(); // Ensure that setUser is called after successful login
+      setState(() {
+        _loginStatus = auth.AuthStatus.unknown;
+      });
+      print('After setUser');
     } on auth.AuthExceptionHandler catch (e) {
-      print(e); //? Daj tutaj dialog, żeby się wyświetlał błąd
+      print('Login error: $e'); // Handle authentication exceptions
     } finally {
       Navigator.of(context).pop();
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +71,6 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Container(child: const Herb()), //! tu zostaw z tym kontenerem
               const Herb(), //? nie ma różnicy czy z Container() czy bez
               const SizedBox(
                 height: 15,
