@@ -8,7 +8,8 @@ class MyTextField extends StatelessWidget {
     super.key,
     required this.hintText,
     this.obscureText,
-    required this.controller,
+    required this.controller, 
+    // required void Function(String newNickname) onChanged,
   });
 
   @override
