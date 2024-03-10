@@ -178,49 +178,57 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   PageController pageController = PageController();
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
-  String? userId;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
 
-  Future<String?> fetchNickname(String userId) async {
+  Future<String> fetchNickname(String userId) async {
     try {
       final snapshot = await _db.collection('users').doc(userId).get();
       if (snapshot.exists) {
         var data = snapshot.data();
-        if (data != null && data.containsKey('nickname') && data['nickname'] is String) {
-          print("Nickname fetched successfully: ${data['nickname']}");
-          return data['nickname'] as String;
+        if (data != null && data.containsKey('nickname')) {
+          // Check if 'nickname' is of type String before returning
+          if (data['nickname'] is String) {
+            debugPrint("Nickname fetched successfully: ${data['nickname']}");
+            return data['nickname'] as String;
+          } else {
+            debugPrint("Nickname is not of type String");
+          }
         }
+      } else {
+        debugPrint("User document not found for userId: $userId");
       }
-    } catch (e) {
-      print("Error fetching nickname: $e");
+    } catch (e, stackTrace) {
+      debugPrint("Error fetching nickname: $e\n$stackTrace");
     }
-    return null;
+    return '';  
   }
 
   Widget buildNickname(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: fetchNickname(userId!),
+    return FutureBuilder<String>(
+      future: fetchNickname(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Show a loading indicator while waiting for the nickname
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
-          // Show an error message if fetching the nickname failed
           return Text('Error fetching nickname');
         } else {
-          // The nickname has been fetched successfully
-          final nickname = snapshot.data;
-          return Text('$nickname',
-              style: GoogleFonts.nunito(
-                textStyle: const TextStyle(
-                    fontFamily: 'Nunito',
-                    fontStyle: FontStyle.normal,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w700),
-            ));
+          final nickname = snapshot.data ?? '';
+          return Text(
+            '$nickname',
+            style: GoogleFonts.nunito(
+              textStyle: const TextStyle(
+                fontFamily: 'Nunito',
+                fontStyle: FontStyle.normal,
+                fontSize: 26,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          );
         }
       },
     );
   }
+
 
 
   @override
