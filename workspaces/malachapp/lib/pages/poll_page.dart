@@ -6,7 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:malachapp/services/notification_service.dart';
+import 'package:malachapp/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
+/// FILEPATH: /home/dr3x_0/Projects/malachApp/workspaces/malachapp/lib/pages/poll_page.dart
+/// A page widget that displays a list of polls.
 class PollPage extends StatelessWidget {
   const PollPage({Key? key}) : super(key: key);
 
@@ -31,6 +35,7 @@ class PollPage extends StatelessWidget {
   }
 }
 
+/// A stateful widget that represents a list of polls.
 class PollList extends StatefulWidget {
   const PollList({super.key});
 
@@ -39,6 +44,7 @@ class PollList extends StatefulWidget {
 }
 
 class _PollListState extends State<PollList> {
+  /// Refreshes the list of polls.
   Future<void> _refresh() async {
     setState(() {
       FirebaseFirestore.instance.collection('polls').snapshots();
@@ -51,7 +57,7 @@ class _PollListState extends State<PollList> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       color: Colors.black12,
       alignment: Alignment.bottomCenter,
       child: ReloadableWidget(
@@ -84,42 +90,8 @@ class _PollListState extends State<PollList> {
               );
             }
 
-            // return ListView.builder(
-            //   padding: EdgeInsets.all(8),
-            //   itemCount: polls.length,
-            //   itemBuilder: (context, index) {
-            //     final doc = polls[index];
-            //     final question = doc['question'] ??
-            //         ''; // Default to an empty string if 'question' is null
-            //     final options = doc['options'] ?? [];
-            //     final docId = doc['id'] ??
-            //         ''; // Default to an empty string if 'id' is null
-
-            //     final optionWidgets =
-            //         (options as List<dynamic>).map<Widget>((option) {
-            //       final optionData = option as Map<String, dynamic>;
-            //       final optionText = optionData['text'] ?? '';
-            //       final voters = optionData['voters'] as List<dynamic>?;
-
-            //       return VoteButton(
-            //         pollId: docId,
-            //         optionIndex: options.indexOf(option),
-            //         optionText: optionText,
-            //         voters: voters ?? [], // Ensure 'voters' is a list
-            //       );
-            //     }).toList();
-
-            //     return ListTile(
-            //       title: Text(question),
-            //       subtitle: Column(
-            //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         children: optionWidgets,
-            //       ),
-            //     );
-            //   },
-            // );
             return ListView.builder(
-              padding: EdgeInsets.all(5),
+              padding: const EdgeInsets.all(5),
               itemCount: polls.length,
               itemBuilder: (context, index) {
                 final doc = polls[index];
@@ -145,8 +117,8 @@ class _PollListState extends State<PollList> {
 
                 return Container(
                   // Dodany kontener zawierający pytanie i odpowiedzi
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.symmetric(vertical: 7),
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.symmetric(vertical: 7),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -157,13 +129,13 @@ class _PollListState extends State<PollList> {
                       Center(
                         child: Text(
                           question,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                           ),
                         ),
                       ),
-                      SizedBox(height: 40),
+                      const SizedBox(height: 40),
                       Container(
                         height: 80,
                         width: screenWidth - 40, // dowolna wartość wysokości
@@ -184,6 +156,7 @@ class _PollListState extends State<PollList> {
   }
 }
 
+/// A stateful widget that represents a vote button for a poll option.
 class VoteButton extends StatefulWidget {
   final String pollId;
   final int optionIndex; // Change the type to int
@@ -203,6 +176,7 @@ class VoteButton extends StatefulWidget {
 }
 
 class _VoteButtonState extends State<VoteButton> {
+  /// Checks if the current user has voted for this option.
   bool get userVoted {
     final user = FirebaseAuth.instance.currentUser;
     return user != null &&
@@ -216,8 +190,8 @@ class _VoteButtonState extends State<VoteButton> {
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
       width: 160,
-      padding: EdgeInsets.all(0),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(0),
+      decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Center(
@@ -313,7 +287,9 @@ class _VoteButtonState extends State<VoteButton> {
               child: Text(
                 widget.optionText,
                 style:
-                    TextStyle(color: Colors.black), // Set text color to black
+                    TextStyle(
+                      color: Theme.of(context).textTheme.bodyLarge?.color, // Set text color to black
+                    ),
               ),
             ),
           ],

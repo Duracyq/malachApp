@@ -151,9 +151,14 @@
 //           ),
 //         ););))));}}
 //                     //* zawartosc kontenera
+import 'dart:ffi';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/pages/add_group_page.dart';
 
 class HomeHomeWidget extends StatefulWidget {
   const HomeHomeWidget({Key? key}) : super(key: key);
@@ -171,6 +176,45 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   // ];
   int current = 0;
   PageController pageController = PageController();
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
+
+  Stream<String> fetchNickname(String userId) {
+    return _db
+        .collection('users')
+        .doc(userId)
+        .snapshots()
+        .map((snapshot) => snapshot.data()?['nickname'] as String? ?? '');
+  }
+
+  Widget buildNickname(BuildContext context) {
+    return StreamBuilder<String>(
+      stream: fetchNickname(userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error fetching nickname');
+        } else {
+          final nickname = snapshot.data ?? '';
+          return Text(
+            '$nickname',
+            style: GoogleFonts.nunito(
+              textStyle: const TextStyle(
+                fontFamily: 'Nunito',
+                fontStyle: FontStyle.normal,
+                fontSize: 26,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -208,16 +252,17 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                     children: [
                       const MyText(
                           text: "Witaj ", rozmiar: 26, waga: FontWeight.w700),
-                      Text(
-                        "Wiktor",
-                        style: GoogleFonts.nunito(
-                          textStyle: const TextStyle(
-                              fontFamily: 'Nunito',
-                              fontStyle: FontStyle.normal,
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ),
+                      // Text(
+                      //   nickname ?? '',
+                      //   style: GoogleFonts.nunito(
+                      //     textStyle: const TextStyle(
+                      //         fontFamily: 'Nunito',
+                      //         fontStyle: FontStyle.normal,
+                      //         fontSize: 26,
+                      //         fontWeight: FontWeight.w700),
+                      //   ),
+                      // ),
+                      buildNickname(context),
                       Text(
                         "!",
                         style: GoogleFonts.nunito(

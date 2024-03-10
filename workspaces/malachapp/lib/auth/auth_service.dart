@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -124,6 +125,14 @@ class AuthService {
         .then((value) => _status = AuthStatus.successful)
         .catchError((e) => _status = AuthExceptionHandler.handleAuthException(e));
     return _status;
+  }
+
+  Future<bool> isAdmin(User? user) async {
+    final res = await FirebaseFirestore.instance
+        .collection('admins')
+        .doc('CcEYLsqPT31By3zjzEKg')
+        .get();
+    return res.exists;
   }
 
   Future<AuthStatus> signOut() async {
