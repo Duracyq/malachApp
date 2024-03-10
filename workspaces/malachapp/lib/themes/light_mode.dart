@@ -8,6 +8,9 @@ ThemeData lightMode = ThemeData(
     secondary: Colors.grey.shade400,
     background: Colors.grey.shade300,
     onPrimary: Colors.black,
+    onSecondary: Colors.grey.shade400,
+    onSurface: Colors.black,
+    onBackground: Colors.black,
   ),
   textTheme: ThemeData.light()
       .textTheme

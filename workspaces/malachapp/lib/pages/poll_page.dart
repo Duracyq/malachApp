@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:malachapp/services/notification_service.dart';
@@ -17,21 +18,22 @@ class PollPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ankiety'),
-      ),
-      body: const PollList(),
-      floatingActionButton: FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
-      ? FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => PollCreatorPage()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ) : null
-    );
+        appBar: AppBar(
+          title: const Text('Ankiety'),
+        ),
+        body: const PollList(),
+        floatingActionButton: FirebaseAuth.instance.currentUser?.email ==
+                "00011@malach.com"
+            ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PollCreatorPage()),
+                  );
+                },
+                child: const Icon(Icons.add),
+              )
+            : null);
   }
 }
 
@@ -115,36 +117,64 @@ class _PollListState extends State<PollList> {
                   );
                 }).toList();
 
-                return Container(
-                  // Dodany kontener zawierający pytanie i odpowiedzi
-                  padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.symmetric(vertical: 7),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Text(
-                          question,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PollAnswering(),
                       ),
-                      const SizedBox(height: 40),
-                      Container(
-                        height: 80,
-                        width: screenWidth - 40, // dowolna wartość wysokości
-                        child: ListView(
-                            itemExtent: 120,
-                            scrollDirection: Axis.horizontal,
-                            children: optionWidgets),
-                      )
-                    ],
+                    );
+                  },
+                  child: Container(
+                    // Dodany kontener zawierający pytanie i odpowiedzi
+                    padding: EdgeInsets.all(10),
+                    height: screenHeight * 0.1,
+                    margin: EdgeInsets.symmetric(vertical: 7),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: MyText(
+                        text:
+                            question + "(nazwaAnkiety)", //!nazwa calej ankiety
+                        rozmiar: 22,
+                        waga: FontWeight.w700,
+                      ),
+                    ),
+// =======
+//                 return Container(
+//                   // Dodany kontener zawierający pytanie i odpowiedzi
+//                   padding: const EdgeInsets.all(10),
+//                   margin: const EdgeInsets.symmetric(vertical: 7),
+//                   decoration: BoxDecoration(
+//                     color: Colors.white,
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Center(
+//                         child: Text(
+//                           question,
+//                           style: const TextStyle(
+//                             fontWeight: FontWeight.bold,
+//                             fontSize: 18,
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 40),
+//                       Container(
+//                         height: 80,
+//                         width: screenWidth - 40, // dowolna wartość wysokości
+//                         child: ListView(
+//                             itemExtent: 120,
+//                             scrollDirection: Axis.horizontal,
+//                             children: optionWidgets),
+//                       )
+//                     ],
+// >>>>>>> main
                   ),
                 );
               },
@@ -153,8 +183,104 @@ class _PollListState extends State<PollList> {
         ),
       ),
     );
+
+    ///*/
   }
 }
+
+class PollAnswering extends StatefulWidget {
+  @override
+  _PollAnsweringState createState() => _PollAnsweringState();
+}
+
+class _PollAnsweringState extends State<PollAnswering> {
+  final List<Widget> pollQuestions = [
+    createPollQuestion('Pytanie 1', 'pollId1'),
+    createPollQuestion('Pytanie 2', 'pollId2'),
+    createPollQuestion('Pytanie 3', 'pollId3'),
+    // Dodaj więcej pytań tutaj
+  ];
+
+  static Widget createPollQuestion(String questionText, String pollId) {
+    return Container(
+      child: Column(
+        children: [
+          MyText(
+            text: questionText,
+            rozmiar: 22,
+            waga: FontWeight.w700,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: VoteButton(
+              pollId: pollId,
+              optionIndex: 0,
+              optionText: 'Odpowiedź 1',
+              voters: [],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: VoteButton(
+              pollId: pollId,
+              optionIndex: 1,
+              optionText: 'Odpowiedź 2',
+              voters: [],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: VoteButton(
+              pollId: pollId,
+              optionIndex: 2,
+              optionText: 'Odpowiedź 3',
+              voters: [],
+            ),
+          ),
+          // Dodaj więcej odpowiedzi tutaj
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tytul ankiety'),
+      ),
+      body: Center(
+        child: ListView(
+          children: pollQuestions,
+        ),
+      ),
+    );
+  }
+}
+
+// onPressed: () {
+//                       Navigator.of(context).push(
+//                         PageRouteBuilder(
+//                           pageBuilder:
+//                               (context, animation, secondaryAnimation) =>
+//                                   const AddMemberPage(),
+//                           transitionsBuilder:
+//                               (context, animation, secondaryAnimation, child) {
+//                             var begin = const Offset(1.0, 0.0);
+//                             var end = Offset.zero;
+//                             var curve = Curves.ease;
+
+//                             var tween = Tween(begin: begin, end: end)
+//                                 .chain(CurveTween(curve: curve));
+
+//                             return SlideTransition(
+//                               position: animation.drive(tween),
+//                               child: child,
+//                             );
+//                           },
+//                         ),
+//                       );
+//                     },
 
 /// A stateful widget that represents a vote button for a poll option.
 class VoteButton extends StatefulWidget {
@@ -397,7 +523,10 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                       controller.clear();
                     }
 
-                    await NotificationService().sendPersonalisedFCMMessage('Go and make your vote count!', 'polls', 'New Poll has just arrived');
+                    await NotificationService().sendPersonalisedFCMMessage(
+                        'Go and make your vote count!',
+                        'polls',
+                        'New Poll has just arrived');
                   } catch (e) {
                     print(e);
                   }
@@ -411,3 +540,65 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
     );
   }
 }
+// Klasa modelu ankiety
+// Klasa modelu ankiety
+// class Poll {
+//   String title;
+//   String type; // 'multiple' lub 'single'
+//   List<String> questions;
+
+//   Poll({required this.title, required this.type, required this.questions});
+// }
+
+// // Widok listy ankiet
+// class PollsListPage extends StatelessWidget {
+//   List<Poll> polls;
+
+//   PollsListPage({required this.polls});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView.builder(
+//       itemCount: polls.length,
+//       itemBuilder: (context, index) {
+//         return ListTile(
+//           title: Text(polls[index].title),
+//           trailing: Icon(Icons.arrow_forward),
+//           onTap: () {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(
+//                 builder: (context) => PollPage(poll: polls[index]),
+//               ),
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+// }
+
+// // Widok ankiety
+// class PollPage extends StatelessWidget {
+//   Poll poll;
+
+//   PollPage({required this.poll});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(poll.title),
+//       ),
+//       body: ListView.builder(
+//         itemCount: poll.questions.length,
+//         itemBuilder: (context, index) {
+//           return ListTile(
+//             title: Text(poll.questions[index]),
+//             // Tutaj dodaj logikę odpowiedzi na pytania
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }

@@ -6,6 +6,7 @@ import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/services/group_service.dart';
+import 'package:intl/intl.dart';
 
 class MessagingPage extends StatefulWidget {
   final String groupId;
@@ -126,7 +127,10 @@ class _MessagingPageState extends State<MessagingPage> {
                                         ),
                                         const Spacer(),
                                         Text(
-                                          message['timestamp'], // replace with your message time
+                                          message['timestamp'] != null
+                                              ? formatMessageTime(
+                                                  message['timestamp'])
+                                              : '...',
                                           style: const TextStyle(
                                               fontSize: 12, color: Colors.grey),
                                         ),
@@ -353,5 +357,18 @@ class _GroupPageState extends State<GroupPage> {
                 : null,
           );
         });
+  }
+}
+
+String formatMessageTime(Timestamp timestamp) {
+  DateTime messageTime = timestamp.toDate();
+  DateTime now = DateTime.now();
+
+  if (now.difference(messageTime).inHours < 24) {
+    // If the message was sent within the last 24 hours, display only the time
+    return DateFormat('HH:mm').format(messageTime);
+  } else {
+    // If the message was sent more than 24 hours ago, display the full date and time
+    return DateFormat('yyyy-MM-dd HH:mm').format(messageTime);
   }
 }
