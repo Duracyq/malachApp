@@ -180,32 +180,17 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   String userId = FirebaseAuth.instance.currentUser!.uid;
 
-  Future<String> fetchNickname(String userId) async {
-    try {
-      final snapshot = await _db.collection('users').doc(userId).get();
-      if (snapshot.exists) {
-        var data = snapshot.data();
-        if (data != null && data.containsKey('nickname')) {
-          // Check if 'nickname' is of type String before returning
-          if (data['nickname'] is String) {
-            debugPrint("Nickname fetched successfully: ${data['nickname']}");
-            return data['nickname'] as String;
-          } else {
-            debugPrint("Nickname is not of type String");
-          }
-        }
-      } else {
-        debugPrint("User document not found for userId: $userId");
-      }
-    } catch (e, stackTrace) {
-      debugPrint("Error fetching nickname: $e\n$stackTrace");
-    }
-    return '';  
+  Stream<String> fetchNickname(String userId) {
+    return _db
+        .collection('users')
+        .doc(userId)
+        .snapshots()
+        .map((snapshot) => snapshot.data()?['nickname'] as String? ?? '');
   }
 
   Widget buildNickname(BuildContext context) {
-    return FutureBuilder<String>(
-      future: fetchNickname(userId),
+    return StreamBuilder<String>(
+      stream: fetchNickname(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
