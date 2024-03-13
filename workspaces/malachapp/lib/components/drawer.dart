@@ -86,8 +86,7 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           const SizedBox(height: 60),
-          Expanded(
-            child: Align(
+          Align(
               alignment: Alignment.bottomCenter,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -101,7 +100,6 @@ class CustomDrawer extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
         ],
       ),
     );
