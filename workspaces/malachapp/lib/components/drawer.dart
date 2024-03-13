@@ -73,7 +73,7 @@ class CustomDrawer extends StatelessWidget {
               // Update the state of the app
               // Then close the drawer
               Navigator.of(context).push(
-                  MaterialPageRoute(builder: ((context) => ProfilePageSettings()))
+                  MaterialPageRoute(builder: ((context) => ProfilePage()))
               );
             },
           ),

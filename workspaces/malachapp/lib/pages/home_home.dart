@@ -159,6 +159,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/pages/add_group_page.dart';
+import 'package:malachapp/services/nickname_fetcher.dart';
 
 class HomeHomeWidget extends StatefulWidget {
   const HomeHomeWidget({Key? key}) : super(key: key);
@@ -179,42 +180,6 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
   String userId = FirebaseAuth.instance.currentUser!.uid;
-
-  Stream<String> fetchNickname(String userId) {
-    return _db
-        .collection('users')
-        .doc(userId)
-        .snapshots()
-        .map((snapshot) => snapshot.data()?['nickname'] as String? ?? '');
-  }
-
-  Widget buildNickname(BuildContext context) {
-    return StreamBuilder<String>(
-      stream: fetchNickname(userId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error fetching nickname');
-        } else {
-          final nickname = snapshot.data ?? '';
-          return Text(
-            '$nickname',
-            style: GoogleFonts.nunito(
-              textStyle: const TextStyle(
-                fontFamily: 'Nunito',
-                fontStyle: FontStyle.normal,
-                fontSize: 26,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +227,7 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                       //         fontWeight: FontWeight.w700),
                       //   ),
                       // ),
-                      buildNickname(context),
+                      NicknameFetcher().buildNickname(context, userId),
                       Text(
                         "!",
                         style: GoogleFonts.nunito(
