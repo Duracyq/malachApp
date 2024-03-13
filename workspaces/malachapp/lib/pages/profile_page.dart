@@ -8,12 +8,12 @@ import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 /// A page that displays the user's profile information.
-class ProfilePage extends StatefulWidget {
+class ProfilePageSettings extends StatefulWidget {
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _ProfilePageSettingsState createState() => _ProfilePageSettingsState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageSettingsState extends State<ProfilePageSettings> {
   String _nickname = '';
   bool _gdprConfirmed = false;
   bool _vulgularConfirmation = false;

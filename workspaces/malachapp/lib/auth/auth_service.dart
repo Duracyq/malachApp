@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:malachapp/main.dart';
-import 'package:malachapp/pages/notification_subs_page.dart';
-import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/subscribe_to_noti.dart';
 
 enum AuthStatus {
@@ -87,14 +85,14 @@ class AuthService {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Welcome!'),
-              content: Text(
+              content: const Text(
                 'It seems like you are logging in from a new device. '
                 'Would you like to set up your notification subscriptions?',
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(), // Close dialog
-                  child: Text('Later'),
+                  child: const Text('Later'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -105,7 +103,7 @@ class AuthService {
                     );
                     
                   },
-                  child: Text('Setup Subscriptions'),
+                  child: const Text('Setup Subscriptions'),
                 ),
               ],
             );
@@ -127,12 +125,14 @@ class AuthService {
     return _status;
   }
 
-  Future<bool> isAdmin(User? user) async {
+  Future<bool> isAdmin() async {
     final res = await FirebaseFirestore.instance
         .collection('admins')
         .doc('CcEYLsqPT31By3zjzEKg')
         .get();
-    return res.exists;
+    return (res.data()?.containsKey('email') ?? false) &&
+      ((res.data()!['email'] as List<dynamic>?) ?? [])
+        .contains(FirebaseAuth.instance.currentUser!.email);
   }
 
   Future<AuthStatus> signOut() async {

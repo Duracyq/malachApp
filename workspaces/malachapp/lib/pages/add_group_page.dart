@@ -36,7 +36,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
             ElevatedButton(
               onPressed: () async {
                 // Check if the current user is an admin
-                bool isAdmin = await _authService.isAdmin(_auth.currentUser!);
+                bool isAdmin = await _authService.isAdmin();
 
                 if (isAdmin) {
                   await _db.collection('groups').add({

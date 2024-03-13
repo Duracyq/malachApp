@@ -10,7 +10,7 @@ class GroupService {
   // Function to create a group (Admin only)
   Future<void> createGroup(String groupName, List<String> membersEmails, String adminEmail) async {
     // Check if creator is an Admin
-    final isAdmin = await AuthService().isAdmin(FirebaseAuth.instance.currentUser!);
+    final isAdmin = await AuthService().isAdmin();
     if (!isAdmin) {
       throw Exception('Only admins can create groups.');
     }
