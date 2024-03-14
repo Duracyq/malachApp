@@ -125,7 +125,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: MyTextField(
                     hintText: isChecked ? 'Enter member email' : 'Enter member code',
-                    controller: memberEmailController
+                    controller: memberEmailController,
+                    keyboardType: isChecked ? null : TextInputType.number,
                 ), 
               ),
               CheckboxListTile(
