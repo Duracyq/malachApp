@@ -267,7 +267,7 @@ class _HomeHomeState extends State<HomeHome> {
 //                 child: Column(
 //                   children: [
 //                     // limit user
-//                     if(FirebaseAuth.instance.currentUser?.email == "00011@malach.com") 
+//                     if(FirebaseAuth.instance.currentUser?.email == "00011@malach.com")
 //                       Column(
 //                         children: [
 //                           TextButton(
@@ -390,13 +390,15 @@ class _HomeHomeState extends State<HomeHome> {
           ),
         ],
       ),
-      floatingActionButton: FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
-        ? FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const CreatorPage()));
-        },
-      ) : null,
+      floatingActionButton:
+          FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
+              ? FloatingActionButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const CreatorPage()));
+                  },
+                )
+              : null,
     );
   }
 }
