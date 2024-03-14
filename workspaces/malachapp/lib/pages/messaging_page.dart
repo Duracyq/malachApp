@@ -199,6 +199,7 @@ class _MessagingPageState extends State<MessagingPage> {
                   ],
                 ),
               ),
+              const SizedBox(height: 10),
             ],
           ),
         );
