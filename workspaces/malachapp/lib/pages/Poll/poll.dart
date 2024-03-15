@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/themes/dark_mode.dart';
+import 'package:malachapp/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class PollDesign1 extends StatefulWidget {
   const PollDesign1({Key? key}) : super(key: key);
@@ -33,7 +36,7 @@ class _PollDesign1State extends State<PollDesign1> {
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My App Bar'),
+        title: const Text('Nazwa Ankiety'),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.all(10.0),
@@ -107,8 +110,12 @@ class _AnswerBoxState extends State<AnswerBox> {
             margin: EdgeInsets.only(top: 10),
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              border:
-                  Border.all(color: Colors.black, width: selected ? 3.0 : 1.0),
+              border: Border.all(
+                  color:
+                      Provider.of<ThemeProvider>(context).themeData == darkMode
+                          ? Colors.white ?? Colors.grey
+                          : Colors.black,
+                  width: selected ? 3.0 : 1.0),
               borderRadius: BorderRadius.circular(15),
             ),
           ),
@@ -116,25 +123,48 @@ class _AnswerBoxState extends State<AnswerBox> {
             margin: EdgeInsets.only(top: 10),
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black, width: 1.0),
+              border: Border.all(
+                  color:
+                      Provider.of<ThemeProvider>(context).themeData == darkMode
+                          ? Colors.white ?? Colors.grey
+                          : Colors.black,
+                  width: 1.0),
               borderRadius: BorderRadius.circular(15),
             ),
+            //! srodek
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                //! text
                 Expanded(
                   child: Text(
                     widget.text,
-                    style: TextStyle(color: Colors.black, fontSize: 16),
+                    style: TextStyle(
+                        color: Provider.of<ThemeProvider>(context).themeData ==
+                                darkMode
+                            ? Colors.white ?? Colors.grey
+                            : Colors.black,
+                        fontSize: 16),
                   ),
                 ),
+                //! kolko
                 Container(
                   height: 28,
                   width: 26,
                   decoration: BoxDecoration(
-                    color: selected ? Colors.black : Colors.transparent,
+                    color: selected
+                        ? (Provider.of<ThemeProvider>(context).themeData ==
+                                darkMode
+                            ? Colors.white
+                            : Colors.black)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(50),
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(
+                      color: Provider.of<ThemeProvider>(context).themeData ==
+                              darkMode
+                          ? Colors.white
+                          : Colors.black,
+                    ),
                   ),
                 )
               ],
