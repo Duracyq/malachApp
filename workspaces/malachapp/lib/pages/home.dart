@@ -13,6 +13,7 @@ import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/message_broadcast_page.dart';
+import 'package:malachapp/pages/poll_list_design.dart';
 // import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/poll_page.dart';
 import 'package:malachapp/services/fb_storage_loader.dart';
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
       HomeHomeWidget(
           // storage: storage, firebaseFirestore: firebaseFirestore, auth: auth
           ),
-      const PollPage(),
+      const PollDesign(),
       const EventListPage(),
     ];
   }
