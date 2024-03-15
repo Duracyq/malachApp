@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:malachapp/services/notification_service.dart';
@@ -412,10 +413,12 @@ class _VoteButtonState extends State<VoteButton> {
               ),
               child: Text(
                 widget.optionText,
-                style:
-                    TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color, // Set text color to black
-                    ),
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.color, // Set text color to black
+                ),
               ),
             ),
           ],
@@ -455,86 +458,114 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
       appBar: AppBar(
         title: const Text('Create Poll'),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            MyTextField(hintText: 'Question', controller: questionController),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: _howManyOptions,
-              itemBuilder: (context, index) {
-                return MyTextField(
-                  hintText: 'Option ${index + 1}',
-                  controller: optionControllers[index],
-                );
-              },
-            ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    setState(() {
-                      _howManyOptions++;
-                      // Add a new controller for the new option
-                      optionControllers.add(TextEditingController());
-                    });
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                child: MyTextField(
+                    hintText: 'Question', controller: questionController),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _howManyOptions,
+                  itemBuilder: (context, index) {
+                    return MyTextField(
+                      hintText: 'Option ${index + 1}',
+                      controller: optionControllers[index],
+                    );
                   },
-                  icon: const Icon(Icons.add),
                 ),
-                // remove
-                IconButton(
-                  onPressed: () async {
-                    setState(() {
-                      if (_howManyOptions > 0) {
-                        _howManyOptions--;
-                      }
-                      optionControllers.removeLast();
-                    });
-                  },
-                  icon: const Icon(Icons.remove),
-                ),
-              ],
-            ),
-            IconButton(
-              onPressed: () async {
-                if (questionController.text.isNotEmpty) {
-                  try {
-                    // Create a list to store options
-                    List<Map<String, dynamic>> options = [];
-
-                    // Add options to the list
-                    for (int i = 0; i < _howManyOptions; i++) {
-                      options.add({
-                        'text': optionControllers[i].text,
-                        'voters': [], // Initialize an empty list of voters
+              ),
+              Column(
+                children: [
+                  Container(
+                    height: 50,
+                    width: 50,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            Theme.of(context).colorScheme.primary),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10))),
+                        padding: MaterialStateProperty.all(EdgeInsets
+                            .zero), // Dodajemy to, aby usunąć domyślne marginesy
+                      ),
+                      onPressed: () async {
+                        setState(() {
+                          _howManyOptions++;
+                          // Add a new controller for the new option
+                          optionControllers.add(TextEditingController());
+                        });
+                      },
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  // remove
+                  IconButton(
+                    onPressed: () async {
+                      setState(() {
+                        if (_howManyOptions > 0) {
+                          _howManyOptions--;
+                        }
+                        optionControllers.removeLast();
                       });
+                    },
+                    icon: const Icon(Icons.remove),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MyButton(
+                  text: "Dodaj Ankietę",
+                  onTap: () async {
+                    if (questionController.text.isNotEmpty) {
+                      try {
+                        // Create a list to store options
+                        List<Map<String, dynamic>> options = [];
+
+                        // Add options to the list
+                        for (int i = 0; i < _howManyOptions; i++) {
+                          options.add({
+                            'text': optionControllers[i].text,
+                            'voters': [], // Initialize an empty list of voters
+                          });
+                        }
+
+                        // Add data to Firestore
+                        await db.collection('polls').add({
+                          'question': questionController.text,
+                          'options': options,
+                        });
+
+                        questionController.clear();
+
+                        // Clear option controllers
+                        for (var controller in optionControllers) {
+                          controller.clear();
+                        }
+
+                        await NotificationService().sendPersonalisedFCMMessage(
+                            'Go and make your vote count!',
+                            'polls',
+                            'New Poll has just arrived');
+                      } catch (e) {
+                        print(e);
+                      }
                     }
-
-                    // Add data to Firestore
-                    await db.collection('polls').add({
-                      'question': questionController.text,
-                      'options': options,
-                    });
-
-                    questionController.clear();
-
-                    // Clear option controllers
-                    for (var controller in optionControllers) {
-                      controller.clear();
-                    }
-
-                    await NotificationService().sendPersonalisedFCMMessage(
-                        'Go and make your vote count!',
-                        'polls',
-                        'New Poll has just arrived');
-                  } catch (e) {
-                    print(e);
-                  }
-                }
-              },
-              icon: const Icon(Icons.send_rounded),
-            ),
-          ],
+                  },
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/pages/Poll/poll.dart';
+import 'package:malachapp/pages/Poll/poll_page.dart';
 import 'package:malachapp/pages/Poll/test_chwilowy.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
@@ -16,6 +17,19 @@ class PollDesign extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: Text('Poll Design'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PollCreatorPage(),
+                  ),
+                );
+              },
+              icon: Icon(Icons.add),
+            ),
+          ],
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
