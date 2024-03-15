@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/my_button.dart';
+import 'package:malachapp/pages/Poll/poll_list_design.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -66,20 +68,38 @@ class _PollDesign1State extends State<PollDesign1> {
                 controller: _pageController,
                 itemCount: 3,
                 itemBuilder: (context, index) {
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 16.0),
-                          AnswerBox(press: () {}, text: "Odp 1", index: 1),
-                          AnswerBox(press: () {}, text: "Odp 2", index: 1),
-                          AnswerBox(press: () {}, text: "Odp 3", index: 1),
-                          AnswerBox(press: () {}, text: "Odp 4", index: 1),
-                        ],
+                  return Column(
+                    children: [
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 16.0),
+                              AnswerBox(press: () {}, text: "Odp 1", index: 1),
+                              AnswerBox(press: () {}, text: "Odp 2", index: 1),
+                              AnswerBox(press: () {}, text: "Odp 3", index: 1),
+                              AnswerBox(press: () {}, text: "Odp 4", index: 1),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                      if (index == 2)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: MyButton(
+                              text: "Wyślij",
+                              onTap: () {
+                                Navigator.pop(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PollDesign(),
+                                  ),
+                                );
+                              }),
+                        )
+                    ],
                   );
                 },
               ),

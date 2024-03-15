@@ -563,7 +563,39 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                     }
                   },
                 ),
-              )
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 140.0),
+                  child: Theme(
+                    data: ThemeData(
+                      unselectedWidgetColor: Colors
+                          .red, // Kolor checkboxa, gdy nie jest zaznaczony
+                      hintColor: Colors
+                          .blue, // Replace 'accentColor' with an existing named parameter or define a named parameter with the name 'accentColor'
+                      // Kolor checkboxa, gdy jest zaznaczony
+                    ),
+                    child: CheckboxListTile(
+                      title: const Text(
+                        'Jednokrotny wybór',
+                        style: TextStyle(
+                          // Kolor tekstu
+                          fontWeight: FontWeight.bold, // Grubość czcionki
+                        ),
+                      ),
+                      value: false,
+                      onChanged: (bool? value) {},
+                      activeColor: Colors
+                          .yellow, // Kolor tła, gdy checkbox jest zaznaczony
+                      checkColor: Colors.black, // Kolor znaku zaznaczenia
+                      tileColor: Colors.grey[200], // Kolor tła elementu listy
+                      controlAffinity: ListTileControlAffinity
+                          .leading, // Umieszczenie checkboxa przed tekstem
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -571,65 +603,3 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
     );
   }
 }
-// Klasa modelu ankiety
-// Klasa modelu ankiety
-// class Poll {
-//   String title;
-//   String type; // 'multiple' lub 'single'
-//   List<String> questions;
-
-//   Poll({required this.title, required this.type, required this.questions});
-// }
-
-// // Widok listy ankiet
-// class PollsListPage extends StatelessWidget {
-//   List<Poll> polls;
-
-//   PollsListPage({required this.polls});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView.builder(
-//       itemCount: polls.length,
-//       itemBuilder: (context, index) {
-//         return ListTile(
-//           title: Text(polls[index].title),
-//           trailing: Icon(Icons.arrow_forward),
-//           onTap: () {
-//             Navigator.push(
-//               context,
-//               MaterialPageRoute(
-//                 builder: (context) => PollPage(poll: polls[index]),
-//               ),
-//             );
-//           },
-//         );
-//       },
-//     );
-//   }
-// }
-
-// // Widok ankiety
-// class PollPage extends StatelessWidget {
-//   Poll poll;
-
-//   PollPage({required this.poll});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(poll.title),
-//       ),
-//       body: ListView.builder(
-//         itemCount: poll.questions.length,
-//         itemBuilder: (context, index) {
-//           return ListTile(
-//             title: Text(poll.questions[index]),
-//             // Tutaj dodaj logikę odpowiedzi na pytania
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
