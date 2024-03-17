@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
@@ -23,8 +24,7 @@ class PollPage extends StatelessWidget {
           title: const Text('Ankiety'),
         ),
         body: const PollList(),
-        floatingActionButton: FirebaseAuth.instance.currentUser?.email ==
-                "00011@malach.com"
+        floatingActionButton: AuthService().isAdmin() != false
             ? FloatingActionButton(
                 onPressed: () {
                   Navigator.push(
