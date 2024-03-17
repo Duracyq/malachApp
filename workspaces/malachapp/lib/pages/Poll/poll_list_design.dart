@@ -16,6 +16,7 @@ class PollDesign extends StatelessWidget {
       double screenWidth, 
       double screenHeight, 
       int index, 
+      int? howManyQuestions,
       String? pollListTitle) {
     return Container(
       width: screenWidth,
@@ -77,8 +78,8 @@ class PollDesign extends StatelessWidget {
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    '9', // Updated text
+                  child: Text(
+                    '$howManyQuestions', // Updated text
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
@@ -118,7 +119,7 @@ class PollDesign extends StatelessWidget {
           ),
         ],
       ),
-      body: const Column(
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
@@ -131,8 +132,8 @@ class PollDesign extends StatelessWidget {
 }
 
 class _PollListViewerState extends StatelessWidget {
-  const _PollListViewerState();
-
+  _PollListViewerState();
+  final _db = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -140,7 +141,7 @@ class _PollListViewerState extends StatelessWidget {
       child: RefreshIndicator(
         onRefresh: () => Future.delayed(Duration.zero), // Placeholder for actual refresh function
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('pollList').snapshots(),
+          stream: _db.collection('pollList').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -155,12 +156,24 @@ class _PollListViewerState extends StatelessWidget {
               itemBuilder: (context, index) {
                 final pollDoc = pollDocs[index];
                 final pollTitle = pollDoc['pollListTitle'];
-                return const PollDesign().buildPollList(
-                  context,
-                  screenWidth,
-                  screenHeight,
-                  index,
-                  pollTitle as String?, // Added type casting
+                return FutureBuilder<QuerySnapshot>(
+                future: _db.collection('pollList').doc(pollDoc.id).collection('polls').get(),
+                  builder: (context, pollListSnapshot) {
+                    if (pollListSnapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    final pollListLength = pollListSnapshot.data!.docs.length;
+                    return PollDesign().buildPollList(
+                      context,
+                      screenWidth,
+                      screenHeight,
+                      index,
+                      pollListLength,
+                      pollTitle as String?, // Added type casting
+                    );
+                  },
                 );
               },
             );
