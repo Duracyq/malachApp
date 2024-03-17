@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_debugPrint
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +8,7 @@ import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/text_field.dart';
+import 'package:malachapp/components/vote_button.dart';
 import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -56,7 +57,7 @@ class _PollListState extends State<PollList> {
 
   @override
   Widget build(BuildContext context) {
-    print('Building PollList widget');
+    debugPrint('Building PollList widget');
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
@@ -84,10 +85,10 @@ class _PollListState extends State<PollList> {
               return {...data, 'id': doc.id};
             }).toList();
 
-            print('Number of polls: ${polls.length}');
+            debugPrint('Number of polls: ${polls.length}');
 
             if (polls.isEmpty) {
-              print('No polls available');
+              debugPrint('No polls available');
               return const Center(
                 child: Text('No polls available.'),
               );
@@ -158,7 +159,7 @@ class _PollListState extends State<PollList> {
 //                     children: [
 //                       Center(
 //                         child: Text(
-//                           question,
+//                           'Pytanie',
 //                           style: const TextStyle(
 //                             fontWeight: FontWeight.bold,
 //                             fontSize: 18,
@@ -284,150 +285,8 @@ class _PollAnsweringState extends State<PollAnswering> {
 //                     },
 
 /// A stateful widget that represents a vote button for a poll option.
-class VoteButton extends StatefulWidget {
-  final String pollId;
-  final int optionIndex; // Change the type to int
-  final String optionText;
-  final List<dynamic> voters;
-
-  const VoteButton({
-    super.key,
-    required this.pollId,
-    required this.optionIndex,
-    required this.optionText,
-    required this.voters,
-  });
-
-  @override
-  _VoteButtonState createState() => _VoteButtonState();
-}
-
-class _VoteButtonState extends State<VoteButton> {
-  /// Checks if the current user has voted for this option.
-  bool get userVoted {
-    final user = FirebaseAuth.instance.currentUser;
-    return user != null &&
-        widget.voters != null &&
-        widget.voters!.any((voter) => voter['id'] == user.uid);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-      width: 160,
-      padding: const EdgeInsets.all(0),
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      child: Center(
-        child: Column(
-          children: [
-            ElevatedButton(
-              onPressed: () async {
-                if (!userVoted) {
-                  // Update the document to include the user's vote
-                  final user = FirebaseAuth.instance.currentUser;
-                  final pollReference = FirebaseFirestore.instance
-                      .collection('polls')
-                      .doc(widget.pollId);
-
-                  await FirebaseFirestore.instance
-                      .runTransaction((transaction) async {
-                    final docSnapshot = await transaction.get(pollReference);
-                    if (!docSnapshot.exists) {
-                      return; // Document does not exist, handle accordingly
-                    }
-
-                    final options = docSnapshot['options'] as List<dynamic>;
-                    final updatedOptions =
-                        List<Map<String, dynamic>>.from(options);
-
-                    // Find the option by text
-                    int optionIndex = -1;
-                    for (int i = 0; i < updatedOptions.length; i++) {
-                      if (updatedOptions[i]['text'] == widget.optionText) {
-                        optionIndex = i;
-                        break;
-                      }
-                    }
-
-                    if (optionIndex != -1) {
-                      updatedOptions[optionIndex]['voters'] = [
-                        ...updatedOptions[optionIndex]['voters'],
-                        {'id': user?.uid},
-                      ];
-
-                      transaction
-                          .update(pollReference, {'options': updatedOptions});
-                    } else {
-                      // Handle the case where the option is not found
-                      print('Option not found: ${widget.optionText}');
-                    }
-                  });
-                } else {
-                  // Remove the user's vote from the document
-                  final user = FirebaseAuth.instance.currentUser;
-                  final pollReference = FirebaseFirestore.instance
-                      .collection('polls')
-                      .doc(widget.pollId);
-
-                  await FirebaseFirestore.instance
-                      .runTransaction((transaction) async {
-                    final docSnapshot = await transaction.get(pollReference);
-                    if (!docSnapshot.exists) {
-                      return; // Document does not exist, handle accordingly
-                    }
-
-                    final options = docSnapshot['options'] as List<dynamic>;
-                    final updatedOptions =
-                        List<Map<String, dynamic>>.from(options);
-
-                    // Find the option by text
-                    int optionIndex = -1;
-                    for (int i = 0; i < updatedOptions.length; i++) {
-                      if (updatedOptions[i]['text'] == widget.optionText) {
-                        optionIndex = i;
-                        break;
-                      }
-                    }
-
-                    if (optionIndex != -1) {
-                      updatedOptions[optionIndex]
-                          ['voters'] = List<Map<String, dynamic>>.from(
-                        updatedOptions[optionIndex]['voters'],
-                      )..removeWhere((voter) => voter['id'] == user?.uid);
-
-                      transaction
-                          .update(pollReference, {'options': updatedOptions});
-                    } else {
-                      // Handle the case where the option is not found
-                      print('Option not found: ${widget.optionText}');
-                    }
-                  });
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: userVoted ? Colors.green : null,
-              ),
-              child: Text(
-                widget.optionText,
-                style: TextStyle(
-                  color: Theme.of(context)
-                      .textTheme
-                      .bodyLarge
-                      ?.color, // Set text color to black
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 //* Kreator Ankiet
+
 
 class PollCreatorPage extends StatefulWidget {
   PollCreatorPage({Key? key}) : super(key: key);
@@ -438,6 +297,7 @@ class PollCreatorPage extends StatefulWidget {
 
 class _PollCreatorPageState extends State<PollCreatorPage> {
   final TextEditingController questionController = TextEditingController();
+  final TextEditingController pollListTitleController = TextEditingController();
   late FirebaseFirestore db = FirebaseFirestore.instance;
   var _howManyOptions = 1;
   List<TextEditingController> optionControllers = [];
@@ -456,60 +316,56 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Poll'),
+        title: const Text('Stwórz ankietę'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Center(
+        child: SingleChildScrollView(
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-                child: MyTextField(
-                    hintText: 'Question', controller: questionController),
-              ),
-              Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _howManyOptions,
-                  itemBuilder: (context, index) {
-                    return MyTextField(
-                      hintText: 'Option ${index + 1}',
-                      controller: optionControllers[index],
-                    );
-                  },
+                child: MyTextField(
+                  hintText: 'Nazwa ankiety',
+                  controller: pollListTitleController,
                 ),
               ),
-              Column(
-                children: [
-                  Container(
-                    height: 50,
-                    width: 50,
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            Theme.of(context).colorScheme.primary),
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10))),
-                        padding: MaterialStateProperty.all(EdgeInsets
-                            .zero), // Dodajemy to, aby usunąć domyślne marginesy
-                      ),
-                      onPressed: () async {
-                        setState(() {
-                          _howManyOptions++;
-                          // Add a new controller for the new option
-                          optionControllers.add(TextEditingController());
-                        });
-                      },
-                      child: const Icon(
-                        Icons.add,
-                        color: Colors.black,
-                      ),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                child: MyTextField(
+                  hintText: 'Pytanie',
+                  controller: questionController,
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: _howManyOptions,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 5.0, 8.0, 5.0),
+                    child: MyTextField(
+                      hintText: 'Opcja #${index + 1}',
+                      controller: optionControllers[index],
                     ),
+                  );
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        _howManyOptions++;
+                        // Add a new controller for the new option
+                        optionControllers.add(TextEditingController());
+                      });
+                    },
+                    child: const Icon(Icons.add),
                   ),
-                  // remove
-                  IconButton(
+                  ElevatedButton(
                     onPressed: () async {
                       setState(() {
                         if (_howManyOptions > 0) {
@@ -518,17 +374,20 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                         optionControllers.removeLast();
                       });
                     },
-                    icon: const Icon(Icons.remove),
+                    child: const Icon(Icons.remove),
                   ),
                 ],
               ),
-              Padding(
+               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: MyButton(
                   text: "Dodaj Ankietę",
                   onTap: () async {
                     if (questionController.text.isNotEmpty) {
                       try {
+                        // Generate a unique ID for pollList
+                        String pollListId = db.collection('pollList').doc().id;
+
                         // Create a list to store options
                         List<Map<String, dynamic>> options = [];
 
@@ -540,8 +399,12 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                           });
                         }
 
+                        await db.collection('pollList').doc(pollListId).set({
+                          'pollListTitle': pollListTitleController.text,
+                          'oneTimeChoice': false,
+                        });
                         // Add data to Firestore
-                        await db.collection('polls').add({
+                        await db.collection('pollList').doc(pollListId).collection('polls').add({
                           'question': questionController.text,
                           'options': options,
                         });
@@ -554,46 +417,33 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                         }
 
                         await NotificationService().sendPersonalisedFCMMessage(
-                            'Go and make your vote count!',
-                            'polls',
-                            'New Poll has just arrived');
+                          'Idź i oddaj swój głos!',
+                          'polls',
+                          'Nowa ankieta właśnie się pojawiła',
+                        );
+                        Navigator.of(context).pop();
                       } catch (e) {
-                        print(e);
+                        debugPrint(e.toString());
                       }
                     }
                   },
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(8),
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 140.0),
-                  child: Theme(
-                    data: ThemeData(
-                      unselectedWidgetColor: Colors
-                          .red, // Kolor checkboxa, gdy nie jest zaznaczony
-                      hintColor: Colors
-                          .blue, // Replace 'accentColor' with an existing named parameter or define a named parameter with the name 'accentColor'
-                      // Kolor checkboxa, gdy jest zaznaczony
-                    ),
-                    child: CheckboxListTile(
-                      title: const Text(
-                        'Jednokrotny wybór',
-                        style: TextStyle(
-                          // Kolor tekstu
-                          fontWeight: FontWeight.bold, // Grubość czcionki
-                        ),
-                      ),
-                      value: false,
-                      onChanged: (bool? value) {},
-                      activeColor: Colors
-                          .yellow, // Kolor tła, gdy checkbox jest zaznaczony
-                      checkColor: Colors.black, // Kolor znaku zaznaczenia
-                      tileColor: Colors.grey[200], // Kolor tła elementu listy
-                      controlAffinity: ListTileControlAffinity
-                          .leading, // Umieszczenie checkboxa przed tekstem
+                padding: const EdgeInsets.all(8.0),
+                child: CheckboxListTile(
+                  title: const Text(
+                    'Pojedynczy wybór',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  value: false,
+                  onChanged: (bool? value) {},
+                  activeColor: Colors.yellow,
+                  checkColor: Colors.black,
+                  tileColor: Colors.grey[200],
+                  controlAffinity: ListTileControlAffinity.leading,
                 ),
               ),
             ],
