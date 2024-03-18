@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
         home: const FirebaseAuthPage(),
         routes: {
           '/event': (context) => const EventListPage(),
-          '/polls': (context) => const PollList(),
+          // '/polls': (context) => const PollList(),
           '/notifications': (context) => NotificationsSubscriptionPage(),
           '/messages_page': (context) => MessagingPage(
                 groupId: '',

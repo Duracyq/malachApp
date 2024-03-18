@@ -17,7 +17,9 @@ class PollDesign extends StatelessWidget {
       double screenHeight, 
       int index, 
       int? howManyQuestions,
-      String? pollListTitle) {
+      String? pollListTitle,
+      String pollListId,
+    ) {
     return Container(
       width: screenWidth,
       padding: const EdgeInsets.all(0),
@@ -29,7 +31,11 @@ class PollDesign extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const PollDesign1(),
+                builder: (context) => PollDesign1(
+                  pollListTitle: pollListTitle.toString(),
+                  pollCount: howManyQuestions!,
+                  pollListId: pollListId,
+                ),
               ),
             );
           },
@@ -171,7 +177,8 @@ class _PollListViewerState extends StatelessWidget {
                       screenHeight,
                       index,
                       pollListLength,
-                      pollTitle as String?, // Added type casting
+                      pollTitle as String?,
+                      pollDoc.id // Added type casting
                     );
                   },
                 );

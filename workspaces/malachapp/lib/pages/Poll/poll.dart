@@ -1,13 +1,24 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';
+import 'package:malachapp/components/vote_button.dart';
 import 'package:malachapp/pages/Poll/poll_list_design.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class PollDesign1 extends StatefulWidget {
-  const PollDesign1({Key? key}) : super(key: key);
+  final String pollListTitle;
+  final int pollCount;
+  final String pollListId;
+  const PollDesign1({
+    super.key,
+    required this.pollListTitle,
+    required this.pollCount,
+    required this.pollListId,
+  });
 
   @override
   _PollDesign1State createState() => _PollDesign1State();
@@ -31,81 +42,117 @@ class _PollDesign1State extends State<PollDesign1> {
     _pageController.dispose();
     super.dispose();
   }
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  @override
+  @override 
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nazwa Ankiety'),
+        title: Text(widget.pollListTitle),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: MyText(
-              text: "${_currentPage + 1}/3",
+              text: "${_currentPage + 1}/${widget.pollCount}",
               rozmiar: 20,
               waga: FontWeight.bold,
             ),
           ),
         ],
       ),
-      body: SizedBox(
-        height: screenHeight,
-        width: screenWidth,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: MyText(
-                text: "${_currentPage + 1}.Treść pytania",
-                rozmiar: 26,
-                waga: FontWeight.bold,
-              ),
-            ),
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 16.0),
-                              AnswerBox(press: () {}, text: "Odp 1", index: 1),
-                              AnswerBox(press: () {}, text: "Odp 2", index: 1),
-                              AnswerBox(press: () {}, text: "Odp 3", index: 1),
-                              AnswerBox(press: () {}, text: "Odp 4", index: 1),
-                            ],
-                          ),
-                        ),
-                      ),
-                      if (index == 2)
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: MyButton(
-                              text: "Wyślij",
-                              onTap: () {
-                                Navigator.pop(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PollDesign(),
+      body: FutureBuilder(
+        future: _db.collection('pollList').doc(widget.pollListId).collection('polls').get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            final DocumentSnapshot firstDocument = snapshot.data!.docs.first;
+            final String pollTitle = firstDocument['pollTitle'];
+            return SizedBox(
+              height: screenHeight,
+              width: screenWidth,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: MyText(
+                      text: "${_currentPage + 1}.$pollTitle",
+                      rozmiar: 26,
+                      waga: FontWeight.bold,
+                    ),
+                  ),
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: widget.pollCount,
+                      itemBuilder: (context, index) {
+                        return Column(
+                          children: [
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: snapshot.data!.docs.map<Widget>((doc) {
+                                      final List<dynamic> options = doc['options'];
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: options.map<Widget>((option) {
+                                          return AnswerBox(
+                                            press: () {},
+                                            text: option['text'],
+                                            index: options.indexOf(option) + 1,
+                                          );
+                                        }).toList(),
+                                      );
+                                    }).toList(),
                                   ),
-                                );
-                              }),
-                        )
-                    ],
-                  );
-                },
+                                ),
+                              ),
+                            ),
+                            if (index == widget.pollCount-1)
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: MyButton(
+                                  text: "Wyślij",
+                                  onTap: () {
+                                    final doc = snapshot.data!.docs.first;
+                                    final List<dynamic> options = doc['options'];
+                                    final int selectedIndex = _currentPage * options.length + index;
+                                    VoteButton(pollId: doc.id, pollListId: widget.pollListId).handleVote(
+                                      pollId: doc.id,
+                                      optionIndex: selectedIndex,
+                                      // voters: [],
+                                      optionText: options[selectedIndex]['text'],
+                                      pollListId: widget.pollListId,
+                                      // pollTitle: doc['pollTitle'],
+                                    );
+                                    Navigator.pop(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const PollDesign(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+
+                ],
               ),
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
     );
   }
