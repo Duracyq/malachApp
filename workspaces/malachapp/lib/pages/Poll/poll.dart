@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';
+import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/vote_button.dart';
 import 'package:malachapp/pages/Poll/poll_list_design.dart';
 import 'package:malachapp/themes/dark_mode.dart';
@@ -42,6 +43,12 @@ class _PollDesign1State extends State<PollDesign1> {
     _pageController.dispose();
     super.dispose();
   }
+  late FirebaseFirestore _dbSnap;
+  Future<void> _refresh() async {
+    await Future.delayed(const Duration(seconds: 1));
+
+  }
+
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   @override 
@@ -62,97 +69,98 @@ class _PollDesign1State extends State<PollDesign1> {
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: _db.collection('pollList').doc(widget.pollListId).collection('polls').get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            final DocumentSnapshot firstDocument = snapshot.data!.docs.first;
-            final String pollTitle = firstDocument['pollTitle'];
-            return SizedBox(
-              height: screenHeight,
-              width: screenWidth,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: MyText(
-                      text: "${_currentPage + 1}.$pollTitle",
-                      rozmiar: 26,
-                      waga: FontWeight.bold,
+      body: ReloadableWidget(
+        onRefresh: _refresh,
+        child: FutureBuilder(
+          future: _db.collection('pollList').doc(widget.pollListId).collection('polls').get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              final DocumentSnapshot firstDocument = snapshot.data!.docs.first;
+              final String pollTitle = firstDocument['pollTitle'];
+              return SizedBox(
+                height: screenHeight,
+                width: screenWidth,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: MyText(
+                        text: "${_currentPage + 1}.$pollTitle",
+                        rozmiar: 26,
+                        waga: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: widget.pollCount,
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: [
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: snapshot.data!.docs.map<Widget>((doc) {
-                                      final List<dynamic> options = doc['options'];
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: options.map<Widget>((option) {
-                                          return AnswerBox(
-                                            press: () {},
-                                            text: option['text'],
-                                            index: options.indexOf(option) + 1,
-                                          );
-                                        }).toList(),
-                                      );
-                                    }).toList(),
-                                  ),
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: widget.pollCount,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: snapshot.data!.docs.map<Widget>((doc) {
+                                        final List<dynamic> options = doc['options'];
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: options.map<Widget>((option) {
+                                            return AnswerBox(
+                                              press: () {},
+                                              text: option['text'],
+                                              index: options.indexOf(option) + 1,
+                                            );
+                                          }).toList(),
+                                        );
+                                      }).toList(),
+                                    ),
                                 ),
                               ),
-                            ),
-                            if (index == widget.pollCount-1)
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: MyButton(
-                                  text: "Wyślij",
-                                  onTap: () {
-                                    final doc = snapshot.data!.docs.first;
-                                    final List<dynamic> options = doc['options'];
-                                    final int selectedIndex = _currentPage * options.length + index;
-                                    VoteButton(pollId: doc.id, pollListId: widget.pollListId).handleVote(
-                                      pollId: doc.id,
-                                      optionIndex: selectedIndex,
-                                      // voters: [],
-                                      optionText: options[selectedIndex]['text'],
-                                      pollListId: widget.pollListId,
-                                      // pollTitle: doc['pollTitle'],
-                                    );
-                                    Navigator.pop(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const PollDesign(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
-                          ],
-                        );
-                      },
+                              if (index == widget.pollCount-1)
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: MyButton(
+                                    text: "Wyślij",
+                                    onTap: () {
+                                      final doc = snapshot.data!.docs.first;
+                                      final List<dynamic> options = doc['options'];
+                                      final int selectedIndex = _currentPage * options.length + index;
+                                      VoteButton(pollId: doc.id, pollListId: widget.pollListId).handleVote(
+                                        pollId: doc.id,
+                                        optionIndex: selectedIndex,
+                                        // voters: [],
+                                        optionText: options[selectedIndex]['text'],
+                                        pollListId: widget.pollListId,
+                                        // pollTitle: doc['pollTitle'],
+                                      );
+                                      Navigator.pop(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const PollDesign(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-
-                ],
-              ),
-            );
-          }
-        },
+        
+                  ],
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }
