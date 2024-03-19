@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:malachapp/components/MyText.dart';
@@ -28,13 +32,46 @@ class PollDesign1 extends StatefulWidget {
 class _PollDesign1State extends State<PollDesign1> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+
+  late List<int> selectedIndex;
+
+  Stream<bool> _isVoted(String currentUserId, String pollListId, String pollId) {
+    // Reference to the poll document
+    DocumentReference pollRef = FirebaseFirestore.instance
+        .collection('pollList')
+        .doc(pollListId)
+        .collection('polls')
+        .doc(pollId); // Replace 'yourPollId' with the actual poll ID
+    
+    // Check if the user has voted
+    return pollRef.snapshots().map((snapshot) {
+      if (snapshot.exists) {
+        // Get the votes array from the document data
+        List<dynamic> votes = (snapshot.data() as Map<String, dynamic>)['votes'] ?? [];
+        // Check if the current user's ID is in the votes array
+        return votes.contains(currentUserId) ? true : false;
+      } else {
+        // Handle case when the document doesn't exist
+        return false;
+      }
+    });
+  }
+
+
   @override
   void initState() {
     super.initState();
+    selectedIndex = [];
     _pageController.addListener(() {
       setState(() {
         _currentPage = _pageController.page!.round();
+        selectedIndex = [];
       });
+    });
+  }
+  void setSelectedIndex(List<int> indexList) {
+    setState(() {
+      selectedIndex = indexList;
     });
   }
 
@@ -43,18 +80,20 @@ class _PollDesign1State extends State<PollDesign1> {
     _pageController.dispose();
     super.dispose();
   }
-  late FirebaseFirestore _dbSnap;
   Future<void> _refresh() async {
-    await Future.delayed(const Duration(seconds: 1));
-
+    setState(() {
+      FirebaseFirestore.instance.collection('pollList').doc(widget.pollListId).collection('polls').get();
+    });    
   }
 
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
   @override 
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    List<int> _selectedIndexTemp = [];
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.pollListTitle),
@@ -113,9 +152,18 @@ class _PollDesign1State extends State<PollDesign1> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: options.map<Widget>((option) {
                                             return AnswerBox(
-                                              press: () {},
+                                              press: () {
+                                                if(selectedIndex.contains(options.indexOf(option))) {
+                                                  _selectedIndexTemp.remove(options.indexOf(option));
+                                                }
+                                                else {
+                                                  _selectedIndexTemp.add(options.indexOf(option));
+                                                }
+                                              },
                                               text: option['text'],
                                               index: options.indexOf(option) + 1,
+                                              pollId: doc.id,
+                                              pollListId: widget.pollListId,
                                             );
                                           }).toList(),
                                         );
@@ -129,24 +177,28 @@ class _PollDesign1State extends State<PollDesign1> {
                                   child: MyButton(
                                     text: "Wyślij",
                                     onTap: () {
+                                      setSelectedIndex(_selectedIndexTemp);
                                       final doc = snapshot.data!.docs.first;
                                       final List<dynamic> options = doc['options'];
-                                      final int selectedIndex = _currentPage * options.length + index;
-                                      VoteButton(pollId: doc.id, pollListId: widget.pollListId).handleVote(
-                                        pollId: doc.id,
-                                        optionIndex: selectedIndex,
-                                        // voters: [],
-                                        optionText: options[selectedIndex]['text'],
-                                        pollListId: widget.pollListId,
-                                        // pollTitle: doc['pollTitle'],
-                                      );
+                                      for (var v = 0; v < selectedIndex.length; ++v) {
+                                        VoteButton(pollId: doc.id, pollListId: widget.pollListId).handleVote(
+                                          pollId: doc.id,
+                                          optionIndex: selectedIndex[v],
+                                          optionText: options[selectedIndex[v]]['text'],
+                                          pollListId: widget.pollListId,
+                                        );
+                                      }
+                                      // Clear the selected index list
+                                      selectedIndex = [];
+                                      _selectedIndexTemp = [];
+                                      // Go back to the previous page
                                       Navigator.pop(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const PollDesign(),
                                         ),
                                       );
-                                    },
+                                    }, 
                                   ),
                                 )
                             ],
@@ -154,7 +206,6 @@ class _PollDesign1State extends State<PollDesign1> {
                         },
                       ),
                     ),
-        
                   ],
                 ),
               );
@@ -165,10 +216,66 @@ class _PollDesign1State extends State<PollDesign1> {
     );
   }
 }
+class AnswerBox extends StatefulWidget {
+  final VoidCallback press;
+  final String text;
+  final int index;
+  final String pollListId;
+  final String pollId;
+
+  const AnswerBox({
+    super.key,
+    required this.press, 
+    required this.text, 
+    required this.index,
+    required this.pollId,
+    required this.pollListId,
+  });
+
+  @override
+  _AnswerBoxState createState() => _AnswerBoxState();
+}
 
 class _AnswerBoxState extends State<AnswerBox> {
   bool selected = false;
 
+  @override
+  void initState() {
+    super.initState();
+    checkIfVoted();
+  }
+
+// TODO: implement this to code so user is informed if they have already voted
+  void checkIfVoted() async {
+    bool result = await isVoted(
+      FirebaseAuth.instance.currentUser!.uid,
+      widget.pollListId,
+      widget.pollId,
+    );
+    if (mounted) {
+      setState(() {
+        selected = result;
+      });
+    }
+  }
+
+  Future<bool> isVoted(String currentUserId, String pollListId, String pollId) async {
+    // Reference to the poll document
+    DocumentReference pollRef = FirebaseFirestore.instance
+        .collection('pollList')
+        .doc(pollListId)
+        .collection('polls')
+        .doc(pollId);
+
+    // Fetch the document and check if the user has voted
+    var snapshot = await pollRef.get();
+    if (snapshot.exists) {
+      List<dynamic> votes = (snapshot.data() as Map<String, dynamic>)['votes'] ?? [];
+      return votes.contains(currentUserId);
+    }
+    return false;
+  }
+  
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -186,11 +293,13 @@ class _AnswerBoxState extends State<AnswerBox> {
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               border: Border.all(
-                  color:
-                      Provider.of<ThemeProvider>(context).themeData == darkMode
-                          ? Colors.white ?? Colors.grey
-                          : Colors.black,
-                  width: selected ? 3.0 : 1.0),
+                color: selected
+                    ? (Provider.of<ThemeProvider>(context).themeData == darkMode
+                        ? Colors.white ?? Colors.grey
+                        : Colors.black)
+                    : Colors.transparent,
+                width: selected ? 3.0 : 1.0,
+              ),
               borderRadius: BorderRadius.circular(15),
             ),
           ),
@@ -199,49 +308,44 @@ class _AnswerBoxState extends State<AnswerBox> {
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               border: Border.all(
-                  color:
-                      Provider.of<ThemeProvider>(context).themeData == darkMode
-                          ? Colors.white ?? Colors.grey
-                          : Colors.black,
-                  width: 1.0),
+                color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                    ? Colors.white ?? Colors.grey
+                    : Colors.black,
+                width: 1.0,
+              ),
               borderRadius: BorderRadius.circular(15),
             ),
-            //! srodek
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                //! text
                 Expanded(
                   child: Text(
                     widget.text,
                     style: TextStyle(
-                        color: Provider.of<ThemeProvider>(context).themeData ==
-                                darkMode
-                            ? Colors.white ?? Colors.grey
-                            : Colors.black,
-                        fontSize: 16),
+                      color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                          ? Colors.white ?? Colors.grey
+                          : Colors.black,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
-                //! kolko
                 Container(
                   height: 28,
                   width: 26,
                   decoration: BoxDecoration(
                     color: selected
-                        ? (Provider.of<ThemeProvider>(context).themeData ==
-                                darkMode
+                        ? (Provider.of<ThemeProvider>(context).themeData == darkMode
                             ? Colors.white
                             : Colors.black)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(50),
                     border: Border.all(
-                      color: Provider.of<ThemeProvider>(context).themeData ==
-                              darkMode
+                      color: Provider.of<ThemeProvider>(context).themeData == darkMode
                           ? Colors.white
                           : Colors.black,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -251,15 +355,3 @@ class _AnswerBoxState extends State<AnswerBox> {
   }
 }
 
-class AnswerBox extends StatefulWidget {
-  final Function press;
-  final String text;
-  final int index;
-
-  const AnswerBox(
-      {Key? key, required this.press, required this.text, required this.index})
-      : super(key: key);
-
-  @override
-  _AnswerBoxState createState() => _AnswerBoxState();
-}

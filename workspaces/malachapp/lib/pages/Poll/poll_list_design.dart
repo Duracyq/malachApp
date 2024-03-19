@@ -10,6 +10,28 @@ import 'package:provider/provider.dart';
 
 class PollDesign extends StatelessWidget {
   const PollDesign({super.key});
+  //! TO IMPLEMENT: Add the _isVoted to BoxDecoration
+  Stream<bool> isVoted(String currentUserId, String pollListId, String pollId) {
+    // Reference to the poll document
+    DocumentReference pollRef = FirebaseFirestore.instance
+        .collection('pollList')
+        .doc(pollListId)
+        .collection('polls')
+        .doc(pollId); // Replace 'yourPollId' with the actual poll ID
+    
+    // Check if the user has voted
+    return pollRef.snapshots().map((snapshot) {
+      if (snapshot.exists) {
+        // Get the votes array from the document data
+        List<dynamic> votes = (snapshot.data() as Map<String, dynamic>)['votes'] ?? [];
+        // Check if the current user's ID is in the votes array
+        return votes.contains(currentUserId);
+      } else {
+        // Handle case when the document doesn't exist
+        return false;
+      }
+    });
+  }
 
   Widget buildPollList(
       BuildContext context, 
