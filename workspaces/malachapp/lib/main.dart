@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:malachapp/auth/admin/firebase_api.dart';
 import 'package:malachapp/auth/auth_page.dart';
 import 'package:malachapp/firebase_options.dart';
+import 'package:malachapp/pages/Poll/poll.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/messaging_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
@@ -44,8 +45,15 @@ class _MyAppState extends State<MyApp> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return ChangeNotifierProvider<UserNotificationPreferences>(
-      create: (context) => UserNotificationPreferences(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<UserNotificationPreferences>(
+          create: (context) => UserNotificationPreferences(),
+        ),
+        // ChangeNotifierProvider<SelectedState>(
+        //   create: (context) => SelectedState(),
+        // ),
+      ],
       child: MaterialApp(
         navigatorKey: navKey,
         scaffoldMessengerKey: scaffoldMessengerKey,

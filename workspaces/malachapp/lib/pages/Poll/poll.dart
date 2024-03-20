@@ -32,6 +32,7 @@ class PollDesign1 extends StatefulWidget {
 class _PollDesign1State extends State<PollDesign1> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  Map<int, List<int>> selectedOptionsByPage = {};
 
   late List<int> selectedIndex;
 
@@ -61,17 +62,19 @@ class _PollDesign1State extends State<PollDesign1> {
   @override
   void initState() {
     super.initState();
-    selectedIndex = [];
     _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page!.round();
-        selectedIndex = [];
-      });
+      int currentPage = _pageController.page!.round();
+      if (_currentPage != currentPage) {
+        setState(() {
+          _currentPage = currentPage;
+        });
+      }
     });
   }
-  void setSelectedIndex(List<int> indexList) {
+
+  void setSelectedIndex(int pageIndex, List<int> indexList) {
     setState(() {
-      selectedIndex = indexList;
+      selectedIndices[pageIndex] = indexList;
     });
   }
 
@@ -86,8 +89,19 @@ class _PollDesign1State extends State<PollDesign1> {
     });    
   }
 
+   void handleSelectionChange(int pageIndex, int optionIndex) {
+    final currentPageSelections = selectedOptionsByPage[pageIndex] ?? [];
+    if (currentPageSelections.contains(optionIndex)) {
+      currentPageSelections.remove(optionIndex);
+    } else {
+      currentPageSelections.add(optionIndex);
+    }
+    setState(() {
+      selectedOptionsByPage[pageIndex] = currentPageSelections;
+    });
+  }
 
-
+  Map<int, List<int>> selectedIndices = {};
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   @override 
   Widget build(BuildContext context) {
@@ -108,18 +122,24 @@ class _PollDesign1State extends State<PollDesign1> {
           ),
         ],
       ),
-      body: ReloadableWidget(
-        onRefresh: _refresh,
-        child: FutureBuilder(
-          future: _db.collection('pollList').doc(widget.pollListId).collection('polls').get(),
-          builder: (context, snapshot) {
+      body: 
+      // ReloadableWidget(
+      //   onRefresh: _refresh,
+      //   child: 
+        StreamBuilder<QuerySnapshot>(
+            stream: _db.collection('pollList').doc(widget.pollListId).collection('polls').snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
-              final DocumentSnapshot firstDocument = snapshot.data!.docs.first;
-              final String pollTitle = firstDocument['pollTitle'];
+
+              // final DocumentSnapshot firstDocument = snapshot.data!.docs.first;
+              // final String pollTitle = firstDocument['pollTitle'];
+
+              final polls = snapshot.data!.docs;
+              final int itemCount = polls.length;
               return SizedBox(
                 height: screenHeight,
                 width: screenWidth,
@@ -128,56 +148,96 @@ class _PollDesign1State extends State<PollDesign1> {
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: MyText(
-                        text: "${_currentPage + 1}.$pollTitle",
+                        text: "${_currentPage + 1}.$itemCount",
                         rozmiar: 26,
                         waga: FontWeight.bold,
                       ),
                     ),
-                    Flexible(
-                      fit: FlexFit.loose,
+                    Expanded(
                       child: PageView.builder(
                         controller: _pageController,
-                        itemCount: widget.pollCount,
+                        itemCount: itemCount,
+                        onPageChanged: (pageIndex) {
+                          setState(() {
+                            _currentPage = pageIndex;
+                          });
+                        },
                         itemBuilder: (context, index) {
+                          // Fetch the correct document for the current page
+                          final DocumentSnapshot currentDocument = polls[index];
+                          final Map<String, dynamic> data = currentDocument.data() as Map<String, dynamic>;
+                          final String pollTitle = data['pollTitle'];
+                          final List<dynamic> options = data['options'];
+
+                          // List<int> _selectedIndexTemp = selectedIndices[index] ?? [];
                           return Column(
                             children: [
-                              Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: snapshot.data!.docs.map<Widget>((doc) {
-                                        final List<dynamic> options = doc['options'];
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: options.map<Widget>((option) {
-                                            return AnswerBox(
-                                              press: () {
-                                                if(selectedIndex.contains(options.indexOf(option))) {
-                                                  _selectedIndexTemp.remove(options.indexOf(option));
-                                                }
-                                                else {
-                                                  _selectedIndexTemp.add(options.indexOf(option));
-                                                }
-                                              },
-                                              text: option['text'],
-                                              index: options.indexOf(option) + 1,
-                                              pollId: doc.id,
-                                              pollListId: widget.pollListId,
-                                            );
-                                          }).toList(),
-                                        );
-                                      }).toList(),
-                                    ),
+                              Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: MyText(
+                                  text: "${index + 1}.$pollTitle",
+                                  rozmiar: 26,
+                                  waga: FontWeight.bold,
                                 ),
                               ),
-                              if (index == widget.pollCount-1)
+                              // Card(
+                              //   child: 
+                              //   // Padding(
+                              //   //   padding: const EdgeInsets.all(16.0),
+                              //   //   child: 
+                              //     Column(
+                              //       crossAxisAlignment: CrossAxisAlignment.start,
+                              //       children: [
+                              //         ListView.builder(
+                              //         shrinkWrap: true,
+                              //         itemCount: options.length,
+                              //         itemBuilder: (context, index) {
+                              //           final option = options[index];
+                              //           bool isSelected = selectedOptionsByPage[_currentPage]?.contains(index) ?? false;
+                                        
+                              //         return
+                              //         //  IgnorePointer(
+                              //         //   ignoring: false,
+                              //         //   child: 
+                              //           AnswerBox1(
+                              //             onPressed: () => handleSelectionChange(index, options.indexOf(option)),
+                              //             // {
+                              //             //   if(selectedIndex.contains(options.indexOf(option))) {
+                              //             //     _selectedIndexTemp.remove(options.indexOf(option));
+                              //             //   }
+                              //             //   else {
+                              //             //     _selectedIndexTemp.add(options.indexOf(option));
+                              //             //   }
+                              //             // },
+                              //             text: option['text'],
+                              //             index: options.indexOf(option) + 1,
+                              //             pollId: currentDocument.id,
+                              //             pollListId: widget.pollListId,
+                              //           );
+                              //         // );
+                              //       })
+                              //       ],
+                              //       ),
+                              //       ),
+                              ...List.generate(options.length, (index) {
+                                final option = options[index];
+                                bool isSelected = selectedOptionsByPage[_currentPage]?.contains(index) ?? false;
+                                return AnswerBox1(
+                                  onPressed: () {
+                                    handleSelectionChange(index, options.indexOf(option));
+                                  },
+                                  text: option['text'],
+                                  isSelected: isSelected,
+                                );
+                              }),
+                                    // options.map<Widget>((option) {
+                              // if (index == widget.pollCount-1)
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: MyButton(
                                     text: "Wyślij",
                                     onTap: () {
-                                      setSelectedIndex(_selectedIndexTemp);
+                                      setSelectedIndex(_currentPage, _selectedIndexTemp);
                                       final doc = snapshot.data!.docs.first;
                                       final List<dynamic> options = doc['options'];
                                       for (var v = 0; v < selectedIndex.length; ++v) {
@@ -199,19 +259,18 @@ class _PollDesign1State extends State<PollDesign1> {
                                         ),
                                       );
                                     }, 
-                                  ),
-                                )
-                            ],
-                          );
-                        },
-                      ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
-                  ],
-                ),
-              );
-            }
-          },
-        ),
+                  ),  
+                ],
+              ),
+            );
+          }
+        }
       ),
     );
   }
@@ -253,9 +312,7 @@ class _AnswerBoxState extends State<AnswerBox> {
       widget.pollId,
     );
     if (mounted) {
-      setState(() {
-        selected = result;
-      });
+      // Provider.of<SelectedState>(context, listen: false).setSelected(widget.pollId, result);
     }
   }
 
@@ -278,12 +335,16 @@ class _AnswerBoxState extends State<AnswerBox> {
   
   @override
   Widget build(BuildContext context) {
+    // bool result = Provider.of<SelectedState>(context).isSelected(widget.pollId);
+
     return GestureDetector(
       onTap: () {
+        debugPrint('AnswerBox tapped!');
         widget.press();
         setState(() {
           selected = !selected;
         });
+        // Provider.of<SelectedState>(context, listen: false).setSelected(widget.pollId, !selected);
       },
       child: Stack(
         children: [
@@ -355,3 +416,61 @@ class _AnswerBoxState extends State<AnswerBox> {
   }
 }
 
+// class SelectedState with ChangeNotifier {
+//   Map<String, bool> _selected = {};
+
+//   bool isSelected(String id) => _selected[id] ?? false;
+
+//   void setSelected(String id, bool value) {
+//     _selected[id] = value;
+//     notifyListeners();
+//   }
+// }
+
+class AnswerBox1 extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String text;
+  final bool isSelected;
+
+  const AnswerBox1({
+    Key? key,
+    required this.onPressed,
+    required this.text,
+    this.isSelected = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue : Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: isSelected ? Colors.blueAccent : Colors.grey,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? Colors.white : Colors.black,
+              ),
+            ),
+            isSelected
+                ? Icon(Icons.check_circle, color: Colors.white)
+                : Icon(Icons.circle, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+}

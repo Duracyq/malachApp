@@ -280,166 +280,216 @@ import 'package:provider/provider.dart';
 
 
 class PollCreatorPage extends StatefulWidget {
-  PollCreatorPage({Key? key}) : super(key: key);
+  const PollCreatorPage({Key? key}) : super(key: key);
 
   @override
   State<PollCreatorPage> createState() => _PollCreatorPageState();
 }
 
 class _PollCreatorPageState extends State<PollCreatorPage> {
-  final TextEditingController questionController = TextEditingController();
   final TextEditingController pollListTitleController = TextEditingController();
   late FirebaseFirestore db = FirebaseFirestore.instance;
-  var _howManyOptions = 1;
-  List<TextEditingController> optionControllers = [];
+  List<PollData> pollsData = [];
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Add this line
 
-  @override
-  void initState() {
-    super.initState();
-
-    // Initialize option controllers with empty controllers
-    for (int i = 0; i < _howManyOptions; i++) {
-      optionControllers.add(TextEditingController());
-    }
-  }
+  final TextEditingController questionController = TextEditingController(); // Add this line
+  final List<TextEditingController> optionControllers = []; // Add this line
+  final DocumentReference pollListRef = FirebaseFirestore.instance.collection('polls').doc(); // Add this line
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stwórz ankietę'),
+        title: const Text('Create Poll'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: MyTextField(
-                  hintText: 'Nazwa ankiety',
+                  hintText: 'Poll List Title',
                   controller: pollListTitleController,
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-                child: MyTextField(
-                  hintText: 'Pytanie',
-                  controller: questionController,
                 ),
               ),
               ListView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: _howManyOptions,
+                physics: const NeverScrollableScrollPhysics(), // Add the 'const' keyword
+                itemCount: pollsData.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(8.0, 5.0, 8.0, 5.0),
-                    child: MyTextField(
-                      hintText: 'Opcja #${index + 1}',
-                      controller: optionControllers[index],
-                    ),
+                  return PollWidget(
+                    pollData: pollsData[index],
+                    onRemove: () {
+                      setState(() {
+                        pollsData.removeAt(index);
+                      });
+                    },
                   );
                 },
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _howManyOptions++;
-                        // Add a new controller for the new option
-                        optionControllers.add(TextEditingController());
-                      });
-                    },
-                    child: const Icon(Icons.add),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        if (_howManyOptions > 0) {
-                          _howManyOptions--;
-                        }
-                        optionControllers.removeLast();
-                      });
-                    },
-                    child: const Icon(Icons.remove),
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    pollsData.add(PollData());
+                  });
+                },
+                child: const Text('Add Question'),
               ),
-               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: MyButton(
-                  text: "Dodaj Ankietę",
-                  onTap: () async {
-                    if (questionController.text.isNotEmpty) {
-                      try {
-                        // Generate a unique ID for pollList
-                        String pollListId = db.collection('pollList').doc().id;
+              ElevatedButton(
+                onPressed: () async {
+                  if (pollsData.isNotEmpty) {
+                    try {
+                      // Create a new poll list document
+                      DocumentReference pollListRef = await db.collection('pollList').add({
+                        'pollListTitle': pollListTitleController.text,
+                        'oneTimeChoice': false,
+                      });
 
-                        // Create a list to store options
-                        List<Map<String, dynamic>> options = [];
+                      for (var pollData in pollsData) {
+                        String question = pollData.questionController.text;
+                        List<String> options = pollData.optionControllers.map((controller) => controller.text).toList();
 
-                        // Add options to the list
-                        for (int i = 0; i < _howManyOptions; i++) {
-                          options.add({
-                            'text': optionControllers[i].text,
-                            'voters': [], // Initialize an empty list of voters
-                          });
+                        if (question.isEmpty) {
+                          throw Exception('Question cannot be empty');
                         }
 
-                        await db.collection('pollList').doc(pollListId).set({
-                          'pollListTitle': pollListTitleController.text,
-                          'oneTimeChoice': false,
-                        });
-                        // Add data to Firestore
-                        await db.collection('pollList').doc(pollListId).collection('polls').add({
-                          'pollTitle': questionController.text,
-                          'options': options,
-                        });
-
-                        questionController.clear();
-
-                        // Clear option controllers
-                        for (var controller in optionControllers) {
-                          controller.clear();
+                        if (options.any((option) => option.isEmpty)) {
+                          throw Exception('Options cannot be empty');
                         }
 
-                        await NotificationService().sendPersonalisedFCMMessage(
-                          'Idź i oddaj swój głos!',
-                          'polls',
-                          'Nowa ankieta właśnie się pojawiła',
-                        );
+                        // Create a list of options with voters
+                        List<Map<String, dynamic>> optionsWithVoters = options.map((option) => {
+                          'pollTitle': option,
+                          'voters': [],
+                        }).toList();
+
+                        // Add the question as a document in the polls subcollection
+                        await pollListRef.collection('polls').add({
+                          'question': question,
+                          'options': optionsWithVoters,
+                        });
                         Navigator.of(context).pop();
-                      } catch (e) {
-                        debugPrint(e.toString());
                       }
+                    } catch (e) {
+                      // Handle the error
+                      print(e);
                     }
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CheckboxListTile(
-                  title: const Text(
-                    'Pojedynczy wybór',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  value: false,
-                  onChanged: (bool? value) {},
-                  activeColor: Colors.yellow,
-                  checkColor: Colors.black,
-                  tileColor: Colors.grey[200],
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
+                  }
+                },
+                child: const Text('Submit'),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class PollData {
+  late String question;
+  late List<String> options;
+  late TextEditingController questionController;
+  late List<TextEditingController> optionControllers;
+
+  PollData() {
+    question = '';
+    options = [];
+    questionController = TextEditingController(text: question);
+    optionControllers = options.map((option) => TextEditingController(text: option)).toList();
+  }
+
+  Future<DocumentReference> addToDatabase(String pollListId) async {
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    DocumentReference pollRef = await db.collection('pollList').doc(pollListId).collection('polls').add({
+      'pollTitle': questionController.text,
+      'options': optionControllers.map((controller) => controller.text).toList(),
+    });
+    return pollRef;
+  }
+}
+
+class PollWidget extends StatefulWidget {
+  final PollData pollData;
+  final VoidCallback onRemove;
+
+  const PollWidget({Key? key, required this.pollData, required this.onRemove}) : super(key: key);
+
+  @override
+  _PollWidgetState createState() => _PollWidgetState();
+}
+
+class _PollWidgetState extends State<PollWidget> {
+  @override
+  void initState() {
+    super.initState();
+    widget.pollData.questionController = TextEditingController(text: widget.pollData.question);
+    widget.pollData.optionControllers = widget.pollData.options.map((option) => TextEditingController(text: option)).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MyTextField(
+            hintText: 'Question',
+            controller: widget.pollData.questionController,
+            onChanged: (value) {
+              widget.pollData.question = value;
+            },
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: widget.pollData.optionControllers.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: MyTextField(
+                        hintText: 'Option ${index + 1}',
+                        controller: widget.pollData.optionControllers[index],
+                        onChanged: (value) {
+                          widget.pollData.options[index] = value;
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.pollData.optionControllers.removeAt(index);
+                          widget.pollData.options.removeAt(index);
+                        });
+                      },
+                      icon: Icon(Icons.remove),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                widget.pollData.optionControllers.add(TextEditingController());
+                widget.pollData.options.add('');
+              });
+            },
+            child: const Text('Add Option'),
+          ),
+          IconButton(
+            onPressed: widget.onRemove,
+            icon: Icon(Icons.delete),
+          ),
+        ],
       ),
     );
   }
