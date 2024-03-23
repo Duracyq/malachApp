@@ -125,33 +125,30 @@ class _PollDesign1State extends State<PollDesign1> {
                               child: MyButton(
                                 text: "Wyślij",
                                 onTap: () {
-                                  // for (int selectedIndex in _selectedIndexTemp) {
-                                  //   VoteButton(pollId: pollDoc.id, pollListId: widget.pollListId)
-                                  //       .handleVote(
-                                  //     pollId: pollDoc.id,
-                                  //     optionIndex: selectedIndex,
-                                  //     optionText: options[selectedIndex]['text'],
-                                  //     pollListId: widget.pollListId,
-                                  //   );
-                                  // }
                                   _selectedOptionsPerPoll.forEach((pollId, selectedOptions) {
-                                    for (int optionIndex in selectedOptions) {
-                                      VoteButton(pollId: pollId, pollListId: widget.pollListId)
-                                          .handleVote(
-                                        pollId: pollId,
-                                        optionIndex: optionIndex,
-                                        optionText: options[optionIndex]['text'],
-                                        pollListId: widget.pollListId,
-                                      );
-                                    }
-                                  Navigator.pop(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const PollDesign(),
-                                    ),
-                                  );
-                                  });
+                                    // Fetch the correct DocumentSnapshot based on pollId
+                                    final DocumentSnapshot correctPollDoc = snapshot.data!.docs.firstWhere(
+                                      (doc) => doc.id == pollId,
+                                      orElse: () => throw Exception('Poll not found'),
+                                    );
 
+                                    // Now, we can safely assume we have the correct options list
+                                    final List<dynamic> currentOptions = correctPollDoc['options'];
+
+                                    for (int optionIndex in selectedOptions) {
+                                      final String optionText = currentOptions[optionIndex]['text'];
+
+                                      VoteButton(pollId: pollId, pollListId: widget.pollListId)
+                                        .handleVote(
+                                          pollId: pollId,
+                                          optionIndex: optionIndex,
+                                          optionText: optionText,
+                                          pollListId: widget.pollListId,
+                                        );
+                                    }
+                                  });
+                                  // Assuming you want to navigate away after voting on the last poll
+                                  Navigator.of(context).pop();
                                 },
                               ),
                             )
@@ -169,6 +166,8 @@ class _PollDesign1State extends State<PollDesign1> {
     );
   }
 }
+
+
 
 class AnswerBox extends StatelessWidget {
   final Function press;
