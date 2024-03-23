@@ -16,6 +16,7 @@ import 'package:malachapp/pages/message_broadcast_page.dart';
 import 'package:malachapp/pages/Poll/poll_list_design.dart';
 // import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/Poll/poll_page.dart';
+import 'package:malachapp/pages/notification_archive.dart';
 import 'package:malachapp/services/fb_storage_loader.dart';
 import 'package:malachapp/services/notification_service.dart';
 // import 'package:malachapp/services/notification_service.dart';
@@ -54,7 +55,7 @@ class _HomePageState extends State<HomePage> {
 
     // Now you can use these initialized values in the tabs list
     tabs = [
-      HomeHomeWidget(
+      const HomeHomeWidget(
           // storage: storage, firebaseFirestore: firebaseFirestore, auth: auth
           ),
       const PollDesign(),
