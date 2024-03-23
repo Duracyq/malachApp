@@ -1,9 +1,9 @@
-/// notification_service.dart
 import 'dart:convert';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/services.dart' show Uint8List;
 import 'package:googleapis_auth/auth_io.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 const String project_id = 'malachapp';
 
@@ -14,98 +14,94 @@ class NotificationService {
 
   NotificationService._internal();
 
-  // Add a variable to store the FCM server key
-  final String _serverKey =
-      'AAAA8jXsXOg:APA91bG0D8EQZxoTEFSJNOc2nzMjgh7IVTG4jMaQUNSGvctwQcvkoeZ23jkX_95Lrr1xfYZKE9QshjCSJ3C9LbMZL_Nj_eJeXFxVlIZWAALZjZ3Vl_bQwHP8TVVTVN_r5YcrR91mGZUi';
-
-  Future<String> getOAuth2Token() async {
-    var jsonStr = await rootBundle.loadString('lib/auth/admin/malachapp-firebase-adminsdk-9a5ko-d405b11463.json');
-    var accountCredentials = ServiceAccountCredentials.fromJson(jsonDecode(jsonStr));
-    var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-
-    var client = http.Client();
+  Future<String> getOAuth2TokenFromFirebaseStorage() async {
     try {
-      var authClient = await clientViaServiceAccount(accountCredentials, scopes, baseClient: client);
-      return authClient.credentials.accessToken.data;
-    } finally {
-      client.close();
+      // Path to the secret in Firebase Storage
+      final String secretPath = 'secret/malachapp-firebase-adminsdk-9a5ko-d405b11463.json';
+
+      // Retrieve the secret file's content from Firebase Storage
+      final ref = FirebaseStorage.instance.ref().child(secretPath);
+      final Uint8List? fileData = await ref.getData();
+
+      // Ensure we got data
+      if (fileData == null) throw Exception('Failed to download secret file.');
+
+      // Decode the content to string and parse it as JSON
+      final jsonStr = utf8.decode(fileData);
+      final accountCredentials = ServiceAccountCredentials.fromJson(jsonDecode(jsonStr));
+
+      // Define the scopes for your OAuth2 token
+      var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+
+      // Generate the OAuth2 token
+      var client = http.Client();
+      try {
+        var authClient = await clientViaServiceAccount(accountCredentials, scopes, baseClient: client);
+        return authClient.credentials.accessToken.data;
+      } finally {
+        client.close();
+      }
+    } catch (error) {
+      print('Error getting OAuth2 token from Firebase Storage: $error');
+      rethrow;
     }
   }
 
   Future<void> sendFCMMessage(String message) async {
-    try {
-      final Map<String, dynamic> fcmPayload = {
-        'message': {
-          'notification': {
-            'title': 'UWAGA!',
-            'body': message,
-          },
-          'topic': 'all',
+    final Map<String, dynamic> messagePayload = {
+      'message': {
+        'topic': 'all',
+        'notification': {
+          'title': 'UWAGA!',
+          'body': message,
         },
-      };
+        'data': {
+          'message': message,
+        },
+      },
+    };
 
-      final String accessToken = await getOAuth2Token(); // Correctly obtaining the OAuth2 token
+    await _sendMessageToFCM(messagePayload);
+  }
+
+  Future<void> sendPersonalisedFCMMessage(String message, String topic, String title) async {
+    final Map<String, dynamic> messagePayload = {
+      'message': {
+        'topic': topic,
+        'notification': {
+          'title': title,
+          'body': message,
+        },
+        'data': {
+          'message': message,
+        },
+      },
+    };
+
+    await _sendMessageToFCM(messagePayload);
+  }
+
+  Future<void> _sendMessageToFCM(Map<String, dynamic> messagePayload) async {
+    try {
+      final String jsonPayload = jsonEncode(messagePayload);
+      final String accessToken = await getOAuth2TokenFromFirebaseStorage();
 
       final http.Response response = await http.post(
         Uri.parse('https://fcm.googleapis.com/v1/projects/$project_id/messages:send'),
-        headers: {
+        headers: <String, String>{
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken', // Using the OAuth2 token for authentication
+          'Authorization': 'Bearer $accessToken',
         },
-        body: jsonEncode(fcmPayload), // Correctly encoding the FCM payload as JSON
+        body: jsonPayload,
       );
 
       if (response.statusCode == 200) {
-        print('FCM message sent successfully: $message');
+        print('FCM message sent successfully');
       } else {
-        print('Failed to send FCM message. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error sending FCM message: $error');
-      throw error;
-    }
-  }
-
-
-  Future<void> sendPersonalisedFCMMessage(
-      String message, String topic, String title) async {
-    try {
-      final Map<String, dynamic> fcmPayload = {
-        'message': {
-          'notification': {
-            'title': title,
-            'body': message,
-          },
-          'topic': topic,
-        },
-      };
-
-      final String jsonPayload = jsonEncode(fcmPayload);
-
-      final String accessToken = await getOAuth2Token();
-
-      try {
-        final http.Response response = await http.post(
-          Uri.parse('https://fcm.googleapis.com/v1/projects/$project_id/messages:send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $accessToken',
-          },
-          body: jsonPayload,
-        );
-
-        if (response.statusCode == 200) {
-          print('FCM message sent successfully: $message');
-        } else {
-          print(
-              'Failed to send FCM message. Status code: ${response.statusCode}');
-        }
-      } catch (e) {
-        print('Error sending personalised FCM message $e');
-        rethrow;
+        print('Failed to send FCM message. Status code: ${response.statusCode}, Response: ${response.body}');
       }
     } catch (e) {
-      print('Error sending personalised FCM message $e');
+      print('Error sending FCM message $e');
       rethrow;
     }
   }
@@ -134,3 +130,4 @@ class NotificationService {
     }
   }
 }
+
