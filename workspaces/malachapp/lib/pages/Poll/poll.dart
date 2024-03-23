@@ -144,13 +144,14 @@ class _PollDesign1State extends State<PollDesign1> {
                                         pollListId: widget.pollListId,
                                       );
                                     }
-                                  });
                                   Navigator.pop(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => const PollDesign(),
                                     ),
                                   );
+                                  });
+
                                 },
                               ),
                             )
