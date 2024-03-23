@@ -1,50 +1,50 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/vote_button.dart';
 import 'package:malachapp/pages/Poll/poll_list_design.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
-import 'package:provider/provider.dart';
 
 class PollDesign1 extends StatefulWidget {
   final String pollListTitle;
   final int pollCount;
   final String pollListId;
+
   const PollDesign1({
-    super.key,
+    Key? key,
     required this.pollListTitle,
     required this.pollCount,
     required this.pollListId,
-  });
+  }) : super(key: key);
 
   @override
   _PollDesign1State createState() => _PollDesign1State();
 }
 
 class _PollDesign1State extends State<PollDesign1> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-  @override
-  void initState() {
-    super.initState();
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page!.round();
-      });
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final List<int> _selectedIndexTemp = [];
+
+  Map<String, Set<int>> _selectedOptionsPerPoll = {};
+
+  void _handleOptionTap(String pollId, int optionIndex) {
+    setState(() {
+      if (_selectedOptionsPerPoll[pollId] == null) {
+        _selectedOptionsPerPoll[pollId] = {optionIndex};
+      } else {
+        if (_selectedOptionsPerPoll[pollId]!.contains(optionIndex)) {
+          _selectedOptionsPerPoll[pollId]!.remove(optionIndex);
+        } else {
+          _selectedOptionsPerPoll[pollId]!.add(optionIndex);
+        }
+      }
     });
   }
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-
-  @override 
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -55,99 +55,110 @@ class _PollDesign1State extends State<PollDesign1> {
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: MyText(
-              text: "${_currentPage + 1}/${widget.pollCount}",
+              text: "1/${widget.pollCount}",
               rozmiar: 20,
               waga: FontWeight.bold,
             ),
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: _db.collection('pollList').doc(widget.pollListId).collection('polls').get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            final DocumentSnapshot firstDocument = snapshot.data!.docs.first;
-            final String pollTitle = firstDocument['pollTitle'];
-            return SizedBox(
-              height: screenHeight,
-              width: screenWidth,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: MyText(
-                      text: "${_currentPage + 1}.$pollTitle",
-                      rozmiar: 26,
-                      waga: FontWeight.bold,
-                    ),
-                  ),
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: widget.pollCount,
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: [
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: snapshot.data!.docs.map<Widget>((doc) {
-                                      final List<dynamic> options = doc['options'];
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: options.map<Widget>((option) {
-                                          return AnswerBox(
-                                            press: () {},
-                                            text: option['text'],
-                                            index: options.indexOf(option) + 1,
-                                          );
-                                        }).toList(),
+      body: StreamBuilder<QuerySnapshot>(
+  stream: _db
+      .collection('pollList')
+      .doc(widget.pollListId)
+      .collection('polls')
+      .snapshots(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const CircularProgressIndicator();
+    } else if (snapshot.hasError) {
+      return Text('Error: ${snapshot.error}');
+    } else {
+      return SizedBox(
+        height: screenHeight,
+        width: screenWidth,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: snapshot.data!.docs.length, // Count of polls/documents
+                itemBuilder: (context, pollIndex) {
+                  final DocumentSnapshot pollDoc = snapshot.data!.docs[pollIndex];
+                  final String pollTitle = pollDoc['pollTitle'];
+                  final List<dynamic> options = pollDoc['options'];
+                  final String pollId = pollDoc.id;
+
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: MyText(
+                          text: "${pollIndex + 1}.$pollTitle", // Updated to show poll number and title
+                          rozmiar: 26,
+                          waga: FontWeight.bold,
+                        ),
+                      ),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: List<Widget>.generate(options.length, (optionIndex) {
+                              bool isSelected = _selectedOptionsPerPoll[pollId]?.contains(optionIndex) ?? false;
+                              return AnswerBox(
+                                press: () {
+                                  _handleOptionTap(pollId, optionIndex);
+                                },
+                                text: options[optionIndex]['text'],
+                                index: optionIndex,
+                                pollId: pollId,
+                                pollListId: widget.pollListId,
+                                isSelected: isSelected,
+                              );
+                            }),
+                          ),
+                        ),
+                      ),
+                          if (pollIndex == widget.pollCount - 1)
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: MyButton(
+                                text: "Wyślij",
+                                onTap: () {
+                                  // for (int selectedIndex in _selectedIndexTemp) {
+                                  //   VoteButton(pollId: pollDoc.id, pollListId: widget.pollListId)
+                                  //       .handleVote(
+                                  //     pollId: pollDoc.id,
+                                  //     optionIndex: selectedIndex,
+                                  //     optionText: options[selectedIndex]['text'],
+                                  //     pollListId: widget.pollListId,
+                                  //   );
+                                  // }
+                                  _selectedOptionsPerPoll.forEach((pollId, selectedOptions) {
+                                    for (int optionIndex in selectedOptions) {
+                                      VoteButton(pollId: pollId, pollListId: widget.pollListId)
+                                          .handleVote(
+                                        pollId: pollId,
+                                        optionIndex: optionIndex,
+                                        optionText: options[optionIndex]['text'],
+                                        pollListId: widget.pollListId,
                                       );
-                                    }).toList(),
-                                  ),
-                                ),
+                                    }
+                                  });
+                                  Navigator.pop(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const PollDesign(),
+                                    ),
+                                  );
+                                },
                               ),
-                            ),
-                            if (index == widget.pollCount-1)
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: MyButton(
-                                  text: "Wyślij",
-                                  onTap: () {
-                                    final doc = snapshot.data!.docs.first;
-                                    final List<dynamic> options = doc['options'];
-                                    final int selectedIndex = _currentPage * options.length + index;
-                                    VoteButton(pollId: doc.id, pollListId: widget.pollListId).handleVote(
-                                      pollId: doc.id,
-                                      optionIndex: selectedIndex,
-                                      // voters: [],
-                                      optionText: options[selectedIndex]['text'],
-                                      pollListId: widget.pollListId,
-                                      // pollTitle: doc['pollTitle'],
-                                    );
-                                    Navigator.pop(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const PollDesign(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
+                            )
                           ],
                         );
                       },
                     ),
                   ),
-
                 ],
               ),
             );
@@ -158,17 +169,29 @@ class _PollDesign1State extends State<PollDesign1> {
   }
 }
 
-class _AnswerBoxState extends State<AnswerBox> {
-  bool selected = false;
+class AnswerBox extends StatelessWidget {
+  final Function press;
+  final String text;
+  final int index;
+  final String pollId;
+  final String pollListId;
+  final bool isSelected;
+
+  const AnswerBox({
+    Key? key,
+    required this.press,
+    required this.text,
+    required this.index,
+    required this.pollId,
+    required this.pollListId,
+    required this.isSelected,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        widget.press();
-        setState(() {
-          selected = !selected;
-        });
+        press();
       },
       child: Stack(
         children: [
@@ -178,11 +201,11 @@ class _AnswerBoxState extends State<AnswerBox> {
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               border: Border.all(
-                  color:
-                      Provider.of<ThemeProvider>(context).themeData == darkMode
-                          ? Colors.white ?? Colors.grey
-                          : Colors.black,
-                  width: selected ? 3.0 : 1.0),
+                color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                    ? Colors.white ?? Colors.grey
+                    : Colors.black,
+                width: isSelected ? 3.0 : 1.0,
+              ),
               borderRadius: BorderRadius.circular(15),
             ),
           ),
@@ -191,11 +214,11 @@ class _AnswerBoxState extends State<AnswerBox> {
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               border: Border.all(
-                  color:
-                      Provider.of<ThemeProvider>(context).themeData == darkMode
-                          ? Colors.white ?? Colors.grey
-                          : Colors.black,
-                  width: 1.0),
+                color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                    ? Colors.white ?? Colors.grey
+                    : Colors.black,
+                width: 1.0,
+              ),
               borderRadius: BorderRadius.circular(15),
             ),
             //! srodek
@@ -205,13 +228,13 @@ class _AnswerBoxState extends State<AnswerBox> {
                 //! text
                 Expanded(
                   child: Text(
-                    widget.text,
+                    text,
                     style: TextStyle(
-                        color: Provider.of<ThemeProvider>(context).themeData ==
-                                darkMode
-                            ? Colors.white ?? Colors.grey
-                            : Colors.black,
-                        fontSize: 16),
+                      color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                          ? Colors.white ?? Colors.grey
+                          : Colors.black,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 //! kolko
@@ -219,21 +242,19 @@ class _AnswerBoxState extends State<AnswerBox> {
                   height: 28,
                   width: 26,
                   decoration: BoxDecoration(
-                    color: selected
-                        ? (Provider.of<ThemeProvider>(context).themeData ==
-                                darkMode
+                    color: isSelected
+                        ? (Provider.of<ThemeProvider>(context).themeData == darkMode
                             ? Colors.white
                             : Colors.black)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(50),
                     border: Border.all(
-                      color: Provider.of<ThemeProvider>(context).themeData ==
-                              darkMode
+                      color: Provider.of<ThemeProvider>(context).themeData == darkMode
                           ? Colors.white
                           : Colors.black,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -241,17 +262,4 @@ class _AnswerBoxState extends State<AnswerBox> {
       ),
     );
   }
-}
-
-class AnswerBox extends StatefulWidget {
-  final Function press;
-  final String text;
-  final int index;
-
-  const AnswerBox(
-      {Key? key, required this.press, required this.text, required this.index})
-      : super(key: key);
-
-  @override
-  _AnswerBoxState createState() => _AnswerBoxState();
 }
