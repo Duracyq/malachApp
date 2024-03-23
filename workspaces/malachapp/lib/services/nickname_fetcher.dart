@@ -24,7 +24,7 @@ class NicknameFetcher {
         } else {
           final nickname = snapshot.data ?? '';
           return Text(
-            '$nickname',
+            nickname,
             style: GoogleFonts.nunito(
               textStyle: const TextStyle(
                 fontFamily: 'Nunito',

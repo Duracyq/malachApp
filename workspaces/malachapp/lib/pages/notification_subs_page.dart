@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/subscribe_to_noti.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -100,16 +98,30 @@ class UserNotificationPreferences with ChangeNotifier {
     _savePreferences();
     notifyListeners();
   }
-
   Future<void> _loadPreferences() async {
-    Map<String, dynamic> savedPreferences = {
-      'polls': await _secureStorage.read(key: 'subscribed_polls') == 'true',
-      'events': await _secureStorage.read(key: 'subscribed_events') == 'true',
-      'posts': await _secureStorage.read(key: 'subscribed_posts') == 'true',
-      'all': await _secureStorage.read(key: 'all') == 'true',
+    // Initialize an empty map to hold the dynamically loaded preferences
+    Map<String, bool> loadedPreferences = {
+      'polls': false,
+      'events': false,
+      'posts': false,
+      'all': false,
     };
 
-    _subscriptions = savedPreferences.cast<String, bool>();
+    // Read all values from secure storage
+    Map<String, String> allValues = await _secureStorage.readAll();
+
+    // Include predefined categories and dynamically identified group subscriptions
+    allValues.forEach((key, value) {
+      if (loadedPreferences.containsKey(key) || key.startsWith('subscribed_')) {
+        // Assuming the value is stored as a string 'true' or 'false'
+        loadedPreferences[key] = value == 'true';
+      }
+    });
+
+    // Update the _subscriptions map with the dynamically loaded preferences
+    _subscriptions = loadedPreferences;
+
+    // Notify listeners to update UI or perform other actions in response to the data load
     notifyListeners();
   }
 
