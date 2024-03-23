@@ -17,7 +17,7 @@ class NotificationService {
   Future<String> getOAuth2TokenFromFirebaseStorage() async {
     try {
       // Path to the secret in Firebase Storage
-      const String secretPath = 'secret/malachapp-firebase-adminsdk-9a5ko-d405b11463.json';
+      const String secretPath = 'secret/malachapp-firebase-adminsdk-9a5ko-7e05d828f3.json';
 
       // Retrieve the secret file's content from Firebase Storage
       final ref = FirebaseStorage.instance.ref().child(secretPath);
