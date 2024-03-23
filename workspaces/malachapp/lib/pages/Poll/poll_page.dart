@@ -12,6 +12,7 @@ import 'package:malachapp/components/vote_button.dart';
 import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
+
 /// A stateful widget that represents a vote button for a poll option.
 class PollCreatorPage extends StatefulWidget {
   PollCreatorPage({Key? key}) : super(key: key);
@@ -66,7 +67,7 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stwórz ankietę'),
+        title: const Text('Stwórz ankietę'), // Translate: Create a survey
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -76,24 +77,25 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: MyTextField(
-                  hintText: 'Nazwa ankiety',
+                  hintText: 'Nazwa ankiety', // Translate: Survey name
                   controller: pollListTitleController,
                 ),
               ),
               ...questions.map((question) => _buildQuestionSection(question, questions.indexOf(question))).toList(),
               ElevatedButton(
                 onPressed: _addQuestion,
-                child: const Text('Dodaj pytanie'),
+                child: const Text('Dodaj pytanie'), // Translate: Add question
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: MyButton(
-                  text: "Dodaj Ankietę",
+                  text: "Dodaj Ankietę", // Translate: Add Survey
                   onTap: () async {
                     await _submitPoll();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Ankieta została dodana'),
+                      const SnackBar(content: Text('Ankieta została dodana'), // Translate: Survey has been added
                     ));
+                    NotificationService().sendPersonalisedFCMMessage('Niech Twój głos się liczy! 🗳️', 'polls', 'Nowa dostępna ankieta! 🎉'); 
                     Navigator.of(context).pop();
                   },
                 ),
@@ -102,7 +104,7 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: CheckboxListTile(
                   title: const Text(
-                    'Pojedynczy wybór',
+                    'Pojedynczy wybór', // Translate: Single choice
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   value: _oneTimeChoice,
@@ -128,7 +130,7 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
     return Column(
       children: [
         MyTextField(
-          hintText: 'Pytanie',
+          hintText: 'Pytanie', // Translate: Question
           controller: question.questionController,
         ),
         ListView.builder(
@@ -139,7 +141,7 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
             return Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 5.0, 8.0, 5.0),
               child: MyTextField(
-                hintText: 'Opcja #${optionIndex + 1}',
+                hintText: 'Opcja #${optionIndex + 1}', // Translate: Option #
                 controller: question.optionControllers[optionIndex],
               ),
             );
@@ -163,34 +165,39 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
   }
 
   Future<void> _submitPoll() async {
-    if (questions.any((question) => question.questionController.text.isNotEmpty && question.optionControllers.any((controller) => controller.text.isNotEmpty))) {
-      String pollListId = db.collection('pollList').doc().id;
+    try {
+      if (questions.any((question) => question.questionController.text.isNotEmpty && question.optionControllers.any((controller) => controller.text.isNotEmpty))) {
+        String pollListId = db.collection('pollList').doc().id;
 
-      await db.collection('pollList').doc(pollListId).set({
-        'pollListTitle': pollListTitleController.text,
-        'oneTimeChoice': _oneTimeChoice,
-      });
+        await db.collection('pollList').doc(pollListId).set({
+          'pollListTitle': pollListTitleController.text,
+          'oneTimeChoice': _oneTimeChoice,
+        });
 
-      for (Question question in questions) {
-        if (question.questionController.text.isNotEmpty && question.optionControllers.any((controller) => controller.text.isNotEmpty)) {
-          List<Map<String, dynamic>> options = question.optionControllers
-              .where((controller) => controller.text.isNotEmpty)
-              .map((controller) => {'text': controller.text, 'voters': []})
-              .toList();
+        for (Question question in questions) {
+          if (question.questionController.text.isNotEmpty && question.optionControllers.any((controller) => controller.text.isNotEmpty)) {
+            List<Map<String, dynamic>> options = question.optionControllers
+                .where((controller) => controller.text.isNotEmpty)
+                .map((controller) => {'text': controller.text, 'voters': []})
+                .toList();
 
-          await db.collection('pollList').doc(pollListId).collection('polls').add({
-            'pollTitle': question.questionController.text,
-            'options': options,
-          });
+            await db.collection('pollList').doc(pollListId).collection('polls').add({
+              'pollTitle': question.questionController.text,
+              'options': options,
+            });
+          }
         }
-      }
 
-      // Reset state after successful submission
-      pollListTitleController.clear();
-      _oneTimeChoice = false; // Reset this if you want to clear the choice for the next use
-      questions.clear(); // Clear the entire list of questions
-      // Optionally, re-initialize the form to start with a single empty question
-      initState(); // Or a custom method to reinitialize the question form
+        // Reset state after successful submission
+        pollListTitleController.clear();
+        _oneTimeChoice = false; // Reset this if you want to clear the choice for the next use
+        questions.clear(); // Clear the entire list of questions
+        // Optionally, re-initialize the form to start with a single empty question
+        // initState(); // Or a custom method to reinitialize the question form
+      }
+    } catch (e) {
+      // Handle the error here
+      print('Error submitting poll: $e');
     }
   }
 }

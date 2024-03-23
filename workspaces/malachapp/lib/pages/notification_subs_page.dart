@@ -27,26 +27,13 @@ class _NotificationsSubscriptionPageState extends State<NotificationsSubscriptio
           _buildSubscriptionTile('posts'),
           const SizedBox(height: 50),
           //admin privliges
-          _buildSendingTile('polls'),
-          _buildSendingTile('events'),
-          _buildSendingTile('posts')
           
         ],
       ),
     );
   }
 
-  Widget _buildSendingTile(String topic) {
-    if(FirebaseAuth.instance.currentUser?.displayName != '00011@malach.com'){
-      return SizedBox();
-    }
-    return ListTile(
-            title: Text('Send Notification to $topic'),
-            onTap: () {
-              NotificationService().sendFCMMessage(topic);
-      }
-    );
-  }
+
 
   Widget _buildSubscriptionTile(String topic) {
     bool isSubscribed =
@@ -55,7 +42,7 @@ class _NotificationsSubscriptionPageState extends State<NotificationsSubscriptio
     return ListTile(
       title: Text('Subscribe to $topic'),
       onTap: () => _toggleSubscription(topic, !isSubscribed),
-      trailing: isSubscribed ? null : const Icon(Icons.check),
+      trailing: !isSubscribed ? null : const Icon(Icons.check),
     );
   }
 
@@ -74,18 +61,19 @@ class _NotificationsSubscriptionPageState extends State<NotificationsSubscriptio
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              '${!subscribe ? 'Subscribed to' : 'Unsubscribed from'} $topic notifications'),
+              '${subscribe ? 'Subscribed to' : 'Unsubscribed from'} $topic notifications'),
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'Failed to ${!subscribe ? 'subscribe to' : 'unsubscribe from'} $topic notifications'),
+              'Failed to ${subscribe ? 'subscribe to' : 'unsubscribe from'} $topic notifications'),
         ),
       );
     }
   }
+
 }
 class UserNotificationPreferences with ChangeNotifier {
   // static const String _prefKey = 'notification_preferences';
@@ -115,9 +103,9 @@ class UserNotificationPreferences with ChangeNotifier {
 
   Future<void> _loadPreferences() async {
     Map<String, dynamic> savedPreferences = {
-      'polls': await _secureStorage.read(key: 'polls') == 'true',
-      'events': await _secureStorage.read(key: 'events') == 'true',
-      'posts': await _secureStorage.read(key: 'posts') == 'true',
+      'polls': await _secureStorage.read(key: 'subscribed_polls') == 'true',
+      'events': await _secureStorage.read(key: 'subscribed_events') == 'true',
+      'posts': await _secureStorage.read(key: 'subscribed_posts') == 'true',
       'all': await _secureStorage.read(key: 'all') == 'true',
     };
 
