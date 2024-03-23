@@ -83,7 +83,7 @@ class _EventCreatorPageState extends State<EventCreatorPage> {
             ElevatedButton(
               onPressed: () async {
                 await _addEvent();
-                await NotificationService().sendPersonalisedFCMMessage("See if you've got something for yourself!", 'events', 'New Event has just dropped!');
+                await NotificationService().sendPersonalisedFCMMessage("Sprawdź, czy masz coś dla siebie! 😊", 'events', 'Nowe wydarzenie właśnie się pojawiło! 🎉');
                 Navigator.pop(context); // Go back to the previous screen after adding the event
               },
               child: const Text('Create Event'),
