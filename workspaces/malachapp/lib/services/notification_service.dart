@@ -1,9 +1,11 @@
-/// notification_service.dart
 import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/services.dart' show Uint8List;
+import 'package:googleapis_auth/auth_io.dart';
+
+const String project_id = 'malachapp';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -12,81 +14,43 @@ class NotificationService {
 
   NotificationService._internal();
 
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  Future<String> getOAuth2TokenFromFirebaseStorage() async {
+    try {
+      // Path to the secret in Firebase Storage
+      const String secretPath = 'secret/malachapp-firebase-adminsdk-9a5ko-7e05d828f3.json';
 
-  // Add a variable to store the FCM registration token
-  String? _fcmToken;
+      // Retrieve the secret file's content from Firebase Storage
+      final ref = FirebaseStorage.instance.ref().child(secretPath);
+      final Uint8List? fileData = await ref.getData();
 
-  // Getter method to retrieve the FCM registration token
-  String? get fcmToken => _fcmToken;
+      // Ensure we got data
+      if (fileData == null) throw Exception('Failed to download secret file.');
 
-  Future<void> initialize() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
+      // Decode the content to string and parse it as JSON
+      final jsonStr = utf8.decode(fileData);
+      final accountCredentials = ServiceAccountCredentials.fromJson(jsonDecode(jsonStr));
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+      // Define the scopes for your OAuth2 token
+      var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-    // Retrieve the FCM registration token when the app starts
-    _fcmToken = await _firebaseMessaging.getToken();
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.data.isNotEmpty) {
-        print('Message data payload: ${message.data}');
+      // Generate the OAuth2 token
+      var client = http.Client();
+      try {
+        var authClient = await clientViaServiceAccount(accountCredentials, scopes, baseClient: client);
+        return authClient.credentials.accessToken.data;
+      } finally {
+        client.close();
       }
-
-      showNotification(
-        title: message.notification?.title ?? '',
-        body: message.notification?.body ?? '',
-      );
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Notification tapped!');
-    });
-    FirebaseMessaging.onBackgroundMessage(backgroundMessageHandler);
-  }
-
-  Future<void> backgroundMessageHandler(RemoteMessage message) async {
-    print('Handling a background message: ${message.messageId}');
-    // Implement your logic to handle the FCM message when the app is in the background
-    // For example, you can schedule a local notification here
-    showNotification(
-      title: message.notification?.title ?? '',
-      body: message.notification?.body ?? '',
-    );
-  }
-
-  Future<void> showNotification({
-    required String title,
-    required String body,
-  }) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'channel_id',
-      'channel_name',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-    );
+    } catch (error) {
+      print('Error getting OAuth2 token from Firebase Storage: $error');
+      rethrow;
+    }
   }
 
   Future<void> sendFCMMessage(String message) async {
-    try {
-      final Map<String, dynamic> fcmPayload = {
+    final Map<String, dynamic> messagePayload = {
+      'message': {
+        'topic': 'all',
         'notification': {
           'title': 'UWAGA!',
           'body': message,
@@ -94,45 +58,16 @@ class NotificationService {
         'data': {
           'message': message,
         },
-        'priority': 'high',
-        'to': '/topics/all',
-      };
+      },
+    };
 
-      final String jsonPayload = jsonEncode(fcmPayload);
-
-      try {
-        const String serverKey =
-            'AAAA8jXsXOg:APA91bG0D8EQZxoTEFSJNOc2nzMjgh7IVTG4jMaQUNSGvctwQcvkoeZ23jkX_95Lrr1xfYZKE9QshjCSJ3C9LbMZL_Nj_eJeXFxVlIZWAALZjZ3Vl_bQwHP8TVVTVN_r5YcrR91mGZUi'; // Replace with your FCM server key
-
-        final http.Response response = await http.post(
-          Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $serverKey',
-          },
-          body: jsonPayload,
-        );
-
-        if (response.statusCode == 200) {
-          print('FCM message sent successfully: $message');
-        } else {
-          print(
-              'Failed to send FCM message. Status code: ${response.statusCode}');
-        }
-      } catch (error) {
-        print('Error getting or sending FCM server key: $error');
-        throw error;
-      }
-    } catch (error) {
-      print('Error sending FCM message: $error');
-      throw error;
-    }
+    await _sendMessageToFCM(messagePayload);
   }
 
-  Future<void> sendPersonalisedFCMMessage(
-      String message, String topic, String title) async {
-    try {
-      final Map<String, dynamic> fcmPayload = {
+  Future<void> sendPersonalisedFCMMessage(String message, String topic, String title) async {
+    final Map<String, dynamic> messagePayload = {
+      'message': {
+        'topic': topic,
         'notification': {
           'title': title,
           'body': message,
@@ -140,62 +75,36 @@ class NotificationService {
         'data': {
           'message': message,
         },
-        'priority': 'high',
-        'to': '/topics/$topic',
-      };
+      },
+    };
 
-      final String jsonPayload = jsonEncode(fcmPayload);
+    await _sendMessageToFCM(messagePayload);
+  }
 
-      try {
-        const String serverKey = 'AAAA8jXsXOg:APA91bG0D8EQZxoTEFSJNOc2nzMjgh7IVTG4jMaQUNSGvctwQcvkoeZ23jkX_95Lrr1xfYZKE9QshjCSJ3C9LbMZL_Nj_eJeXFxVlIZWAALZjZ3Vl_bQwHP8TVVTVN_r5YcrR91mGZUi'; // Replace with your FCM server key
-        
-        final http.Response response =
-            await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-                headers: <String, String>{
-                  'Content-Type': 'application/json',
-                  'Authorization': 'Bearer $serverKey',
-                },
-                body: jsonPayload);
+  Future<void> _sendMessageToFCM(Map<String, dynamic> messagePayload) async {
+    try {
+      final String jsonPayload = jsonEncode(messagePayload);
+      final String accessToken = await getOAuth2TokenFromFirebaseStorage();
 
-        if (response.statusCode == 200) {
-          print('FCM message sent successfully: $message');
-        } else {
-          print(
-              'Failed to send FCM message. Status code: ${response.statusCode}');
-        }
-      } catch (e) {
-        print('Error getting or sending FCM server key $e');
-        rethrow;
+      final http.Response response = await http.post(
+        Uri.parse('https://fcm.googleapis.com/v1/projects/$project_id/messages:send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonPayload,
+      );
+
+      if (response.statusCode == 200) {
+        print('FCM message sent successfully');
+      } else {
+        print('Failed to send FCM message. Status code: ${response.statusCode}, Response: ${response.body}');
       }
     } catch (e) {
-      print('Error sending personalised FCM message $e');
+      print('Error sending FCM message $e');
       rethrow;
     }
   }
-
-// Future<String> getServerKey() async {
-//   // Initialize Firebase Admin with your credentials
-//   const String path = 'lib/auth/admin/9a5ko-35eeb1e303.json';
-//   final admin = FirebaseAdmin.instance;
-//   final app = await admin.initializeApp(
-//     AppOptions(
-//       credential: admin.certFromPath(path),
-//     ),
-//   );
-//   print('Current working directory: ${Directory.current}');
-
-//   // Retrieve the FCM server key from the service account credentials
-//   final Map<String, dynamic>? credentials =
-//       app.options.credential as Map<String, dynamic>?;
-
-//   if (credentials != null && credentials.containsKey('private_key')) {
-//     final String privateKey = credentials['private_key'] as String;
-//     // You may need to format the privateKey if it includes line breaks or other characters
-//     return privateKey;
-//   } else {
-//     throw Exception('Failed to retrieve FCM server key');
-//   }
-// }
 
   Future<void> requestNotificationPermission() async {
     PermissionStatus status = await Permission.notification.status;
@@ -221,3 +130,4 @@ class NotificationService {
     }
   }
 }
+
