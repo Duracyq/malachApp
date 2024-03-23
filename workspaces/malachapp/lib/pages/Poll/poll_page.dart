@@ -187,7 +187,6 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
             });
           }
         }
-        NotificationService().sendPersonalisedFCMMessage('Twój głos się liczy! 🗳️', 'polls', 'Nowa ankieta właśnie dotarła! 🎉');        // Resetuj stan po pomyślnym przesłaniu
         pollListTitleController.clear();
         _oneTimeChoice = false; // Reset this if you want to clear the choice for the next use
         questions.clear(); // Clear the entire list of questions
