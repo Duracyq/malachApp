@@ -19,3 +19,11 @@ ThemeData lightMode = ThemeData(
         labelLarge: TextStyle(color: Colors.black),
       ),
 );
+
+
+// Theme.of(context).colorScheme.onSecondary,
+
+// Provider.of<ThemeProvider>(context).themeData == darkMode
+//             ? Colors.red[400]
+//             : Colors.red[700],
+

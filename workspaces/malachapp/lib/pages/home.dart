@@ -13,8 +13,9 @@ import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/message_broadcast_page.dart';
+import 'package:malachapp/pages/Poll/poll_list_design.dart';
 // import 'package:malachapp/pages/home_home.dart';
-import 'package:malachapp/pages/poll_page.dart';
+import 'package:malachapp/pages/Poll/poll_page.dart';
 import 'package:malachapp/services/fb_storage_loader.dart';
 import 'package:malachapp/services/notification_service.dart';
 // import 'package:malachapp/services/notification_service.dart';
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
       HomeHomeWidget(
           // storage: storage, firebaseFirestore: firebaseFirestore, auth: auth
           ),
-      const PollPage(),
+      const PollDesign(),
       const EventListPage(),
     ];
   }
@@ -267,7 +268,7 @@ class _HomeHomeState extends State<HomeHome> {
 //                 child: Column(
 //                   children: [
 //                     // limit user
-//                     if(FirebaseAuth.instance.currentUser?.email == "00011@malach.com") 
+//                     if(FirebaseAuth.instance.currentUser?.email == "00011@malach.com")
 //                       Column(
 //                         children: [
 //                           TextButton(
@@ -390,13 +391,15 @@ class _HomeHomeState extends State<HomeHome> {
           ),
         ],
       ),
-      floatingActionButton: FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
-        ? FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const CreatorPage()));
-        },
-      ) : null,
+      floatingActionButton:
+          FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
+              ? FloatingActionButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const CreatorPage()));
+                  },
+                )
+              : null,
     );
   }
 }

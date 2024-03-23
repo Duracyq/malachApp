@@ -61,6 +61,15 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isChecked = false;
+
+    void onChanged(bool value) {
+      debugPrint('Checkbox value: $value');
+      setState(() {
+        isChecked = value;
+      });
+    }
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: lightMode,
@@ -92,16 +101,22 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
                 child: MyTextField(
-                    hintText: "login",
+                    hintText: "Login",
                     obscureText: false,
+                    keyboardType: TextInputType.emailAddress,
                     controller: loginController),
               ),
+              // CheckboxListTile(
+              //   value: isChecked,
+              //   title: const Text("Custom Domain"),
+              //   onChanged: (value) => onChanged(value!)),
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12),
                 child: MyTextField(
-                    hintText: "haslo",
+                    hintText: "Haslo",
                     obscureText: true,
+                    keyboardType: TextInputType.visiblePassword,
                     controller: passwController),
               ),
               Padding(

@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:malachapp/auth/admin_settings_page.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/pages/message_broadcast_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
+import 'package:malachapp/pages/profile_page.dart';
 import 'package:malachapp/services/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:malachapp/themes/theme_provider.dart';
@@ -10,7 +14,7 @@ import 'package:malachapp/themes/dark_mode.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -18,11 +22,6 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final AuthService _authService = AuthService();
-
-  Future<bool> isAdmin() async {
-    return await _authService.isAdmin(FirebaseAuth.instance.currentUser!);
-  }
-  
   Widget buildDivider(BuildContext context) {
     ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     return Column(
@@ -47,10 +46,10 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text('Ustawienia'),
       ),
       body: FutureBuilder<bool>(
-        future: isAdmin(),
+        future: _authService.isAdmin(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           } else if (snapshot.hasError) {
@@ -62,13 +61,22 @@ class _SettingsPageState extends State<SettingsPage> {
             return Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  
+                children: [ 
                   ListTile(
                     title: const Text('Notifications Settings'),
+                    leading: const Icon(Icons.notifications),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: ((context) => NotificationsSubscriptionPage()),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Profile Settings'),
+                    leading: const Icon(Icons.person),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ProfilePageSettings(),
                       ),
                     ),
                   ),
@@ -77,29 +85,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Column(
                       children: [
                         buildDivider(context),
-                        // separator named Admin Privilages
-                        Text('Admin Privilages',
-                            style: GoogleFonts.roboto(
-                              textStyle: const TextStyle(
-                                fontStyle: FontStyle.normal,
-                                fontSize: 18,
-                              ),
-                        )),
-                        buildDivider(context),
                         ListTile(
+                          title: const Text('Admin Settings'),
+                          leading: const Icon(Icons.admin_panel_settings),
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => MessageBroadcastPage(),
+                              builder: (context) => AdminSettingsPage(),
                             ),
                           ),
-                          title: const Text("Send Message Page"),
-                        ),
-                        ListTile(
-                          onTap: () async {
-                            await NotificationService()
-                                .requestNotificationPermission();
-                          },
-                          title: const Text('Request Notification Permission'),
                         ),
                       ],
                     ),

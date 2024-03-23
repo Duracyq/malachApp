@@ -36,6 +36,7 @@ dependencies:
   http: ^0.13.6
   flutter_secure_storage: ^9.0.0
   uuid: ^4.3.3
+  intl: ^0.18.1
 
 flutter_icons:
   image_path: "assets/favicon.png"

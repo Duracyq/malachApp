@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 class MessagingPage extends StatefulWidget {
   final String groupId;
 
-  MessagingPage({Key? key, required this.groupId}) : super(key: key);
+  const MessagingPage({super.key, required this.groupId});
 
   @override
   _MessagingPageState createState() => _MessagingPageState();
@@ -27,7 +27,7 @@ class _MessagingPageState extends State<MessagingPage> {
   Future<bool> isAdminAsync() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      return await _authService.isAdmin(user);
+      return await _authService.isAdmin();
     }
     return false;
   }
@@ -60,7 +60,7 @@ class _MessagingPageState extends State<MessagingPage> {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  const AddMemberPage(),
+                                  AddMemberPage(groupID: widget.groupId),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             var begin = const Offset(1.0, 0.0);
@@ -95,8 +95,9 @@ class _MessagingPageState extends State<MessagingPage> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData)
+                    if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
+                    }
                     return ListView(
                       children: snapshot.data!.docs.map((message) {
                         return Padding(
@@ -119,7 +120,11 @@ class _MessagingPageState extends State<MessagingPage> {
                                     Row(
                                       children: [
                                         Text(
-                                          message['sender'],
+                                            message['sendersNickname'] != null
+                                                ? "${message['sendersNickname']
+                                                    .split('@')[0]} (${message['sender']
+                                                    .split('@')[0]})"
+                                                : message['sender'],
                                           style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors
@@ -185,7 +190,7 @@ class _MessagingPageState extends State<MessagingPage> {
                           await _groupService.sendMessage(
                             widget.groupId,
                             _messageController.text,
-                            _auth.currentUser!.email!,
+                            _auth.currentUser!.email!
                           );
                           _messageController.clear();
                         }
@@ -194,6 +199,7 @@ class _MessagingPageState extends State<MessagingPage> {
                   ],
                 ),
               ),
+              const SizedBox(height: 10),
             ],
           ),
         );
@@ -203,7 +209,7 @@ class _MessagingPageState extends State<MessagingPage> {
 }
 
 class GroupPage extends StatefulWidget {
-  const GroupPage({Key? key}) : super(key: key);
+  const GroupPage({super.key});
 
   @override
   State<GroupPage> createState() => _GroupPageState();
@@ -234,7 +240,7 @@ class _GroupPageState extends State<GroupPage> {
   Future<bool> isAdminAsync() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      return await _authService.isAdmin(user);
+      return await _authService.isAdmin();
     }
     return false;
   }

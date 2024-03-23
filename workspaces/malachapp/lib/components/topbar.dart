@@ -62,7 +62,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   //   icon: const Icon(Icons.arrow_back_ios_new_rounded),
                   //   alignment: Alignment.topLeft,
                   // )
-                  //Image.asset('assets/herb1.png'),
+                  // Image.asset('assets/herb1.png'),
                 ],
               ),
             ),

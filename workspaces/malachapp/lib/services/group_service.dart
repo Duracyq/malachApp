@@ -5,11 +5,12 @@ import 'package:malachapp/auth/auth_service.dart';
 
 class GroupService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Function to create a group (Admin only)
   Future<void> createGroup(String groupName, List<String> membersEmails, String adminEmail) async {
     // Check if creator is an Admin
-    final isAdmin = await AuthService().isAdmin(FirebaseAuth.instance.currentUser!);
+    final isAdmin = await AuthService().isAdmin();
     if (!isAdmin) {
       throw Exception('Only admins can create groups.');
     }
@@ -29,6 +30,11 @@ class GroupService {
     await _db.collection('groups').doc(groupId).collection('messages').add({
       'text': message,
       'sender': userEmail,
+      'sendersNickname': await _db
+                          .collection('users')
+                          .doc(_auth.currentUser!.uid)
+                          .get()
+                          .then((value) => value.data()!['nickname']) as String,
       'timestamp': FieldValue.serverTimestamp(),
     });
   }
