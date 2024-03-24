@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert'; // Import JSON codec
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -17,7 +17,7 @@ class NotificationArchive extends StatefulWidget {
 class _NotificationArchiveState extends State<NotificationArchive> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  List<Map<String, dynamic>> notifications = []; // Changed to dynamic to handle JSON
+  List<Map<String, dynamic>> notifications = [];
   final Logger logger = Logger();
 
   String? _currentToken;
@@ -35,13 +35,12 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     _firebaseMessaging.getToken().then((token) {
       setState(() {
-        _currentToken = token ?? ""; // Provide a default empty string if token is null
+        _currentToken = token;
       });
       if (token != null) {
         logger.d("Firebase Token: $token");
       }
     });
-
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       final topic = message.data['topic'] ?? 'Unknown';
@@ -66,25 +65,48 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     }
   }
 
-  void _storeNotification(String title, String notification, String topic) async {
+  Future<void> _storeNotification(String title, String notification, String topic) async {
     if (_savingNotification) return;
     _savingNotification = true;
 
-    final key = 'notification_${DateTime.now().millisecondsSinceEpoch}';
+    // Generate a unique key based on the notification's content, including a timestamp for sorting
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
+    final String formattedDate = formatter.format(now);
+    final uniqueKey = _generateUniqueKey(title, notification, topic, formattedDate);
+
+    // Check if this unique key already exists
+    if (await _uniqueKeyExists(uniqueKey)) {
+      logger.d("Notification already stored, skipping...");
+      _savingNotification = false;
+      return;
+    }
+
+    // Prepare the notification data with the formatted date
     final Map<String, dynamic> notificationData = {
       "title": title,
       "notification": notification,
       "topic": topic,
+      "timestamp": formattedDate, // Save the formatted date
     };
 
-    // Remove any null values from the map
-    final nonNullData = notificationData.map((key, value) => MapEntry(key, value ?? "Unknown"));
+    final String valueToStore = jsonEncode(notificationData);
+    await _secureStorage.write(key: uniqueKey, value: valueToStore); // Use the uniqueKey as the storage key
 
-    final String valueToStore = jsonEncode(nonNullData);
-    await _secureStorage.write(key: key, value: valueToStore);
     _retrieveNotifications();
-
     _savingNotification = false;
+  }
+
+
+  // Helper method to generate a unique key (this is a simple version, consider a hash for more complexity)
+  String _generateUniqueKey(String title, String notification, String topic, String formattedDate) {
+    return "$title-$notification-$topic-$formattedDate";
+  }
+
+  // Check if a unique key already exists in the storage
+  Future<bool> _uniqueKeyExists(String uniqueKey) async {
+    final allKeys = await _secureStorage.readAll();
+    return allKeys.containsKey(uniqueKey);
   }
 
   Future<bool> _isNotificationAlreadyStored(String title, String notification, String topic) async {
@@ -98,22 +120,40 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     return false;
   }
 
-  void _retrieveNotifications() async {
+  // Future<void> _retrieveNotifications() async {
+  //   Map<String, String> allValues = await _secureStorage.readAll();
+  //   List<Map<String, dynamic>> parsedNotifications = [];
+  //   allValues.forEach((key, value) {
+  //     Map<String, dynamic> storedData = jsonDecode(value);
+  //     int timestamp = int.tryParse(key.substring(key.lastIndexOf('_') + 1)) ?? 0;
+  //     storedData['timestamp'] = timestamp.toString();
+  //     parsedNotifications.add(storedData);
+  //   });
+
+  //   parsedNotifications.sort((a, b) => int.parse(b['timestamp']).compareTo(int.parse(a['timestamp'])));
+
+  //   setState(() {
+  //     notifications = parsedNotifications;
+  //   });
+  // }
+
+  Future<void> _retrieveNotifications() async {
     Map<String, String> allValues = await _secureStorage.readAll();
     List<Map<String, dynamic>> parsedNotifications = [];
     allValues.forEach((key, value) {
       Map<String, dynamic> storedData = jsonDecode(value);
-      int timestamp = int.tryParse(key.substring(key.lastIndexOf('_') + 1)) ?? 0;
-      storedData['timestamp'] = timestamp.toString();
+      // Use the 'timestamp' directly from storedData, assuming it's stored in the correct format
       parsedNotifications.add(storedData);
     });
 
-    parsedNotifications.sort((a, b) => int.parse(b['timestamp']).compareTo(int.parse(a['timestamp'])));
+    // Sort based on the 'timestamp' string; consider converting to DateTime for accurate sorting if necessary
+    parsedNotifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
 
     setState(() {
       notifications = parsedNotifications;
     });
   }
+
 
   void _deleteNotification(int index) async {
     String key = notifications[index]['key']!;
@@ -121,24 +161,11 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     _retrieveNotifications();
   }
 
-  String _formatTimestamp(int timestamp) {
-    var dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    var formatter = DateFormat('yyyy-MM-dd HH:mm');
-    return formatter.format(dateTime);
-  }
-
-  // Check if the notification is already stored
-  // Future<bool> _isNotificationAlreadyStored(String title, String notification) async {
-  //   Map<String, String> allValues = await _secureStorage.readAll();
-  //   for (var value in allValues.values) {
-  //     List<String> parts = value.split('|');
-  //     if (parts.length >= 3 && parts[0] == title && parts[1] == notification) {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
+  // String _formatTimestamp(String timestamp) {
+  //   var dateTime = DateTime.fromMillisecondsSinceEpoch(int.tryParse(timestamp) ?? 0);
+  //   var formatter = DateFormat('yyyy-MM-dd HH:mm');
+  //   return formatter.format(dateTime);
   // }
-
   @override
   Widget build(BuildContext context) {
         return Scaffold(
@@ -182,7 +209,11 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                             // ),
                             // SizedBox(height: 4),
                             Text(
-                              'Saved at: ${_formatTimestamp(int.tryParse(notification['timestamp'].toString()) ?? 0)}', // Safe parsing with fallback
+                              'Saved at: ${notification['timestamp']}', // Safe parsing with fallback
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                            Text(
+                              'Topic: ${notification['topic'] ?? ''}', // Already correctly handled
                               style: const TextStyle(fontSize: 12, color: Colors.grey),
                             ),
                           ],
