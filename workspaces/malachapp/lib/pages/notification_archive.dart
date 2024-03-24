@@ -43,7 +43,9 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      print("Received message: ${message.data}");
       final topic = message.data['topic'] ?? 'Unknown';
+      logger.d("Topic: $topic");
       if (message.notification != null && message.from != _currentToken) {
         logger.d("Received message: ${message.notification!.body}");
         if (!await _isNotificationAlreadyStored(message.notification!.title!, message.notification!.body!, topic)) {
@@ -55,10 +57,17 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     _retrieveNotifications();
   }
 
+  // String extractTopicFromNotification() {
+
+  //   String topic = messagePayload['message']['topic'] as String;
+  //   return topic;
+  // }
+
+
   Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     final topic = message.data['topic'] ?? 'Unknown';
     if (message.notification != null && message.from != _currentToken) {
-      logger.d("Handling a background message: ${message.notification!.body}");
+      logger.d("Received message: ${message.notification!.body}");
       if (!await _isNotificationAlreadyStored(message.notification!.title!, message.notification!.body!, topic)) {
         _storeNotification(message.notification!.title!, message.notification!.body!, topic);
       }

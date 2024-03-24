@@ -57,6 +57,7 @@ class NotificationService {
         },
         'data': {
           'message': message,
+          'topic': 'all',
         },
       },
     };
@@ -74,6 +75,7 @@ class NotificationService {
         },
         'data': {
           'message': message,
+          'topic': topic,
         },
       },
     };
