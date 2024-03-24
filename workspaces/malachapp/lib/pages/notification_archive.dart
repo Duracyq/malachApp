@@ -35,12 +35,13 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     _firebaseMessaging.getToken().then((token) {
       setState(() {
-        _currentToken = token;
+        _currentToken = token ?? ""; // Provide a default empty string if token is null
       });
       if (token != null) {
         logger.d("Firebase Token: $token");
       }
     });
+
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       final topic = message.data['topic'] ?? 'Unknown';
@@ -70,11 +71,16 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     _savingNotification = true;
 
     final key = 'notification_${DateTime.now().millisecondsSinceEpoch}';
-    final String valueToStore = jsonEncode({
+    final Map<String, dynamic> notificationData = {
       "title": title,
       "notification": notification,
       "topic": topic,
-    });
+    };
+
+    // Remove any null values from the map
+    final nonNullData = notificationData.map((key, value) => MapEntry(key, value ?? "Unknown"));
+
+    final String valueToStore = jsonEncode(nonNullData);
     await _secureStorage.write(key: key, value: valueToStore);
     _retrieveNotifications();
 
@@ -143,37 +149,38 @@ class _NotificationArchiveState extends State<NotificationArchive> {
         child: notifications.isEmpty
             ? Text('No notifications saved.')
             : ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  final notification = notifications[index];
-                  return Card(
-                    child: Dismissible(
-                      key: Key(notification['key']),
-                      onDismissed: (direction) {
-                        _deleteNotification(index);
-                      },
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 16.0),
-                        child: const Icon(Icons.delete, color: Colors.white),
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                final notification = notifications[index];
+                // Ensure key is never null
+                final String itemKey = notification['key'] ?? 'item_$index';
+                return Card(
+                  child: Dismissible(
+                    key: Key(itemKey),
+                    onDismissed: (direction) {
+                      _deleteNotification(index);
+                    },
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        notification['title'] ?? 'No Title', // Use ?? to provide a fallback
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       ),
-                      child: ListTile(
-                        title: Text(
-                          notification['title'] != null ? notification['title']! : 'No Title',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                        ),
-
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(notification['notification'] ?? 'No Details'), // Fallback for null notification
                             SizedBox(height: 4),
-                            Text(
-                              'Topic: ${notification['topic'] ?? 'Unknown'}', // Already correctly handled
-                              style: const TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                            SizedBox(height: 4),
+                            // Text(
+                            //   'Topic: ${notification['topic'] ?? 'Unknown'}', // Already correctly handled
+                            //   style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            // ),
+                            // SizedBox(height: 4),
                             Text(
                               'Saved at: ${_formatTimestamp(int.tryParse(notification['timestamp'].toString()) ?? 0)}', // Safe parsing with fallback
                               style: const TextStyle(fontSize: 12, color: Colors.grey),
