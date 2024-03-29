@@ -3,9 +3,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:malachapp/components/reloadable_widget.dart';
+import 'package:malachapp/pages/messaging_page.dart';
+import 'package:malachapp/themes/dark_mode.dart';
+import 'package:malachapp/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class NotificationArchive extends StatefulWidget {
   const NotificationArchive({Key? key}) : super(key: key);
@@ -20,6 +26,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   List<Map<String, dynamic>> notifications = [];
   final Logger logger = Logger();
 
+
   String? _currentToken;
   bool _savingNotification = false;
 
@@ -27,6 +34,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   void initState() {
     super.initState();
     _initFirebase();
+    migrateDataIfNeeded();
   }
 
   Future<void> _initFirebase() async {
@@ -71,6 +79,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
       if (!await _isNotificationAlreadyStored(message.notification!.title!, message.notification!.body!, topic)) {
         _storeNotification(message.notification!.title!, message.notification!.body!, topic);
       }
+      debugPrint("Handling a background message: ${message.messageId}");
     }
   }
 
@@ -80,7 +89,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
 
     // Generate a unique key based on the notification's content, including a timestamp for sorting
     final DateTime now = DateTime.now();
-    final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
+    final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
     final String formattedDate = formatter.format(now);
     final uniqueKey = _generateUniqueKey(title, notification, topic, formattedDate);
 
@@ -121,13 +130,18 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   Future<bool> _isNotificationAlreadyStored(String title, String notification, String topic) async {
     Map<String, String> allValues = await _secureStorage.readAll();
     for (var value in allValues.values) {
-      Map<String, dynamic> storedData = jsonDecode(value);
-      if (storedData['title'] == title && storedData['notification'] == notification && storedData['topic'] == topic) {
-        return true;
+      try {
+        Map<String, dynamic> storedData = jsonDecode(value);
+        if (storedData['title'] == title && storedData['notification'] == notification && storedData['topic'] == topic) {
+          return true;
+        }
+      } catch (e) {
+        logger.e("Error decoding or processing stored data: $e");
       }
     }
     return false;
   }
+
 
   // Future<void> _retrieveNotifications() async {
   //   Map<String, String> allValues = await _secureStorage.readAll();
@@ -145,24 +159,55 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   //     notifications = parsedNotifications;
   //   });
   // }
-
   Future<void> _retrieveNotifications() async {
     Map<String, String> allValues = await _secureStorage.readAll();
     List<Map<String, dynamic>> parsedNotifications = [];
+
     allValues.forEach((key, value) {
-      Map<String, dynamic> storedData = jsonDecode(value);
-      // Use the 'timestamp' directly from storedData, assuming it's stored in the correct format
-      parsedNotifications.add(storedData);
+      try {
+        final dynamic decodedData = jsonDecode(value);
+        if (decodedData is Map<String, dynamic>) {
+          parsedNotifications.add(decodedData);
+        } else {
+          // Log unexpected data types for further investigation
+          logger.d("Unexpected data format for key $key: Expected a Map but got ${decodedData.runtimeType}");
+        }
+      } catch (e) {
+        logger.e("Error decoding data for key $key: $e");
+      }
     });
 
-    // Sort based on the 'timestamp' string; consider converting to DateTime for accurate sorting if necessary
-    parsedNotifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
 
-    setState(() {
-      notifications = parsedNotifications;
+    parsedNotifications.sort((a, b) {
+      // Assuming 'timestamp' is stored as a String in ISO 8601 format
+      var dateA = DateTime.tryParse(a['timestamp'] ?? '') ?? DateTime.now();
+      var dateB = DateTime.tryParse(b['timestamp'] ?? '') ?? DateTime.now();
+      return dateB.compareTo(dateA); // Sort in descending order
     });
+
+
+    if (mounted) {
+      setState(() {
+        notifications = parsedNotifications;
+      });
+    }
   }
 
+  Future<void> migrateDataIfNeeded() async {
+    final Map<String, String> allValues = await _secureStorage.readAll();
+    for (var key in allValues.keys) {
+      final dynamic decodedData = jsonDecode(allValues[key]!);
+      if (decodedData is! Map<String, dynamic>) {
+        // Assume the data needs to be converted or handled differently
+        // For instance, convert boolean values to a map or handle them appropriately
+        if (decodedData is bool) {
+          // Convert or handle the boolean value as needed
+          final Map<String, dynamic> newData = {'isEnabled': decodedData};
+          await _secureStorage.write(key: key, value: jsonEncode(newData));
+        }
+      }
+    }
+  }
 
   void _deleteNotification(int index) async {
     String key = notifications[index]['key']!;
@@ -170,72 +215,126 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     _retrieveNotifications();
   }
 
+  Future<void> _refresh() async {
+    await _retrieveNotifications();
+  }
+
   // String _formatTimestamp(String timestamp) {
   //   var dateTime = DateTime.fromMillisecondsSinceEpoch(int.tryParse(timestamp) ?? 0);
   //   var formatter = DateFormat('yyyy-MM-dd HH:mm');
   //   return formatter.format(dateTime);
   // }
+
+  Widget _buildNotificationDescription(BuildContext context, String notification) {
+    if (notification.length > 200) {
+      return Text('${notification.substring(0, 100)}...');
+    } else {
+      return Text(notification);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-        return Scaffold(
+    final themeColor = Provider.of<ThemeProvider>(context).themeData == darkMode ? Colors.white : Colors.black;
+    return Scaffold(
       appBar: AppBar(
         title: const Text('Notification Archive'),
       ),
       body: Center(
         child: notifications.isEmpty
-            ? Text('No notifications saved.')
-            : ListView.builder(
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                final notification = notifications[index];
-                // Ensure key is never null
-                final String itemKey = notification['key'] ?? 'item_$index';
-                return Card(
-                  child: Dismissible(
-                    key: Key(itemKey),
-                    onDismissed: (direction) {
-                      _deleteNotification(index);
-                    },
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    child: ListTile(
-                      title: Text(
-                        notification['title'] ?? 'No Title', // Use ?? to provide a fallback
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(notification['notification'] ?? 'No Details'), // Fallback for null notification
-                            SizedBox(height: 4),
-                            // Text(
-                            //   'Topic: ${notification['topic'] ?? 'Unknown'}', // Already correctly handled
-                            //   style: const TextStyle(fontSize: 12, color: Colors.grey),
-                            // ),
-                            // SizedBox(height: 4),
-                            Text(
-                              'Saved at: ${notification['timestamp']}', // Safe parsing with fallback
-                              style: const TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                            Text(
-                              'Topic: ${notification['topic'] ?? ''}', // Already correctly handled
-                              style: const TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                          ],
-                        ),
-
-                        onTap: () {
-                          // Here you can add actions for when the user taps a notification
+            ? const Text('No notifications saved.')
+            : ReloadableWidget(
+              onRefresh: _refresh,
+              child: ListView.builder(
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final notification = notifications[index];
+                  // Ensure key is never null
+                  final String itemKey = notification['key'] ?? 'item_$index';
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(6.0, 2.0, 6.0, 0),
+                    child: Card(
+                      child: Dismissible(
+                        key: Key(itemKey),
+                        onDismissed: (direction) {
+                          _deleteNotification(index);
                         },
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            notification['title'] ?? 'No Title', // Use ?? to provide a fallback
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildNotificationDescription(context, notification['notification']), 
+                                const SizedBox(height: 4),
+                                // Text(
+                                //   'Topic: ${notification['topic'] ?? 'Unknown'}', // Already correctly handled
+                                //   style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                // ),
+                                // SizedBox(height: 4),
+                                Text(
+                                  'Saved at: ${notification['timestamp']}', // Safe parsing with fallback
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                ),
+                                Text(
+                                  'Topic: ${notification['topic'] ?? ''}', // Already correctly handled
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                                  
+                            onTap: () {
+                              if(notification['notification'].toString().split('').length >= 100) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text(notification['title'] ?? 'No Title'),
+                                      content: SingleChildScrollView(
+                                        child: Text(notification['notification'] ?? 'No Details'),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('Zamknij', style: TextStyle(color: themeColor),),
+                                        ),
+                                        Visibility(
+                                          visible: notification['topic'] != {'all', 'polls', 'posts', 'events'},
+                                          child: TextButton(
+                                            onPressed: () => Navigator.of(context).push(
+                                              MaterialPageRoute(builder: ((context) => MessagingPage(groupId: notification['topic'] ?? '')))
+                                            ),
+                                            child: Text('Otwórz czat', style: TextStyle(color: themeColor)),
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                              if(notification['topic'] != {'all', 'polls', 'posts', 'events'}) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: ((context) => MessagingPage(groupId: notification['topic'] ?? '')))
+                                );
+                              }
+                            },
+                          ),
+                        ),
                       ),
-                    ),
                   );
-                },
-              ),
+                  },
+                ),
+            ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -246,8 +345,8 @@ class _NotificationArchiveState extends State<NotificationArchive> {
             });
           });
         },
-        child: const Icon(Icons.delete_sweep),
         tooltip: 'Clear all notifications',
+        child: const Icon(Icons.delete_sweep),
       ),
     );
   }
