@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    // Update Java version to Java 11
+    // java.sourceCompatibility = JavaVersion.VERSION_11
+    // java.targetCompatibility = JavaVersion.VERSION_11
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }

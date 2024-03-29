@@ -15,6 +15,15 @@ class SubscribeNotifications {
     });
   }
 
+   Future<void> subscribeToGroupTopic(String groupId) async {
+    await fm.subscribeToTopic(groupId);
+  }
+
+  Future<void> unsubscribeFromGroupTopic(String groupId) async {
+    await fm.unsubscribeFromTopic(groupId);
+  } 
+
+
   Future<void> subscribe(String topic) async {
     await fm.subscribeToTopic(topic);
     await _secureStorage.write(key: 'subscribed_$topic', value: 'true');

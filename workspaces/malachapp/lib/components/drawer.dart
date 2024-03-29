@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/pages/messaging_page.dart';
+import 'package:malachapp/pages/notification_archive.dart';
 import 'package:malachapp/pages/profile_page.dart';
 import 'package:malachapp/pages/settings_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
@@ -83,6 +84,15 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: ((context) => const SettingsPage())));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.archive),
+            title: const Text('Notifications Archive'),
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: ((context) => NotificationArchive()))
+              );
             },
           ),
           const SizedBox(height: 60),
