@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:malachapp/pages/Events/add_event.dart';
 import 'package:malachapp/pages/Events/event_design_page.dart';
@@ -13,9 +15,52 @@ class EventList extends StatefulWidget {
 }
 
 class _EventListState extends State<EventList> {
-  bool isChecked = false; // add this line
+  // late bool isChecked = false; // add this line
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  Widget _buildEventCard(BuildContext context, int i) {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    // if(_db.collection('events').doc().get().asStream().contains('isEnrollAvailable') == true) {
+    //   setState(() {
+    //     isChecked = true;
+    //   });
+    // }
+  }
+  Future<void> _enrollEvent(String eventId) async {
+    _db.runTransaction((transaction){
+      return transaction.get(_db.collection('events').doc(eventId)).then((event){
+        if(event.exists){
+          var data = event.data() as Map<String, dynamic>;
+          if(data.containsKey('enrolledUsers')){
+            var enrolledUsers = data['enrolledUsers'] as List<dynamic>;
+            if(enrolledUsers.contains(_auth.currentUser!.email)) {
+              enrolledUsers.remove(_auth.currentUser!.email);
+              transaction.update(_db.collection('events').doc(eventId), {'enrolledUsers': enrolledUsers});
+            } else {
+              enrolledUsers.add(_auth.currentUser!.email);
+              transaction.update(_db.collection('events').doc(eventId), {'enrolledUsers': enrolledUsers});
+            }
+          } else {
+            transaction.update(_db.collection('events').doc(eventId), {'enrolledUsers': [_auth.currentUser!.email]});
+          }
+        }
+      });
+    });
+  }
+
+
+  Widget _buildEventCard(BuildContext context, int i, DocumentSnapshot snapshot) {
+    var data = snapshot.data() as Map<String, dynamic>;
+    late bool isChecked = false;
+    Future<void> _isChecked() async {
+      if(snapshot['enrolledUsers'].containsKey(_auth.currentUser!.uid)) {
+        setState(() {
+          isChecked = true;
+        });
+      }
+    }
     return Material(
           elevation: 3,
           color: Colors.white,
@@ -28,10 +73,10 @@ class _EventListState extends State<EventList> {
               Navigator.push(
                 context,
                 MaterialPageRoute<void>(
-                  builder: (BuildContext context) => EventDesignPage(),
+                  builder: (BuildContext context) => const EventDesignPage(),
                 ),
               );
-              print("Event $i tapped");
+              print("Event ${snapshot.id} tapped");
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +86,7 @@ class _EventListState extends State<EventList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.only(
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20),
                       ),
@@ -51,7 +96,7 @@ class _EventListState extends State<EventList> {
                             .cover, // this is to make sure the image covers the container
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Row(
@@ -60,12 +105,12 @@ class _EventListState extends State<EventList> {
                             decoration: BoxDecoration(
                                 color: Colors.blue,
                                 borderRadius: BorderRadius.circular(30)),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
                                   vertical: 4, horizontal: 8),
                               child: Text(
                                 "Category", // replace with the event category
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 10),
@@ -81,8 +126,8 @@ class _EventListState extends State<EventList> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4, horizontal: 8),
                               child: Text(
-                                "Date", // replace with the event date
-                                style: TextStyle(
+                                "${snapshot['date']}/${snapshot['month']}/${snapshot['year']}", // replace with the event date
+                                style: const TextStyle(
                                     color: Colors.green,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 10),
@@ -94,9 +139,11 @@ class _EventListState extends State<EventList> {
                     ),
                     const SizedBox(height: 8),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      padding: EdgeInsets.symmetric(horizontal: 12.0),
                       child: Text(
-                        "Event name", // replace with the event name
+                        (snapshot.data() != null && data.containsKey('eventName'))
+                          ? snapshot['eventName']
+                          : snapshot['description'], // replace with the event name
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -104,7 +151,7 @@ class _EventListState extends State<EventList> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Text(
-                        "Event descriptionEvent descriptionEvent descriptionEvent descriptionEvent desc", // replace with the event description
+                        snapshot['description'], // replace with the event description
                         style: TextStyle(
                           fontSize: 10,
                           color: Colors.grey.shade500,
@@ -145,46 +192,47 @@ class _EventListState extends State<EventList> {
                 // SizedBox(
                 //   height: 0,
                 // )
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        isChecked =
-                            !isChecked; // toggle isChecked when the button is pressed
-                      });
-                    },
-                    child: Text(
-                      "Zapisz się!",
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700),
-                    ),
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.pressed) ||
-                              isChecked)
-                            return Colors
-                                .transparent; // the color when button is pressed or isChecked is true
-                          return Colors.blue; // the default color
-                        },
-                      ),
-                      fixedSize: MaterialStateProperty.all<Size>(
-                        const Size(118, 25),
-                      ),
-                      shape:
-                          MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              13.0), // round the corners
+                Visibility(
+                  visible: data['isEnrollAvailable'] == true, // show the button only if isChecked is false
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          isChecked = !isChecked; // toggle isChecked when the button is pressed
+                        });
+                        _enrollEvent(snapshot.id); // call the function to enroll the user in the event
+                      },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed) || isChecked) {
+                              return Colors.transparent; // the color when button is pressed or isChecked is true
+                            }
+                            return Colors.blue; // the default color
+                          },
                         ),
+                        fixedSize: MaterialStateProperty.all<Size>(
+                          const Size(118, 25),
+                        ),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(13.0), // round the corners
+                          ),
+                        ),
+                      ),
+                      child: const Text(
+                        "Zapisz się!",
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 3)
+                const SizedBox(height: 3)
               ],
             ),
           ),
@@ -194,18 +242,17 @@ class _EventListState extends State<EventList> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Events"),
+        title: const Text("Events"),
         actions: [
           IconButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (BuildContext context) => AddEvent(),
+                    builder: (BuildContext context) => const AddEvent(),
                   ),
                 );
               },
@@ -214,18 +261,34 @@ class _EventListState extends State<EventList> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(4.0),
-        child: GridView.builder(
-        padding: const EdgeInsets.all(8),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // number of columns
-            crossAxisSpacing: 10, // spacing between the columns
-            mainAxisSpacing: 10, // spacing between the rows
-            childAspectRatio: 0.6),
-        itemCount: 10, // replace with the number of events
+        child: StreamBuilder(
+          stream: _db.collection('events').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final events = snapshot.data!.docs;
+              final currentDate = DateTime.now();
 
-        itemBuilder: (context, int i) {
-          return _buildEventCard(context, i);
-        }
+              final upcomingEvents = events
+                  .where((event) => event['date'].toDate().isAfter(currentDate))
+                  .toList();
+
+              return GridView.builder(
+                padding: const EdgeInsets.all(8),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // number of columns
+                  crossAxisSpacing: 10, // spacing between the columns
+                  mainAxisSpacing: 10, // spacing between the rows
+                  childAspectRatio: 0.6,
+                ),
+                itemCount: upcomingEvents.length, // replace with the number of upcoming events
+                itemBuilder: (context, int i) {
+                  return _buildEventCard(context, i, upcomingEvents[i]);
+                },
+              );
+            } else {
+              return const CircularProgressIndicator();
+            }
+          },
         ),
       ),
     );

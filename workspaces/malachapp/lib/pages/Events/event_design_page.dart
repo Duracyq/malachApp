@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
@@ -20,11 +21,11 @@ class _EventDesignPageState extends State<EventDesignPage> {
           child: Container(
             decoration: BoxDecoration(
                 color: Colors.blue, borderRadius: BorderRadius.circular(30)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
               child: Text(
                 "Category", // replace with the event category
-                style: const TextStyle(
+                style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 15),
@@ -44,7 +45,7 @@ class _EventDesignPageState extends State<EventDesignPage> {
                   color: Colors.grey,
                   image: DecorationImage(
                     image: NetworkImage(
-                      'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
+                      "https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g",
                     ),
                     fit: BoxFit.cover,
                   ),
@@ -64,7 +65,7 @@ class _EventDesignPageState extends State<EventDesignPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
                   Row(
@@ -98,7 +99,7 @@ class _EventDesignPageState extends State<EventDesignPage> {
                       //     ),
                       //   ),
                       // ),
-                      MyText(
+                      const MyText(
                           text: "Event Name",
                           rozmiar: 24,
                           waga: FontWeight.bold),
@@ -116,8 +117,8 @@ class _EventDesignPageState extends State<EventDesignPage> {
                         decoration: BoxDecoration(
                             color: Colors.green.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(30)),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
                               vertical: 4, horizontal: 8),
                           child: Text(
                             "11.05.2024", // replace with the event date
@@ -130,15 +131,15 @@ class _EventDesignPageState extends State<EventDesignPage> {
                       )
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Text(
+                  const SizedBox(height: 10),
+                  const Text(
                     'Event DescriptionEvent DescriptionE vent Desc riptio nEvent De scriptionEvent Descript ionEvent Descri ption Event Descr iptionEvent DescriptionEv ent Descriptio nEvent Description',
                     style: TextStyle(
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(height: 10),
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -155,8 +156,8 @@ class _EventDesignPageState extends State<EventDesignPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(height: 10),
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
