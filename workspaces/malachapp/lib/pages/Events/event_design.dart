@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -61,6 +62,10 @@ class _EventListState extends State<EventList> {
         });
       }
     }
+
+    final DateTime eventDate = snapshot['date'].toDate();
+    final String formattedDate = DateFormat('dd.MM.yyyy').format(eventDate);
+
     return Material(
           elevation: 3,
           color: Colors.white,
@@ -126,7 +131,7 @@ class _EventListState extends State<EventList> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4, horizontal: 8),
                               child: Text(
-                                "${snapshot['date']}/${snapshot['month']}/${snapshot['year']}", // replace with the event date
+                                "$formattedDate", // replace with the formatted event date
                                 style: const TextStyle(
                                     color: Colors.green,
                                     fontWeight: FontWeight.w800,

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:malachapp/pages/Events/event_design_page.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +26,7 @@ class _AddEventState extends State<AddEvent> {
   TextEditingController photoUrlController = TextEditingController();
   File? selectedPhoto;
 
-  bool isEnrollAvailable = true; // Default value, can be changed via UI if needed
+  bool isEnrollAvailable = false; // Default value, can be changed via UI if needed
 
   @override
   Widget build(BuildContext context) {
@@ -53,30 +54,45 @@ class _AddEventState extends State<AddEvent> {
                 ListTile(
                   title: Text(
                     selectedDate == null
-                        ? 'Pick Date and Time'
-                        : 'Event Date: ${DateFormat('dd/MM/yyyy HH:mm').format(selectedDate!)}',
+                        ? 'Wybierz datę i godzinę'
+                        : 'Data wydarzenia: ${DateFormat('dd/MM/yyyy HH:mm').format(selectedDate!)}',
                   ),
                   trailing: const Icon(Icons.calendar_today),
                   onTap: () => _pickDateTime(),
                 ),
                 const SizedBox(height: 16),
                 ListTile(
-                  title: const Text('Photo URL'),
-                  subtitle: const Text('Optional'),
+                  title: Text(selectedPhoto != null ? 'URL zdjęcia: ${selectedPhoto!.path}' : 'URL zdjęcia'),
+                  subtitle: const Text('Opcjonalne'),
                   trailing: const Icon(Icons.image),
-                  onTap: () {
-                    selectedPhoto = pickAndShrinkPhoto() as File?;
+                  onTap: () async {
+                    final File? photo = await pickAndShrinkPhoto();
+                    setState(() {
+                      selectedPhoto = photo;
+                    });
                   },
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
+                ListTile(
+                  title: const Text('Dostępne zapisy'),
+                  trailing: Switch(
+                      value: isEnrollAvailable,
+                      onChanged: (value) {
+                        setState(() {
+                          isEnrollAvailable = value;
+                        });
+                      },
+                    ),
+                  ),
+                const SizedBox(height: 16),
+                MyButton(
+                  onTap: () {
                     if (formKey.currentState!.validate()) {
                       // Process the data and add the event
                       _addEvent();
                     }
                   },
-                  child: const Text('Dodaj Wydarzenie'),
+                  text: 'Dodaj Wydarzenie',
                 ),
               ],
             ),
@@ -115,24 +131,24 @@ class _AddEventState extends State<AddEvent> {
 
   void _addEvent() async {
     if (selectedDate == null) {
-      // Show an error or a reminder to pick a date and time
+      // Wyświetl błąd lub przypomnienie o wybraniu daty i godziny
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please pick a date and time for the event.')),
+        const SnackBar(content: Text('Proszę wybrać datę i godzinę wydarzenia.')),
       );
       return;
     }
-      // Assuming you have a global or class-level variable `File? selectedPhoto;` set by `pickAndShrinkPhoto`
+      // Zakładając, że masz zmienną globalną lub klasową `File? selectedPhoto;` ustawioną przez `pickAndShrinkPhoto`
     String photoUrl = '';
     if (selectedPhoto != null) {
       Storage storageService = Storage();
-      // Update the path as needed. For example: 'event_photos/${eventNameController.text}'
-      photoUrl = await storageService.uploadPhoto(selectedPhoto!, 'path/to/upload');
+      // Zaktualizuj ścieżkę według potrzeb. Na przykład: 'event_photos/${eventNameController.text}'
+      photoUrl = await storageService.uploadPhoto(selectedPhoto!, '/event_photos/');
     }
 
-    // Convert selectedDate to Timestamp for Firestore
+    // Konwertuj selectedDate na Timestamp dla Firestore
     final eventTimestamp = Timestamp.fromDate(selectedDate!);
 
-    // Add the event to Firestore
+    // Dodaj wydarzenie do Firestore
     await FirebaseFirestore.instance.collection('events').add({
       'eventName': eventNameController.text,
       'description': descriptionController.text,
@@ -142,16 +158,16 @@ class _AddEventState extends State<AddEvent> {
       'photoUrl': photoUrl,
     });
 
-    // Clear the inputs or give feedback
+    // Wyczyść pola lub udziel informacji zwrotnej
     eventNameController.clear();
     descriptionController.clear();
     photoUrlController.clear();
     setState(() => selectedDate = null);
 
-    // Show a confirmation message
+    // Wyświetl komunikat potwierdzający
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Event added successfully!')),
+      const SnackBar(content: Text('Wydarzenie dodane pomyślnie!')),
     );
+    Navigator.of(context).pop();
   }
 }
-
