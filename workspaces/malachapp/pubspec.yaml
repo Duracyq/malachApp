@@ -39,6 +39,7 @@ dependencies:
   intl: ^0.18.1
   googleapis_auth: ^1.4.1
   shared_preferences: ^2.2.2
+  getwidget: ^4.0.0
 
 flutter_icons:
   image_path: "assets/favicon.png"

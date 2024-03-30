@@ -9,6 +9,7 @@ import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/drawer.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
+import 'package:malachapp/pages/Events/event_design.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/home_home.dart';
@@ -59,7 +60,8 @@ class _HomePageState extends State<HomePage> {
           // storage: storage, firebaseFirestore: firebaseFirestore, auth: auth
           ),
       const PollDesign(),
-      const EventListPage(),
+      //const EventListPage(),
+      const EventList(),
     ];
   }
 
