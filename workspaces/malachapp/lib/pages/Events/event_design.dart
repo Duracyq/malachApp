@@ -19,7 +19,7 @@ class _EventListState extends State<EventList> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Events"),
+        title: Text("Nadchodzące wydarzenia"),
         actions: [
           IconButton(
               onPressed: () {
@@ -196,8 +196,8 @@ class _EventListState extends State<EventList> {
                               if (states.contains(MaterialState.pressed) ||
                                   isChecked)
                                 return Colors
-                                    .transparent; // the color when button is pressed or isChecked is true
-                              return Colors.blue; // the default color
+                                    .blue; // the color when button is pressed or isChecked is true
+                              return Colors.transparent; // the default color
                             },
                           ),
                           fixedSize: MaterialStateProperty.all<Size>(
