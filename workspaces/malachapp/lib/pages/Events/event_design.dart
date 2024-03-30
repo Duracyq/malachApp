@@ -12,27 +12,11 @@ import 'package:malachapp/pages/Events/event_design_page.dart';
 import 'package:malachapp/services/storage_service.dart';
 
 class EventList extends StatefulWidget {
-  const EventList({Key? key}) : super(key: key);
-
-  @override
-  _EventListState createState() => _EventListState();
-}
-
-class _EventListState extends State<EventList> {
-  // late bool isChecked = false; // add this line
+  EventList({Key? key}) : super(key: key);
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    // if(_db.collection('events').doc().get().asStream().contains('isEnrollAvailable') == true) {
-    //   setState(() {
-    //     isChecked = true;
-    //   });
-    // }
-  }
-  Future<void> _enrollEvent(String eventId) async {
+  late String eventId;
+  Future<void> enrollEvent(String eventId) async {
     _db.runTransaction((transaction){
       return transaction.get(_db.collection('events').doc(eventId)).then((event){
         if(event.exists){
@@ -54,21 +38,51 @@ class _EventListState extends State<EventList> {
     });
   }
 
+  @override
+  _EventListState createState() => _EventListState();
+}
+
+class _EventListState extends State<EventList> {
+  // late bool isChecked = false; // add this line
+  late bool isChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // if(_db.collection('events').doc().get().asStream().contains('isEnrollAvailable') == true) {
+    //   setState(() {
+    //     isChecked = true;
+    //   });
+    // }
+    // checkUserEnrollment();
+  }
+
+  Future<void> checkUserEnrollment(String? eventId) async {
+    try {
+      DocumentSnapshot eventDoc = await widget._db.collection('events').doc(eventId).get();
+      if (eventDoc.exists) {
+        Map<String, dynamic> data = eventDoc.data() as Map<String, dynamic>;
+        List<dynamic> enrolledUsers = data['enrolledUsers'] ?? [];
+        setState(() {
+          isChecked = enrolledUsers.contains(widget._auth.currentUser!.uid);
+        });
+      }
+    } catch (e) {
+      print("Error checking user enrollment: $e");
+    }
+  }
 
   Widget _buildEventCard(BuildContext context, int i, DocumentSnapshot snapshot) {
     var data = snapshot.data() as Map<String, dynamic>;
-    late bool isChecked = false;
-    Future<void> _isChecked() async {
-      if(snapshot['enrolledUsers'].containsKey(_auth.currentUser!.uid)) {
-        setState(() {
-          isChecked = true;
-        });
-      }
-    }
 
     final DateTime eventDate = snapshot['date'].toDate();
     final String formattedDate = DateFormat('dd.MM.yyyy').format(eventDate);
     var logger = Logger();
+
+    final currentUserEmail = widget._auth.currentUser!.email;
+    // bool isUserEnrolled = data.containsKey('enrolledUsers') && data['enrolledUsers'].contains(currentUserEmail);
+    bool isUserEnrolled = (snapshot.data() as Map<String, dynamic>)['enrolledUsers']?.contains(currentUserEmail) ?? false;
+
 
     return Material(
           elevation: 3,
@@ -226,25 +240,28 @@ class _EventListState extends State<EventList> {
                 //   height: 0,
                 // )
                 Visibility(
-                  visible: data['isEnrollAvailable'] == true, // show the button only if isChecked is false
+                  visible: data['isEnrollAvailable'] == true, // show the button only if isEnrollAvailable is true
                   child: Center(
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
                           isChecked = !isChecked; // toggle isChecked when the button is pressed
                         });
-                        _enrollEvent(snapshot.id); // call the function to enroll the user in the event
+                        EventList().enrollEvent(snapshot.id); // call the function to enroll the user in the event
                       },
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                            if (states.contains(MaterialState.pressed) || isChecked) {
-                              return Colors.transparent; // the color when button is pressed or isChecked is true
-                            }
-                            return Colors.blue; // the default color
-                          },
-                        ),
+                            // MaterialStateProperty.resolveWith<Color>(
+                            //   (Set<MaterialState> states) {
+                            //     if (states.contains(MaterialState.pressed) || isChecked || isUserEnrolled) {
+                            //       return Colors.transparent; // the color when button is pressed or isChecked is true
+                            //     }
+                            //     return Colors.blue; // the default color
+                            //   },
+                            // ),
+                            isUserEnrolled
+                                ? MaterialStateProperty.all<Color>(Colors.transparent)
+                                : MaterialStateProperty.all<Color>(Colors.blue),
                         fixedSize: MaterialStateProperty.all<Size>(
                           const Size(118, 25),
                         ),
@@ -295,7 +312,7 @@ class _EventListState extends State<EventList> {
       body: Padding(
         padding: const EdgeInsets.all(4.0),
         child: StreamBuilder(
-          stream: _db.collection('events').snapshots(),
+          stream: EventList()._db.collection('events').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               final events = snapshot.data!.docs;
