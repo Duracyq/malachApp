@@ -3,5 +3,6 @@
         "minimap.background": "#00000000",
         "scrollbar.shadow": "#00000000"
     },
-    "cmake.sourceDirectory": "C:/Flutter/malachApp/workspaces/malachapp/linux"
+    "cmake.sourceDirectory": "C:/Flutter/malachApp/workspaces/malachapp/linux",
+    "java.configuration.updateBuildConfiguration": "disabled"
 }
