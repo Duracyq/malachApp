@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:logger/logger.dart'; 
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:malachapp/pages/Events/add_event.dart';
 import 'package:malachapp/pages/Events/event_design_page.dart';
+import 'package:malachapp/services/storage_service.dart';
 
 class EventList extends StatefulWidget {
   const EventList({Key? key}) : super(key: key);
@@ -65,6 +68,7 @@ class _EventListState extends State<EventList> {
 
     final DateTime eventDate = snapshot['date'].toDate();
     final String formattedDate = DateFormat('dd.MM.yyyy').format(eventDate);
+    var logger = Logger();
 
     return Material(
           elevation: 3,
@@ -78,7 +82,10 @@ class _EventListState extends State<EventList> {
               Navigator.push(
                 context,
                 MaterialPageRoute<void>(
-                  builder: (BuildContext context) => const EventDesignPage(),
+                  builder: (BuildContext context) => EventDesignPage(
+                    eventID: snapshot.id,
+                    eventName: snapshot['eventName'],
+                  ),
                 ),
               );
               print("Event ${snapshot.id} tapped");
@@ -95,10 +102,31 @@ class _EventListState extends State<EventList> {
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20),
                       ),
-                      child: Image.network(
-                        'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
-                        fit: BoxFit
-                            .cover, // this is to make sure the image covers the container
+                      child: FutureBuilder<String>(
+                        future: Storage().getImageUrlFromDir('event_photos/${snapshot.id}/'), // Adjust with your image's name and extension
+                        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            // Show a loader while waiting for the future to complete
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            // If the future completes with an error, show a constant fallback image
+                            return const AspectRatio(aspectRatio: 16 / 9,child: Image(image: AssetImage('assets/favicon.png'), fit: BoxFit.cover));
+                          } else {
+                            // If the future completes successfully, show the CachedNetworkImage
+                            return AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: CachedNetworkImage(
+                                imageUrl: snapshot.data!,
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => const Icon(Icons.error),
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          }
+                          //  else {
+                          //   return Center(child: Text('No image found'));
+                          // }
+                        },
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -114,7 +142,7 @@ class _EventListState extends State<EventList> {
                               padding: EdgeInsets.symmetric(
                                   vertical: 4, horizontal: 8),
                               child: Text(
-                                "Category", // replace with the event category
+                                'Tag', // replace with the event category
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -131,7 +159,7 @@ class _EventListState extends State<EventList> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4, horizontal: 8),
                               child: Text(
-                                "$formattedDate", // replace with the formatted event date
+                                formattedDate, // replace with the formatted event date
                                 style: const TextStyle(
                                     color: Colors.green,
                                     fontWeight: FontWeight.w800,
@@ -144,7 +172,7 @@ class _EventListState extends State<EventList> {
                     ),
                     const SizedBox(height: 8),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Text(
                         (snapshot.data() != null && data.containsKey('eventName'))
                           ? snapshot['eventName']

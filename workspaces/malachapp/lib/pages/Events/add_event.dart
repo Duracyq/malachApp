@@ -55,7 +55,7 @@ class _AddEventState extends State<AddEvent> {
                   title: Text(
                     selectedDate == null
                         ? 'Wybierz datę i godzinę'
-                        : 'Data wydarzenia: ${DateFormat('dd/MM/yyyy HH:mm').format(selectedDate!)}',
+                        : 'Data wydarzenia: ${DateFormat('dd.MM.yyyy - HH:mm').format(selectedDate!)}',
                   ),
                   trailing: const Icon(Icons.calendar_today),
                   onTap: () => _pickDateTime(),
@@ -131,43 +131,48 @@ class _AddEventState extends State<AddEvent> {
 
   void _addEvent() async {
     if (selectedDate == null) {
-      // Wyświetl błąd lub przypomnienie o wybraniu daty i godziny
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Proszę wybrać datę i godzinę wydarzenia.')),
       );
       return;
     }
-      // Zakładając, że masz zmienną globalną lub klasową `File? selectedPhoto;` ustawioną przez `pickAndShrinkPhoto`
-    String photoUrl = '';
-    if (selectedPhoto != null) {
-      Storage storageService = Storage();
-      // Zaktualizuj ścieżkę według potrzeb. Na przykład: 'event_photos/${eventNameController.text}'
-      photoUrl = await storageService.uploadPhoto(selectedPhoto!, '/event_photos/');
-    }
 
-    // Konwertuj selectedDate na Timestamp dla Firestore
+    // Convert selectedDate to Timestamp for Firestore
     final eventTimestamp = Timestamp.fromDate(selectedDate!);
 
-    // Dodaj wydarzenie do Firestore
-    await FirebaseFirestore.instance.collection('events').add({
+    // Step 1: Create the event document in Firestore and get the ID
+    DocumentReference eventRef = await FirebaseFirestore.instance.collection('events').add({
       'eventName': eventNameController.text,
       'description': descriptionController.text,
       'date': eventTimestamp,
       'enrolledUsers': [],
       'isEnrollAvailable': isEnrollAvailable,
-      'photoUrl': photoUrl,
+      // Temporarily set photoUrl to an empty string or a placeholder
+      'photoUrl': '',
     });
 
-    // Wyczyść pola lub udziel informacji zwrotnej
+    String photoUrl = '';
+    if (selectedPhoto != null) {
+      Storage storageService = Storage();
+      // Step 2: Upload the photo to the 'event_photos/<eventID>' folder
+      String folderPath = 'event_photos/${eventRef.id}'; // Use the event ID as the folder name
+      photoUrl = await storageService.uploadPhoto(selectedPhoto!, folderPath);
+
+      // Step 3: Update the Firestore document with the photo's URL
+      await eventRef.update({'photoUrl': photoUrl});
+    }
+
+    // Clear the inputs or give feedback
     eventNameController.clear();
     descriptionController.clear();
     photoUrlController.clear();
     setState(() => selectedDate = null);
 
-    // Wyświetl komunikat potwierdzający
+    // Show a confirmation message and navigate back
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Wydarzenie dodane pomyślnie!')),
     );
     Navigator.of(context).pop();
   }
+
 }

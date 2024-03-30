@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as Path;
 
@@ -37,4 +38,28 @@ class Storage {
 
     return urls;
   }
+
+  Future<String> getImageUrlFromDir(String directoryPath) async {
+    try {
+      // List all items (files) within the directory
+      ListResult result = await storage.ref(directoryPath).listAll();
+      
+      if (result.items.isNotEmpty) {
+        // Assuming you want the URL of the first file
+        Reference firstFileRef = result.items.first;
+        
+        // Fetching the download URL for the first file
+        String downloadUrl = await firstFileRef.getDownloadURL();
+        return downloadUrl;
+      } else {
+        throw Exception("Directory is empty");
+      }
+    } catch (e) {
+      print("Error fetching download URL: $e");
+      throw Exception("Error fetching download URL: $e");
+    }
+  }
+
+
+
 }
