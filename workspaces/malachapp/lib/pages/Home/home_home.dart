@@ -88,7 +88,7 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                                   BorderRadius.all(Radius.circular(10))),
                           color: color,
                           child: Padding(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(13),
                             child: SizedBox(
                               width: screenWidth,
                               child: Column(
@@ -104,11 +104,11 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                                     children: [
                                       const MyText1(
                                         text: "Witaj ",
-                                        rozmiar: 26,
+                                        rozmiar: 33,
                                       ),
                                       MyText1(
                                         text: "Szymon",
-                                        rozmiar: 26,
+                                        rozmiar: 33,
                                       ),
                                       // NicknameFetcher()
                                       //     .buildNickname(context, userId),
@@ -138,9 +138,10 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                                   BorderRadius.all(Radius.circular(10))),
                           color: color,
                           child: Padding(
-                            padding: const EdgeInsets.all(6.0),
+                            padding: const EdgeInsets.all(15.0),
                             child: Center(
                               child: Text(
+                                //! tutaj wyjatakowo damy inny styl tekstu i nie damy komponentu
                                 "... krew człowieka wykonuje pełny obieg w układzie krążenia w ciągu około minuty",
                                 style: GoogleFonts.merriweather(
                                     fontSize: 16, fontWeight: FontWeight.w400),
@@ -149,60 +150,45 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                           ),
                         ),
                       ),
-
-                      // Card(
-                      //   child: Text('Karta 2'),
-                      // ),
                       Container(
                         width: screenWidth,
                         child: Card(
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            color: color,
-                            child: Column(
-                              children: [
-                                Text(
-                                  'Hello, world!',
-                                  style: GoogleFonts.robotoCondensed(
-                                    fontSize: 48,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'This is a description.',
-                                  style: GoogleFonts.openSans(
-                                    fontSize: 24,
-                                  ),
-                                ),
-                              ],
-                            )),
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          color: color,
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Center(
+                              child: Text(
+                                //! tutaj wyjatakowo damy inny styl tekstu i nie damy komponentu
+                                "... krew człowieka wykonuje pełny obieg w układzie krążenia w ciągu około minuty",
+                                style: GoogleFonts.merriweather(
+                                    fontSize: 16, fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-
                       Container(
                         width: screenWidth,
                         child: Card(
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            color: color,
-                            child: Column(
-                              children: [
-                                Text(
-                                  'Hello, world!',
-                                  style: GoogleFonts.playfairDisplay(
-                                    fontSize: 48,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'This is a description.',
-                                  style: GoogleFonts.lato(
-                                    fontSize: 24,
-                                  ),
-                                ),
-                              ],
-                            )),
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          color: color,
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Center(
+                              child: Text(
+                                //! tutaj wyjatakowo damy inny styl tekstu i nie damy komponentu
+                                "... krew człowieka wykonuje pełny obieg w układzie krążenia w ciągu około minuty",
+                                style: GoogleFonts.merriweather(
+                                    fontSize: 16, fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                     pauseAutoPlayOnTouch: Duration(seconds: 1),
