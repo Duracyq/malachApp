@@ -14,7 +14,7 @@ class ResetHasla extends StatefulWidget {
 }
 
 class _ResetHaslaState extends State<ResetHasla> {
-  TextEditingController mail = TextEditingController(text: 'nic waznego');
+  TextEditingController mail = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +58,7 @@ class _ResetHaslaState extends State<ResetHasla> {
                     height: 5,
                   ),
                   Text(
-                    "Aby zresetować hasło wyślij swojego E-maila a natychmiastowo otrzymasz go w skrzynce odbiorczej ;)",
+                    "Aby zresetować hasło wprowadź swojego E-maila a natychmiastowo otrzymasz go w skrzynce odbiorczej!",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.roboto(
                       // Ustawienie czcionki Open Sans
@@ -78,7 +78,9 @@ class _ResetHaslaState extends State<ResetHasla> {
                     child: MyTextField(
                         hintText: "E-mail",
                         obscureText: false,
-                        controller: mail),
+                        controller: mail,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
                   ),
                   const SizedBox(
                     height: 10,
