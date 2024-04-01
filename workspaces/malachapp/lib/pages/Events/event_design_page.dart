@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
-import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/MyText1.dart';
 
 class EventDesignPage extends StatefulWidget {
   const EventDesignPage({Key? key}) : super(key: key);
@@ -98,10 +98,10 @@ class _EventDesignPageState extends State<EventDesignPage> {
                       //     ),
                       //   ),
                       // ),
-                      MyText(
-                          text: "Event Name",
-                          rozmiar: 24,
-                          waga: FontWeight.bold),
+                      MyText1(
+                        text: "Event Name",
+                        rozmiar: 24,
+                      ),
                       // Expanded(
                       //   child: Text(
                       //     'Event Name',

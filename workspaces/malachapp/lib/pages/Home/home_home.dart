@@ -4,9 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/MyText1.dart';
+import 'package:malachapp/components/MyText2.dart';
 import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/services/nickname_fetcher.dart';
+import 'package:malachapp/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeHomeWidget extends StatefulWidget {
   const HomeHomeWidget({Key? key}) : super(key: key);
@@ -24,14 +27,32 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   // ];
   int current = 0;
   PageController pageController = PageController();
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  String userId = FirebaseAuth.instance.currentUser!.uid;
+  // final FirebaseFirestore _db = FirebaseFirestore.instance;
+  // final FirebaseAuth auth = FirebaseAuth.instance;
+  // String userId = FirebaseAuth.instance.currentUser!.uid;
+  List<String> tytul = ['Rada nauczycielska', 'Dni otwarte', 'Studniówka 2024'];
+  List<String> imagePaths = [
+    'assets/zd1.jpg', // Ścieżka do pierwszego obrazka
+    'assets/zd2.jpg', // Ścieżka do drugiego obrazka
+    'assets/zd3.jpg', // Ścieżka do trzeciego obrazka
+  ]; // Ścieżka do trzeciego obrazka
+  List<String> opis = [
+    'Już 19 lutego odbędzie sie Rada Nauczycieli więc uczniowie kończą zajęcia o 13.30',
+    'Chodzą pogłoski że dni otwarte w Małachiwance będą 22 czerwca',
+    "Zobacz już teraz zdjęcia ze studniówki"
+  ];
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    // Ustal kolory na podstawie motywu
+    final color = themeProvider.currentThemeKey == 'light'
+        ? Color.fromARGB(255, 133, 196, 255)
+        : Colors.blueGrey;
+
     return Container(
       width: screenWidth,
       height: double.infinity,
@@ -50,84 +71,161 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
             // Ustawienie odstępu między elementami na 10 pikseli
 
             itemBuilder: (context, index) {
-              List<String> tytul = [
-                'Rada nauczycielska',
-                'Dni otwarte',
-                'Studniówka 2024'
-              ];
-              List<String> imagePaths = [
-                'assets/zd1.jpg', // Ścieżka do pierwszego obrazka
-                'assets/zd2.jpg', // Ścieżka do drugiego obrazka
-                'assets/zd3.jpg', // Ścieżka do trzeciego obrazka
-              ]; // Ścieżka do trzeciego obrazka
-              List<String> opis = [
-                'Już 19 lutego odbędzie sie Rada Nauczycieli więc uczniowie kończą zajęcia o 13.30',
-                'Chodzą pogłoski że dni otwarte w Małachiwance będą 22 czerwca',
-                "Zobacz już teraz zdjęcia ze studniówki"
-              ];
-              double itemHeight = index == 0 ? 100 : 300;
+              double itemHeight = index == 0 ? 120 : 300;
 
               if (index == 0) {
-                // Jeśli jest to pierwszy element, zwracamy kontener "Witaj, admin"
-                return Container(
-                  height: itemHeight,
-                  width: screenWidth * 0.2,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(
-                          10), // Ustawienie promienia zaokrąglenia tylko dla lewego dolnego rogu
-                      bottomRight: Radius.circular(10),
-                    ),
-                  ),
-                  // padding: const EdgeInsets.all(3),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: SizedBox(
-                      width: screenWidth,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const MyText(
-                              text: "Dołącz do naszej szkolnej społeczności!",
-                              rozmiar: 16,
-                              waga: FontWeight.w400),
-                          Row(
-                            children: [
-                              const MyText(
-                                  text: "Witaj ",
-                                  rozmiar: 26,
-                                  waga: FontWeight.w700),
-                              // Text(
-                              //   nickname ?? '',
-                              //   style: GoogleFonts.nunito(
-                              //     textStyle: const TextStyle(
-                              //         fontFamily: 'Nunito',
-                              //         fontStyle: FontStyle.normal,
-                              //         fontSize: 26,
-                              //         fontWeight: FontWeight.w700),
-                              //   ),
-                              // ),
-                              NicknameFetcher().buildNickname(context, userId),
-                              Text(
-                                "!",
-                                style: GoogleFonts.nunito(
-                                  textStyle: const TextStyle(
-                                      fontFamily: 'Nunito',
-                                      fontStyle: FontStyle.normal,
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                              )
-                            ],
-                          )
-                        ],
+                // Jeśli jest to pierwszy element, zwracamy karuzelę
+                return Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: GFCarousel(
+                    items: [
+                      // Tutaj dodaj swoje karty
+                      Container(
+                        width: screenWidth,
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          color: color,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: SizedBox(
+                              width: screenWidth,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  const MyText2(
+                                    text:
+                                        "Dołącz do naszej szkolnej społeczności!",
+                                    rozmiar: 16,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const MyText1(
+                                        text: "Witaj ",
+                                        rozmiar: 26,
+                                      ),
+                                      MyText1(
+                                        text: "Szymon",
+                                        rozmiar: 26,
+                                      ),
+                                      // NicknameFetcher()
+                                      //     .buildNickname(context, userId),
+                                      Text(
+                                        "!",
+                                        style: GoogleFonts.nunito(
+                                          textStyle: const TextStyle(
+                                              fontFamily: 'Nunito',
+                                              fontStyle: FontStyle.normal,
+                                              fontSize: 26,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      Container(
+                        width: screenWidth,
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          color: color,
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Center(
+                              child: Text(
+                                "... krew człowieka wykonuje pełny obieg w układzie krążenia w ciągu około minuty",
+                                style: GoogleFonts.merriweather(
+                                    fontSize: 16, fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Card(
+                      //   child: Text('Karta 2'),
+                      // ),
+                      Container(
+                        width: screenWidth,
+                        child: Card(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            color: color,
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Hello, world!',
+                                  style: GoogleFonts.robotoCondensed(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'This is a description.',
+                                  style: GoogleFonts.openSans(
+                                    fontSize: 24,
+                                  ),
+                                ),
+                              ],
+                            )),
+                      ),
+
+                      Container(
+                        width: screenWidth,
+                        child: Card(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            color: color,
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Hello, world!',
+                                  style: GoogleFonts.playfairDisplay(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'This is a description.',
+                                  style: GoogleFonts.lato(
+                                    fontSize: 24,
+                                  ),
+                                ),
+                              ],
+                            )),
+                      ),
+                    ],
+                    pauseAutoPlayOnTouch: Duration(seconds: 1),
+                    height: itemHeight,
+                    aspectRatio: 16 / 9,
+                    viewportFraction: 0.9,
+                    autoPlay: true,
+                    autoPlayInterval: Duration(seconds: 8),
+                    autoPlayAnimationDuration: Duration(seconds: 1),
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    enlargeMainPage: true,
+                    hasPagination: true,
+                    initialPage: 0,
+                    enableInfiniteScroll: true,
+                    scrollDirection: Axis.horizontal,
+                    onPageChanged: (index) {
+                      // Zrób coś, gdy strona się zmieni
+                    },
                   ),
                 );
-              } else {
+              }
+              if (index != 0) {
+                //! kazdy inny element
                 return GestureDetector(
                   onTap: () {
                     // Navigator.push(
@@ -138,9 +236,12 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                     // );
                   },
                   child: Card(
+                    margin: EdgeInsets.only(top: 5, left: 8, right: 8),
+                    borderOnForeground: true,
+                    elevation: 1,
                     clipBehavior: Clip.antiAlias,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
                       children: [
@@ -176,150 +277,6 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                     ),
                   ),
                 );
-                // return GFCard(
-                //   boxFit: BoxFit.cover,
-                //   titlePosition: GFPosition.start,
-                //   image: Image.network(
-                //     'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
-                //     // height: MediaQuery.of(context).size.height * 0.2,
-                //     // width: MediaQuery.of(context).size.width,
-                //     fit: BoxFit.cover,
-                //   ),
-                //   showImage: true,
-                //   title: GFListTile(
-                //       // avatar: GFAvatar(
-                //       //   backgroundImage: Image.network(
-                //       //     'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
-                //       //     fit: BoxFit
-                //       //         .cover, // this is to make sure the image covers the container
-                //       //   ),
-                //       // ),
-
-                //       ),
-                //   content: Text("Some quick example text to build on the card"),
-                //   buttonBar: GFButtonBar(
-                //     children: <Widget>[
-                //       GFAvatar(
-                //         backgroundColor: GFColors.PRIMARY,
-                //         child: Icon(
-                //           Icons.share,
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //       GFAvatar(
-                //         backgroundColor: GFColors.SECONDARY,
-                //         child: Icon(
-                //           Icons.search,
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //       GFAvatar(
-                //         backgroundColor: GFColors.SUCCESS,
-                //         child: Icon(
-                //           Icons.phone,
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // );
-                // return GFCard( // potraktuj to jako zwykly card
-                //   showImage: true,
-                //   imageOverlay:,
-                //   boxFit: BoxFit.cover,
-                //   image: Image.asset('your asset image'),
-                //   title: GFListTile(
-                //     avatar: GFAvatar(
-                //       backgroundImage: AssetImage('your asset image'),
-                //     ),
-                //     title: Text('Card Title'),
-                //     subTitle: Text('Card Sub Title'),
-                //   ),
-                //   content: Text("Some quick example text to build on the card"),
-                //   buttonBar: GFButtonBar(
-                //     children: <Widget>[
-                //       GFButton(
-                //         onPressed: () {},
-                //         text: 'Buy',
-                //       ),
-                //       GFButton(
-                //         onPressed: () {},
-                //         text: 'Cancel',
-                //       ),
-                //     ],
-                //   ),
-                // );
-                // return Padding(
-                //   padding: const EdgeInsets.all(10),
-                //   child: Container(
-                //     height: itemHeight,
-                //     decoration: BoxDecoration(
-                //       image: DecorationImage(
-                //           image: AssetImage(imagePaths[index - 1]),
-                //           fit: BoxFit.cover),
-
-                //       color: Colors.grey[50],
-                //       borderRadius: BorderRadius.circular(
-                //           20), // Ustawienie promienia zaokrąglenia na 10
-                //       boxShadow: [
-                //         BoxShadow(
-                //           color: Colors.grey.withOpacity(0.5), // Kolor cienia
-                //           spreadRadius: 2, // Rozprzestrzenianie cienia
-                //           blurRadius: 5, // Rozmycie cienia
-                //           offset: const Offset(
-                //               0, 3), // Przesunięcie cienia w osi x i y
-                //         ),
-                //       ],
-                //       gradient: LinearGradient(
-                //         begin: Alignment.bottomCenter,
-                //         stops: [0.3, 0.9],
-                //         colors: [
-                //           Colors.black.withOpacity(.9),
-                //           Colors.black.withOpacity(.7)
-                //         ],
-                //       ),
-                //     ),
-                //     width: screenWidth,
-                //     child: Stack(
-                //       children: [
-                //         // Obrazek
-                //         // Positioned.fill(
-                //         //   child: Image.asset(
-                //         //     imagePaths[
-                //         //         index], // Wybieramy odpowiedni obrazek na podstawie indeksu
-                //         //     fit: BoxFit.cover,
-                //         //   ),
-                //         // ),
-                //         // // Tekst na dole
-                //         Positioned(
-                //           left: 0,
-                //           right: 0,
-                //           bottom: 0,
-                //           child: Opacity(
-                //             opacity: 0.7,
-                //             child: Container(
-                //               decoration: BoxDecoration(
-                //                   color: Colors.black,
-                //                   borderRadius: BorderRadius.only(
-                //                       bottomLeft: Radius.circular(20),
-                //                       bottomRight: Radius.circular(20))),
-                //               padding: EdgeInsets.symmetric(vertical: 8),
-                //               child: Text(
-                //                 tytul[index -
-                //                     1], // Dodajemy indeks + 1, ponieważ indeksowanie zaczyna się od 0
-                //                 textAlign: TextAlign.center,
-                //                 style: TextStyle(
-                //                   color: Colors.white,
-                //                   fontSize: 16,
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // );
               }
             },
           ),

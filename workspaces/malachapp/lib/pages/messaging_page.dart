@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:malachapp/auth/auth_service.dart';
-import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
@@ -34,7 +34,6 @@ class _MessagingPageState extends State<MessagingPage> {
   late SubscribeNotifications _subscribeNotifications;
   late UserNotificationPreferences _notificationPreferences;
 
-
   @override
   void initState() {
     super.initState();
@@ -54,13 +53,15 @@ class _MessagingPageState extends State<MessagingPage> {
   Future<bool> isMemberSubscribed() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      return await _subscribeNotifications.isSubscribedToTopic('subscribed_${widget.groupId}');
+      return await _subscribeNotifications
+          .isSubscribedToTopic('subscribed_${widget.groupId}');
     }
     return false;
   }
 
   Future<void> _checkSubscription() async {
-    bool subscribed = await _notificationPreferences.isTopicSubscribed('subscribed_${widget.groupId}');
+    bool subscribed = await _notificationPreferences
+        .isTopicSubscribed('subscribed_${widget.groupId}');
     setState(() {
       _isSubscribed = subscribed;
     });
@@ -97,15 +98,15 @@ class _MessagingPageState extends State<MessagingPage> {
                               pageBuilder:
                                   (context, animation, secondaryAnimation) =>
                                       AddMemberPage(groupID: widget.groupId),
-                              transitionsBuilder:
-                                  (context, animation, secondaryAnimation, child) {
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
                                 var begin = const Offset(1.0, 0.0);
                                 var end = Offset.zero;
                                 var curve = Curves.ease;
-                    
+
                                 var tween = Tween(begin: begin, end: end)
                                     .chain(CurveTween(curve: curve));
-                    
+
                                 return SlideTransition(
                                   position: animation.drive(tween),
                                   child: child,
@@ -118,18 +119,27 @@ class _MessagingPageState extends State<MessagingPage> {
                     ),
                     Consumer<UserNotificationPreferences>(
                       builder: (context, notificationPrefs, child) {
-                        bool isSubscribed = notificationPrefs.isTopicSubscribed('subscribed_${widget.groupId}');
+                        bool isSubscribed = notificationPrefs
+                            .isTopicSubscribed('subscribed_${widget.groupId}');
                         return IconButton(
-                          icon: isSubscribed ? const Icon(Icons.notifications) : const Icon(Icons.notifications_off),
+                          icon: isSubscribed
+                              ? const Icon(Icons.notifications)
+                              : const Icon(Icons.notifications_off),
                           onPressed: () async {
                             if (isSubscribed) {
-                              await _subscribeNotifications.unsubscribeFromGroupTopic(widget.groupId);
-                              notificationPrefs.updateSubscriptionStatus('subscribed_${widget.groupId}', false);
-                              debugPrint('Unsubscribed from group topic: ${widget.groupId}');
+                              await _subscribeNotifications
+                                  .unsubscribeFromGroupTopic(widget.groupId);
+                              notificationPrefs.updateSubscriptionStatus(
+                                  'subscribed_${widget.groupId}', false);
+                              debugPrint(
+                                  'Unsubscribed from group topic: ${widget.groupId}');
                             } else {
-                              await _subscribeNotifications.subscribeToGroupTopic(widget.groupId);
-                              notificationPrefs.updateSubscriptionStatus('subscribed_${widget.groupId}', true);  
-                              debugPrint('Subscribed to group topic: ${widget.groupId}');
+                              await _subscribeNotifications
+                                  .subscribeToGroupTopic(widget.groupId);
+                              notificationPrefs.updateSubscriptionStatus(
+                                  'subscribed_${widget.groupId}', true);
+                              debugPrint(
+                                  'Subscribed to group topic: ${widget.groupId}');
                             }
                           },
                         );
@@ -178,11 +188,9 @@ class _MessagingPageState extends State<MessagingPage> {
                                     Row(
                                       children: [
                                         Text(
-                                            message['sendersNickname'] != null
-                                                ? "${message['sendersNickname']
-                                                    .split('@')[0]} (${message['sender']
-                                                    .split('@')[0]})"
-                                                : message['sender'],
+                                          message['sendersNickname'] != null
+                                              ? "${message['sendersNickname'].split('@')[0]} (${message['sender'].split('@')[0]})"
+                                              : message['sender'],
                                           style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors
@@ -246,12 +254,17 @@ class _MessagingPageState extends State<MessagingPage> {
                       onPressed: () async {
                         if (_messageController.text.isNotEmpty) {
                           await _groupService.sendMessage(
-                            widget.groupId,
-                            _messageController.text,
-                            _auth.currentUser!.email!
-                          );
-                          String nickname = await NicknameFetcher().fetchNickname(_auth.currentUser!.uid).first;
-                          await NotificationService().sendPersonalisedFCMMessage('$nickname: ${_messageController.text}', widget.groupId, widget.groupTitle ?? 'Group Message');
+                              widget.groupId,
+                              _messageController.text,
+                              _auth.currentUser!.email!);
+                          String nickname = await NicknameFetcher()
+                              .fetchNickname(_auth.currentUser!.uid)
+                              .first;
+                          await NotificationService()
+                              .sendPersonalisedFCMMessage(
+                                  '$nickname: ${_messageController.text}',
+                                  widget.groupId,
+                                  widget.groupTitle ?? 'Group Message');
                           _messageController.clear();
                         }
                       },
@@ -385,10 +398,10 @@ class _GroupPageState extends State<GroupPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ListTile(
-                                title: MyText(
-                                    text: doc['groupTitle'],
-                                    rozmiar: 18,
-                                    waga: FontWeight.bold),
+                                title: MyText1(
+                                  text: doc['groupTitle'],
+                                  rozmiar: 18,
+                                ),
                                 // title: Text(
                                 //   ,
                                 //   style: const TextStyle(
@@ -400,8 +413,10 @@ class _GroupPageState extends State<GroupPage> {
                                   String groupId =
                                       await _groupIDGetter(doc['groupTitle']);
                                   Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          MessagingPage(groupId: groupId, groupTitle: doc['groupTitle'],)));
+                                      builder: (context) => MessagingPage(
+                                            groupId: groupId,
+                                            groupTitle: doc['groupTitle'],
+                                          )));
                                 },
                               ),
                             ],

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/auth/auth_service.dart';
-import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/drawer.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
