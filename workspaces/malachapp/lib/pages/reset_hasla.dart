@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:malachapp/auth/admin/admin.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/my_button.dart';
-import 'package:malachapp/pages/adminPanel.dart';
 
 class ResetHasla extends StatefulWidget {
   const ResetHasla({super.key});
@@ -14,7 +12,7 @@ class ResetHasla extends StatefulWidget {
 }
 
 class _ResetHaslaState extends State<ResetHasla> {
-  TextEditingController mail = TextEditingController(text: 'nic waznego');
+  TextEditingController mail = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +56,7 @@ class _ResetHaslaState extends State<ResetHasla> {
                     height: 5,
                   ),
                   Text(
-                    "Aby zresetować hasło wyślij swojego E-maila a natychmiastowo otrzymasz go w skrzynce odbiorczej ;)",
+                    "Aby zresetować hasło wprowadź swojego E-maila a natychmiastowo otrzymasz go w skrzynce odbiorczej!",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.roboto(
                       // Ustawienie czcionki Open Sans
@@ -78,7 +76,9 @@ class _ResetHaslaState extends State<ResetHasla> {
                     child: MyTextField(
                         hintText: "E-mail",
                         obscureText: false,
-                        controller: mail),
+                        controller: mail,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
                   ),
                   const SizedBox(
                     height: 10,
@@ -90,9 +90,6 @@ class _ResetHaslaState extends State<ResetHasla> {
                       onTap: () =>
                           AuthService().resetPassword(email: mail.text),
                     ),
-                  ),
-                  MyButton(text: '(ADMIN_PANEL)', onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const AdminPanel()))
                   ),
 
                   // jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac

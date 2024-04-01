@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:malachapp/pages/adminPanel.dart';
 import 'package:malachapp/pages/message_broadcast_page.dart';
 import 'package:malachapp/services/notification_service.dart';
 
@@ -32,6 +33,16 @@ class AdminSettingsPage extends StatelessWidget {
               await NotificationService().requestNotificationPermission();
             },
             title: const Text('Request Notification Permission'),
+          ),
+          // MyButton(text: '(ADMIN_PANEL)', onTap: () => Navigator.of(context).push(
+          //           MaterialPageRoute(builder: (context) => const AdminPanel()))
+          //         ),
+          ListTile(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const AdminPanel()),
+            ),
+            title: const Text('Admin Panel'),
+            trailing: const Icon(Icons.padding_rounded),
           ),
         ],
       ),
