@@ -4,6 +4,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:malachapp/pages/Events/event_design_page.dart';
+import 'package:calendar_view/calendar_view.dart';
 
 class AddEvent extends StatefulWidget {
   const AddEvent({super.key});
