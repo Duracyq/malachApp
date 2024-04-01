@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';

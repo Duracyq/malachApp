@@ -26,7 +26,8 @@ void main() async {
   await FirebaseAppCheck.instance.activate();
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => ThemeProvider()),
+      ChangeNotifierProvider(
+          create: (context) => ThemeProvider()..initialize()),
       // ChangeNotifierProvider(create: (context) => PollOptionsModel()),
     ],
     child: const MyApp(),

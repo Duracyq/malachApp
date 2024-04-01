@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/vote_button.dart';
 import 'package:malachapp/pages/Poll/poll_list_design.dart';
@@ -57,101 +57,113 @@ class _PollDesign1State extends State<PollDesign1> {
             child: MyText(
               text: "Ilość pytań: ${widget.pollCount}",
               rozmiar: 20,
-              waga: FontWeight.bold,
             ),
           ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-  stream: _db
-      .collection('pollList')
-      .doc(widget.pollListId)
-      .collection('polls')
-      .snapshots(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const CircularProgressIndicator();
-    } else if (snapshot.hasError) {
-      return Text('Error: ${snapshot.error}');
-    } else {
-      return SizedBox(
-        height: screenHeight,
-        width: screenWidth,
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: snapshot.data!.docs.length, // Count of polls/documents
-                itemBuilder: (context, pollIndex) {
-                  final DocumentSnapshot pollDoc = snapshot.data!.docs[pollIndex];
-                  final String pollTitle = pollDoc['pollTitle'];
-                  final List<dynamic> options = pollDoc['options'];
-                  final String pollId = pollDoc.id;
+        stream: _db
+            .collection('pollList')
+            .doc(widget.pollListId)
+            .collection('polls')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            return SizedBox(
+              height: screenHeight,
+              width: screenWidth,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: snapshot
+                          .data!.docs.length, // Count of polls/documents
+                      itemBuilder: (context, pollIndex) {
+                        final DocumentSnapshot pollDoc =
+                            snapshot.data!.docs[pollIndex];
+                        final String pollTitle = pollDoc['pollTitle'];
+                        final List<dynamic> options = pollDoc['options'];
+                        final String pollId = pollDoc.id;
 
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: MyText(
-                          text: "${pollIndex + 1}.$pollTitle", // Updated to show poll number and title
-                          rozmiar: 26,
-                          waga: FontWeight.bold,
-                        ),
-                      ),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: List<Widget>.generate(options.length, (optionIndex) {
-                              bool isSelected = _selectedOptionsPerPoll[pollId]?.contains(optionIndex) ?? false;
-                              return AnswerBox(
-                                press: () {
-                                  _handleOptionTap(pollId, optionIndex);
-                                },
-                                text: options[optionIndex]['text'],
-                                index: optionIndex,
-                                pollId: pollId,
-                                pollListId: widget.pollListId,
-                                isSelected: isSelected,
-                              );
-                            }),
-                          ),
-                        ),
-                      ),
-                          if (pollIndex == widget.pollCount - 1)
+                        return Column(
+                          children: [
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: MyButton(
-                                text: "Wyślij",
-                                onTap: () {
-                                  _selectedOptionsPerPoll.forEach((pollId, selectedOptions) {
-                                    // Fetch the correct DocumentSnapshot based on pollId
-                                    final DocumentSnapshot correctPollDoc = snapshot.data!.docs.firstWhere(
-                                      (doc) => doc.id == pollId,
-                                      orElse: () => throw Exception('Poll not found'),
+                              padding: const EdgeInsets.all(10.0),
+                              child: MyText1(
+                                text:
+                                    "${pollIndex + 1}.$pollTitle", // Updated to show poll number and title
+                                rozmiar: 26,
+                              ),
+                            ),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: List<Widget>.generate(
+                                      options.length, (optionIndex) {
+                                    bool isSelected =
+                                        _selectedOptionsPerPoll[pollId]
+                                                ?.contains(optionIndex) ??
+                                            false;
+                                    return AnswerBox(
+                                      press: () {
+                                        _handleOptionTap(pollId, optionIndex);
+                                      },
+                                      text: options[optionIndex]['text'],
+                                      index: optionIndex,
+                                      pollId: pollId,
+                                      pollListId: widget.pollListId,
+                                      isSelected: isSelected,
                                     );
+                                  }),
+                                ),
+                              ),
+                            ),
+                            if (pollIndex == widget.pollCount - 1)
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: MyButton(
+                                  text: "Wyślij",
+                                  onTap: () {
+                                    _selectedOptionsPerPoll
+                                        .forEach((pollId, selectedOptions) {
+                                      // Fetch the correct DocumentSnapshot based on pollId
+                                      final DocumentSnapshot correctPollDoc =
+                                          snapshot.data!.docs.firstWhere(
+                                        (doc) => doc.id == pollId,
+                                        orElse: () =>
+                                            throw Exception('Poll not found'),
+                                      );
 
-                                    // Now, we can safely assume we have the correct options list
-                                    final List<dynamic> currentOptions = correctPollDoc['options'];
+                                      // Now, we can safely assume we have the correct options list
+                                      final List<dynamic> currentOptions =
+                                          correctPollDoc['options'];
 
-                                    for (int optionIndex in selectedOptions) {
-                                      final String optionText = currentOptions[optionIndex]['text'];
+                                      for (int optionIndex in selectedOptions) {
+                                        final String optionText =
+                                            currentOptions[optionIndex]['text'];
 
-                                      VoteButton(pollId: pollId, pollListId: widget.pollListId)
-                                        .handleVote(
+                                        VoteButton(
+                                                pollId: pollId,
+                                                pollListId: widget.pollListId)
+                                            .handleVote(
                                           pollId: pollId,
                                           optionIndex: optionIndex,
                                           optionText: optionText,
                                           pollListId: widget.pollListId,
                                         );
-                                    }
-                                  });
-                                  // Assuming you want to navigate away after voting on the last poll
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            )
+                                      }
+                                    });
+                                    // Assuming you want to navigate away after voting on the last poll
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              )
                           ],
                         );
                       },
@@ -166,8 +178,6 @@ class _PollDesign1State extends State<PollDesign1> {
     );
   }
 }
-
-
 
 class AnswerBox extends StatelessWidget {
   final Function press;
@@ -230,7 +240,8 @@ class AnswerBox extends StatelessWidget {
                   child: Text(
                     text,
                     style: TextStyle(
-                      color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                      color: Provider.of<ThemeProvider>(context).themeData ==
+                              darkMode
                           ? Colors.white ?? Colors.grey
                           : Colors.black,
                       fontSize: 16,
@@ -243,13 +254,15 @@ class AnswerBox extends StatelessWidget {
                   width: 26,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? (Provider.of<ThemeProvider>(context).themeData == darkMode
+                        ? (Provider.of<ThemeProvider>(context).themeData ==
+                                darkMode
                             ? Colors.white
                             : Colors.black)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(50),
                     border: Border.all(
-                      color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                      color: Provider.of<ThemeProvider>(context).themeData ==
+                              darkMode
                           ? Colors.white
                           : Colors.black,
                     ),

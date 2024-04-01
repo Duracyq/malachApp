@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:malachapp/auth/auth_service.dart';
-import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/text_field.dart';
@@ -25,7 +25,8 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
   final TextEditingController pollListTitleController = TextEditingController();
   late FirebaseFirestore db = FirebaseFirestore.instance;
   List<Question> questions = [];
-  bool _oneTimeChoice = false; // State to keep track of single/multiple choice selection
+  bool _oneTimeChoice =
+      false; // State to keep track of single/multiple choice selection
 
   @override
   void initState() {
@@ -81,7 +82,10 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                   controller: pollListTitleController,
                 ),
               ),
-              ...questions.map((question) => _buildQuestionSection(question, questions.indexOf(question))).toList(),
+              ...questions
+                  .map((question) => _buildQuestionSection(
+                      question, questions.indexOf(question)))
+                  .toList(),
               ElevatedButton(
                 onPressed: _addQuestion,
                 child: const Text('Dodaj pytanie'), // Translate: Add question
@@ -92,10 +96,14 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
                   text: "Dodaj Ankietę", // Translate: Add Survey
                   onTap: () async {
                     await _submitPoll();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Ankieta została dodana'), // Translate: Survey has been added
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text(
+                          'Ankieta została dodana'), // Translate: Survey has been added
                     ));
-                    NotificationService().sendPersonalisedFCMMessage('Niech Twój głos się liczy! 🗳️', 'polls', 'Nowa dostępna ankieta! 🎉'); 
+                    NotificationService().sendPersonalisedFCMMessage(
+                        'Niech Twój głos się liczy! 🗳️',
+                        'polls',
+                        'Nowa dostępna ankieta! 🎉');
                     Navigator.of(context).pop();
                   },
                 ),
@@ -166,7 +174,10 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
 
   Future<void> _submitPoll() async {
     try {
-      if (questions.any((question) => question.questionController.text.isNotEmpty && question.optionControllers.any((controller) => controller.text.isNotEmpty))) {
+      if (questions.any((question) =>
+          question.questionController.text.isNotEmpty &&
+          question.optionControllers
+              .any((controller) => controller.text.isNotEmpty))) {
         String pollListId = db.collection('pollList').doc().id;
 
         await db.collection('pollList').doc(pollListId).set({
@@ -175,20 +186,27 @@ class _PollCreatorPageState extends State<PollCreatorPage> {
         });
 
         for (Question question in questions) {
-          if (question.questionController.text.isNotEmpty && question.optionControllers.any((controller) => controller.text.isNotEmpty)) {
+          if (question.questionController.text.isNotEmpty &&
+              question.optionControllers
+                  .any((controller) => controller.text.isNotEmpty)) {
             List<Map<String, dynamic>> options = question.optionControllers
                 .where((controller) => controller.text.isNotEmpty)
                 .map((controller) => {'text': controller.text, 'voters': []})
                 .toList();
 
-            await db.collection('pollList').doc(pollListId).collection('polls').add({
+            await db
+                .collection('pollList')
+                .doc(pollListId)
+                .collection('polls')
+                .add({
               'pollTitle': question.questionController.text,
               'options': options,
             });
           }
         }
         pollListTitleController.clear();
-        _oneTimeChoice = false; // Reset this if you want to clear the choice for the next use
+        _oneTimeChoice =
+            false; // Reset this if you want to clear the choice for the next use
         questions.clear(); // Clear the entire list of questions
         // Optionally, re-initialize the form to start with a single empty question
         // initState(); // Or a custom method to reinitialize the question form

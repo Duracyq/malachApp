@@ -1,3 +1,10 @@
+
+
+
+import 'package:getwidget/getwidget.dart';
+import 'package:malachapp/components/MyText1.dart';
+import 'package:malachapp/pages/Events/event_design_page.dart';
+import 'package:calendar_view/calendar_view.dart';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -8,6 +15,7 @@ import 'package:malachapp/components/text_field.dart';
 import 'package:intl/intl.dart';
 import 'package:malachapp/services/photo_from_gallery_picker.dart';
 import 'package:malachapp/services/storage_service.dart';
+
 
 class AddEvent extends StatefulWidget {
   const AddEvent({super.key});

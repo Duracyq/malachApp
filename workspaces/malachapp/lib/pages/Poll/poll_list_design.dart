@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
-import 'package:malachapp/components/MyText.dart';
+import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/pages/Poll/poll.dart';
 import 'package:malachapp/pages/Poll/poll_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
@@ -12,14 +12,14 @@ class PollDesign extends StatelessWidget {
   const PollDesign({super.key});
 
   Widget buildPollList(
-      BuildContext context, 
-      double screenWidth, 
-      double screenHeight, 
-      int index, 
-      int? howManyQuestions,
-      String? pollListTitle,
-      String pollListId,
-    ) {
+    BuildContext context,
+    double screenWidth,
+    double screenHeight,
+    int index,
+    int? howManyQuestions,
+    String? pollListTitle,
+    String pollListId,
+  ) {
     return Container(
       width: screenWidth,
       padding: const EdgeInsets.all(0),
@@ -47,13 +47,15 @@ class PollDesign extends StatelessWidget {
                 width: screenWidth * 0.9,
                 margin: const EdgeInsets.symmetric(vertical: 7),
                 decoration: BoxDecoration(
-                  color: Provider.of<ThemeProvider>(context).themeData == darkMode
-                      ? Colors.grey[700]
-                      : Colors.white,
+                  color:
+                      Provider.of<ThemeProvider>(context).themeData == darkMode
+                          ? Colors.grey[700]
+                          : Colors.white,
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                      color: Provider.of<ThemeProvider>(context).themeData ==
+                              darkMode
                           ? Colors.grey[750]!.withOpacity(0.3)
                           : Colors.grey.withOpacity(0.3),
                       spreadRadius: 5,
@@ -63,10 +65,9 @@ class PollDesign extends StatelessWidget {
                   ],
                 ),
                 child: Center(
-                  child: MyText(
+                  child: MyText1(
                     text: pollListTitle ?? '', // Updated text
                     rozmiar: 22,
-                    waga: FontWeight.w700,
                   ),
                 ),
               ),
@@ -78,7 +79,8 @@ class PollDesign extends StatelessWidget {
                   height: 20,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                    color: Provider.of<ThemeProvider>(context).themeData ==
+                            darkMode
                         ? Colors.grey[600]
                         : Colors.grey[200],
                     shape: BoxShape.rectangle,
@@ -145,7 +147,8 @@ class _PollListViewerState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       child: RefreshIndicator(
-        onRefresh: () => Future.delayed(Duration.zero), // Placeholder for actual refresh function
+        onRefresh: () => Future.delayed(
+            Duration.zero), // Placeholder for actual refresh function
         child: StreamBuilder<QuerySnapshot>(
           stream: _db.collection('pollList').snapshots(),
           builder: (context, snapshot) {
@@ -163,23 +166,28 @@ class _PollListViewerState extends StatelessWidget {
                 final pollDoc = pollDocs[index];
                 final pollTitle = pollDoc['pollListTitle'];
                 return FutureBuilder<QuerySnapshot>(
-                future: _db.collection('pollList').doc(pollDoc.id).collection('polls').get(),
+                  future: _db
+                      .collection('pollList')
+                      .doc(pollDoc.id)
+                      .collection('polls')
+                      .get(),
                   builder: (context, pollListSnapshot) {
-                    if (pollListSnapshot.connectionState == ConnectionState.waiting) {
+                    if (pollListSnapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
                     }
                     final pollListLength = pollListSnapshot.data!.docs.length;
                     return PollDesign().buildPollList(
-                      context,
-                      screenWidth,
-                      screenHeight,
-                      index,
-                      pollListLength,
-                      pollTitle as String?,
-                      pollDoc.id // Added type casting
-                    );
+                        context,
+                        screenWidth,
+                        screenHeight,
+                        index,
+                        pollListLength,
+                        pollTitle as String?,
+                        pollDoc.id // Added type casting
+                        );
                   },
                 );
               },

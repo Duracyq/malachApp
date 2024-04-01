@@ -40,6 +40,7 @@ dependencies:
   googleapis_auth: ^1.4.1
   shared_preferences: ^2.2.2
   getwidget: ^4.0.0
+  calendar_view: ^1.1.0
   image_picker: ^1.0.7
 
 flutter_icons:
