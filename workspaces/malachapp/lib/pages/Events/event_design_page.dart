@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/auth/auth_service.dart';
-import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/pages/Events/enrolled_users_page.dart';
 import 'package:malachapp/pages/Events/event_design.dart';
@@ -197,10 +196,10 @@ class _EventDesignPageState extends State<EventDesignPage> {
                             //     ),
                             //   ),
                             // ),
-                            MyText(
+                            MyText1(
                                 text: snapshot.data!['eventName'] ?? "Event Name",
                                 rozmiar: 24,
-                                waga: FontWeight.bold),
+                            ),
                             Container(
                               decoration: BoxDecoration(
                                   color: Colors.green.withOpacity(0.2),
