@@ -128,77 +128,198 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                   ),
                 );
               } else {
-                return Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Container(
-                    height: itemHeight,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage(imagePaths[index - 1]),
-                          fit: BoxFit.cover),
-
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(
-                          20), // Ustawienie promienia zaokrąglenia na 10
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5), // Kolor cienia
-                          spreadRadius: 2, // Rozprzestrzenianie cienia
-                          blurRadius: 5, // Rozmycie cienia
-                          offset: const Offset(
-                              0, 3), // Przesunięcie cienia w osi x i y
-                        ),
-                      ],
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        stops: [0.3, 0.9],
-                        colors: [
-                          Colors.black.withOpacity(.9),
-                          Colors.black.withOpacity(.7)
-                        ],
-                      ),
+                return GestureDetector(
+                  onTap: () {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => AddPost(),
+                    //   ),
+                    // );
+                  },
+                  child: Card(
+                    clipBehavior: Clip.antiAlias,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
                     ),
-                    width: screenWidth,
-                    child: Stack(
+                    child: Column(
                       children: [
-                        // Obrazek
-                        // Positioned.fill(
-                        //   child: Image.asset(
-                        //     imagePaths[
-                        //         index], // Wybieramy odpowiedni obrazek na podstawie indeksu
-                        //     fit: BoxFit.cover,
-                        //   ),
-                        // ),
-                        // // Tekst na dole
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: Opacity(
-                            opacity: 0.7,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(20),
-                                      bottomRight: Radius.circular(20))),
-                              padding: EdgeInsets.symmetric(vertical: 8),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Ink.image(
+                              image: NetworkImage(
+                                  "https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g"),
+                              child: InkWell(
+                                onTap: () {
+                                  print('tapped');
+                                },
+                              ),
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
+                            Center(
                               child: Text(
-                                tytul[index -
-                                    1], // Dodajemy indeks + 1, ponieważ indeksowanie zaczyna się od 0
-                                textAlign: TextAlign.center,
+                                "Co tam",
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
+                                    fontSize: 30,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
-                          ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 100,
                         ),
                       ],
                     ),
                   ),
                 );
+                // return GFCard(
+                //   boxFit: BoxFit.cover,
+                //   titlePosition: GFPosition.start,
+                //   image: Image.network(
+                //     'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
+                //     // height: MediaQuery.of(context).size.height * 0.2,
+                //     // width: MediaQuery.of(context).size.width,
+                //     fit: BoxFit.cover,
+                //   ),
+                //   showImage: true,
+                //   title: GFListTile(
+                //       // avatar: GFAvatar(
+                //       //   backgroundImage: Image.network(
+                //       //     'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
+                //       //     fit: BoxFit
+                //       //         .cover, // this is to make sure the image covers the container
+                //       //   ),
+                //       // ),
+
+                //       ),
+                //   content: Text("Some quick example text to build on the card"),
+                //   buttonBar: GFButtonBar(
+                //     children: <Widget>[
+                //       GFAvatar(
+                //         backgroundColor: GFColors.PRIMARY,
+                //         child: Icon(
+                //           Icons.share,
+                //           color: Colors.white,
+                //         ),
+                //       ),
+                //       GFAvatar(
+                //         backgroundColor: GFColors.SECONDARY,
+                //         child: Icon(
+                //           Icons.search,
+                //           color: Colors.white,
+                //         ),
+                //       ),
+                //       GFAvatar(
+                //         backgroundColor: GFColors.SUCCESS,
+                //         child: Icon(
+                //           Icons.phone,
+                //           color: Colors.white,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // );
+                // return GFCard( // potraktuj to jako zwykly card
+                //   showImage: true,
+                //   imageOverlay:,
+                //   boxFit: BoxFit.cover,
+                //   image: Image.asset('your asset image'),
+                //   title: GFListTile(
+                //     avatar: GFAvatar(
+                //       backgroundImage: AssetImage('your asset image'),
+                //     ),
+                //     title: Text('Card Title'),
+                //     subTitle: Text('Card Sub Title'),
+                //   ),
+                //   content: Text("Some quick example text to build on the card"),
+                //   buttonBar: GFButtonBar(
+                //     children: <Widget>[
+                //       GFButton(
+                //         onPressed: () {},
+                //         text: 'Buy',
+                //       ),
+                //       GFButton(
+                //         onPressed: () {},
+                //         text: 'Cancel',
+                //       ),
+                //     ],
+                //   ),
+                // );
+                // return Padding(
+                //   padding: const EdgeInsets.all(10),
+                //   child: Container(
+                //     height: itemHeight,
+                //     decoration: BoxDecoration(
+                //       image: DecorationImage(
+                //           image: AssetImage(imagePaths[index - 1]),
+                //           fit: BoxFit.cover),
+
+                //       color: Colors.grey[50],
+                //       borderRadius: BorderRadius.circular(
+                //           20), // Ustawienie promienia zaokrąglenia na 10
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.grey.withOpacity(0.5), // Kolor cienia
+                //           spreadRadius: 2, // Rozprzestrzenianie cienia
+                //           blurRadius: 5, // Rozmycie cienia
+                //           offset: const Offset(
+                //               0, 3), // Przesunięcie cienia w osi x i y
+                //         ),
+                //       ],
+                //       gradient: LinearGradient(
+                //         begin: Alignment.bottomCenter,
+                //         stops: [0.3, 0.9],
+                //         colors: [
+                //           Colors.black.withOpacity(.9),
+                //           Colors.black.withOpacity(.7)
+                //         ],
+                //       ),
+                //     ),
+                //     width: screenWidth,
+                //     child: Stack(
+                //       children: [
+                //         // Obrazek
+                //         // Positioned.fill(
+                //         //   child: Image.asset(
+                //         //     imagePaths[
+                //         //         index], // Wybieramy odpowiedni obrazek na podstawie indeksu
+                //         //     fit: BoxFit.cover,
+                //         //   ),
+                //         // ),
+                //         // // Tekst na dole
+                //         Positioned(
+                //           left: 0,
+                //           right: 0,
+                //           bottom: 0,
+                //           child: Opacity(
+                //             opacity: 0.7,
+                //             child: Container(
+                //               decoration: BoxDecoration(
+                //                   color: Colors.black,
+                //                   borderRadius: BorderRadius.only(
+                //                       bottomLeft: Radius.circular(20),
+                //                       bottomRight: Radius.circular(20))),
+                //               padding: EdgeInsets.symmetric(vertical: 8),
+                //               child: Text(
+                //                 tytul[index -
+                //                     1], // Dodajemy indeks + 1, ponieważ indeksowanie zaczyna się od 0
+                //                 textAlign: TextAlign.center,
+                //                 style: TextStyle(
+                //                   color: Colors.white,
+                //                   fontSize: 16,
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // );
               }
             },
           ),
