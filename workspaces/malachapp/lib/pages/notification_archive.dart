@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
@@ -23,7 +22,6 @@ class NotificationArchive extends StatefulWidget {
 
 class _NotificationArchiveState extends State<NotificationArchive> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   late SharedPreferences _prefs;
   List<Map<String, dynamic>> notifications = [];
   final Logger logger = Logger();
@@ -341,7 +339,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // This button deletes all notifications
-          _secureStorage.deleteAll().then((_) {
+          _prefs.clear().then((_) {
             setState(() {
               notifications.clear();
             });
