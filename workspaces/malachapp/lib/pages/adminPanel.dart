@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/admin/admin.dart';
 import 'package:malachapp/auth/auth_service.dart';
@@ -39,9 +40,10 @@ class _AdminPanelState extends State<AdminPanel> {
               ),
             ),
             const SizedBox(
-              height: 190,
+              height: 10,
             ),
-            Center(
+            Padding(
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -57,20 +59,24 @@ class _AdminPanelState extends State<AdminPanel> {
                     ),
                   ),
                   const SizedBox(
-                    height: 5,
+                    height: 50,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 12),
-                    child: MyButton(
-                      text: 'Wyślij',
-                      onTap: () => AuthService().resetPassword(email: mail.text),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(left: 12, right: 12),
+                  //   child: MyButton(
+                  //     text: 'Wyślij',
+                  //     onTap: () => AuthService().resetPassword(email: mail.text),
+                  //   ),
+                  // ),
                   MyButton(text: 'STWORZ 10(na razie) UŻYTKOWNIKÓW (ADMIN_PANEL)', onTap: () => AuthCreateUser().createUsers()),
                   const SizedBox(height: 10),
-                  MyTextField(hintText: 'email', controller: decipherController),
+                  MyTextField(
+                    hintText: 'kod użytkownika',
+                    controller: decipherController,
+                    keyboardType: TextInputType.number,
+                  ),
                   MyButton(text: 'Deszyfrowanie', onTap: () {
-                    String result = AuthCreateUser().passwDecryption(decipherController.text);
+                    String result = AuthCreateUser().passwDecryption('${decipherController.text}@malach.com');
                     showDialog(
                       context: context,
                       builder: (context) {
@@ -91,7 +97,7 @@ class _AdminPanelState extends State<AdminPanel> {
                   }
                 ),
               ],
-            ),
+                          ),
             ),
           ],
         ),

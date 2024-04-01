@@ -5,8 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';
+import 'package:malachapp/pages/Events/enrolled_users_page.dart';
 import 'package:malachapp/pages/Events/event_design.dart';
 import 'package:malachapp/services/storage_service.dart';
 
@@ -266,25 +268,53 @@ class _EventDesignPageState extends State<EventDesignPage> {
               );
             }
           ),
-           Positioned(
+          Positioned(
             bottom: 16,
             left: 16,
             right: 16,
             child: Visibility(
-              visible: snapshot.data!['isEnrollAvailable'] == true,
+                visible: snapshot.data!['isEnrollAvailable'] == true,
               child: MyButton(
-                text: !isChecked ?'Zapisz się!':'Wypisz się!',
-                onTap: () => EventList().enrollEvent(eventID).then((value) => ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Zapisano na wydarzenie $eventName!'),
-                    duration: const Duration(seconds: 2),
-                  ),
-                )).then((value) => setState(() {
-                  isChecked = !isChecked;
-                })),
+                text: !isChecked ? 'Zapisz się!' : 'Wypisz się!',
+                onTap: () => EventList()
+                    .enrollEvent(eventID)
+                    .then((value) => ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Zapisano na wydarzenie $eventName!'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        ))
+                    .then((value) => setState(() {
+                          isChecked = !isChecked;
+                        })),
               ),
             ),
           ),
+            FutureBuilder(
+              future: AuthService().isAdmin(),
+              builder: (context, snapshot) {
+                  return Visibility(
+                    visible: snapshot.data == true,
+                    child: Positioned(
+                      bottom: 16*6,
+                      left: 16,
+                      right: 16,
+                      child: MyButton(
+                        text: 'Enrolled Users',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EnrolledUsersPage(eventID: eventID),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+              },
+            ),
           ],
         );
         },

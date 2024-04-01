@@ -91,9 +91,6 @@ class _ResetHaslaState extends State<ResetHasla> {
                           AuthService().resetPassword(email: mail.text),
                     ),
                   ),
-                  MyButton(text: '(ADMIN_PANEL)', onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const AdminPanel()))
-                  ),
 
                   // jakbys mial ogromny problem to zamiast komponentu uzyj tego ponizej ale bedzie to zle wygladac
                   // Container(
