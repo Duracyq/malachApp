@@ -30,14 +30,17 @@ class _EventDesignPageState extends State<EventDesignPage> {
   late String eventID;
   late String eventName;
   late Iterable<dynamic> tags;
-  late bool isChecked;
+  bool isChecked = false;
+
+  // late bool isChecked;
   @override
   void initState() {
     eventID = widget.eventID;
     eventName = widget.eventName;
     tags = widget.tags;
-    // isChecked = false;
+    // isChecked = _db.collection('events').doc(eventID).get().then((value) => value.data()?['enrolledUsers'].contains(FirebaseAuth.instance.currentUser!.email)) as bool;
     super.initState();
+    _toggleIsChecked();
   }
 
    void toggleEnrollment(DocumentSnapshot<Map<String, dynamic>> eventData) {
@@ -54,6 +57,11 @@ class _EventDesignPageState extends State<EventDesignPage> {
       EventList().enrollEvent(widget.eventID);
     }
   }
+  void _toggleIsChecked() async {
+    bool result = await _db.collection('events').doc(eventID).get().then((v) => v.data()?['enrolledUsers'].contains(FirebaseAuth.instance.currentUser!.email));
+    setState(() => isChecked = result);
+  }
+
   
 
   @override
@@ -94,175 +102,194 @@ class _EventDesignPageState extends State<EventDesignPage> {
           ],
         ),
       ]),
-      body: Stack(
-        children: [
-         StreamBuilder<DocumentSnapshot<Map<String,dynamic>>>(
-          stream: _db.collection('events').doc(eventID).snapshots(),
-          builder: (context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            Timestamp timestamp = snapshot.data!['date'] as Timestamp;
-            DateTime dateTime = timestamp.toDate();
-            String formattedDate = DateFormat('dd.MM.yyyy HH:mm').format(dateTime);
-            return Column(
-              children: [
-                SizedBox(
-                  height: 140,
-                  width: double.infinity,
-                  child: FutureBuilder<String>(
-                    future: Storage().getImageUrlFromDir('event_photos/$eventID/'), // Ensure $eventID is correctly defined
-                    builder: (context, AsyncSnapshot<String> snapshot) => Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        image: DecorationImage(
-                          image: snapshot.hasData
-                            ? NetworkImage(snapshot.data!) as ImageProvider // Explicitly casting to ImageProvider
-                            : const AssetImage('assets/favicon.png') as ImageProvider, // Explicitly casting to ImageProvider
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      child: Container(
+      body: FutureBuilder(
+        future: _db.collection('events').doc(eventID).get(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+          }
+        return Stack(
+          children: [
+           StreamBuilder<DocumentSnapshot<Map<String,dynamic>>>(
+            stream: _db.collection('events').doc(eventID).snapshots(),
+            builder: (context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              Timestamp timestamp = snapshot.data!['date'] as Timestamp;
+              DateTime dateTime = timestamp.toDate();
+              String formattedDate = DateFormat('dd.MM.yyyy HH:mm').format(dateTime);
+              return Column(
+                children: [
+                  SizedBox(
+                    height: 140,
+                    width: double.infinity,
+                    child: FutureBuilder<String>(
+                      future: Storage().getImageUrlFromDir('event_photos/$eventID/'), // Ensure $eventID is correctly defined
+                      builder: (context, AsyncSnapshot<String> snapshot) => Container(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.transparent, // start with transparent color
-                              Colors.grey.shade300, // end with a specific color
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
+                          color: Colors.grey,
+                          image: DecorationImage(
+                            image: snapshot.hasData
+                              ? NetworkImage(snapshot.data!) as ImageProvider // Explicitly casting to ImageProvider
+                              : const AssetImage('assets/favicon.png') as ImageProvider, // Explicitly casting to ImageProvider
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent, // start with transparent color
+                                Colors.grey.shade300, // end with a specific color
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
                           ),
                         ),
                       ),
                     ),
+                      
                   ),
-                    
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Expanded(
-                          //   child: GFShimmer(
-                          //     child: const MyText(
-                          //         text: "Event Name",
-                          //         rozmiar: 24,
-                          //         waga: FontWeight.bold),
-                          //     showGradient: true,
-                          //     gradient: LinearGradient(
-                          //       begin: Alignment.bottomRight,
-                          //       end: Alignment.centerLeft,
-                          //       stops: const <double>[
-                          //         0,
-                          //         0.3,
-                          //         0.6,
-                          //         0.9,
-                          //         1,
-                          //       ],
-                          //       colors: [
-                          //         Colors.teal.withOpacity(0.1),
-                          //         Colors.teal.withOpacity(0.3),
-                          //         Colors.teal.withOpacity(0.5),
-                          //         Colors.teal.withOpacity(0.7),
-                          //         Colors.teal.withOpacity(0.9),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
-                          MyText(
-                              text: snapshot.data!['eventName'] ?? "Event Name",
-                              rozmiar: 24,
-                              waga: FontWeight.bold),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 8),
-                              child: Text(
-                                formattedDate, // replace with the event date
-                                style: const TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Expanded(
+                            //   child: GFShimmer(
+                            //     child: const MyText(
+                            //         text: "Event Name",
+                            //         rozmiar: 24,
+                            //         waga: FontWeight.bold),
+                            //     showGradient: true,
+                            //     gradient: LinearGradient(
+                            //       begin: Alignment.bottomRight,
+                            //       end: Alignment.centerLeft,
+                            //       stops: const <double>[
+                            //         0,
+                            //         0.3,
+                            //         0.6,
+                            //         0.9,
+                            //         1,
+                            //       ],
+                            //       colors: [
+                            //         Colors.teal.withOpacity(0.1),
+                            //         Colors.teal.withOpacity(0.3),
+                            //         Colors.teal.withOpacity(0.5),
+                            //         Colors.teal.withOpacity(0.7),
+                            //         Colors.teal.withOpacity(0.9),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
+                            MyText(
+                                text: snapshot.data!['eventName'] ?? "Event Name",
+                                rozmiar: 24,
+                                waga: FontWeight.bold),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(30)),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 8),
+                                child: Text(
+                                  formattedDate, // replace with the event date
+                                  style: const TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16),
+                                ),
                               ),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        snapshot.data!['description'] ?? "Description",
-                        style: const TextStyle(
-                          fontSize: 16,
+                            )
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      // const Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //   children: [
-                      //     Text(
-                      //       'Jakies dane',
-                      //       style: TextStyle(
-                      //         fontSize: 16,
-                      //       ),
-                      //     ),
-                      //     Text(
-                      //       'Jakies dane',
-                      //       style: TextStyle(
-                      //         fontSize: 16,
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                      // const SizedBox(height: 10),
-                      // const Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //   children: [
-                      //     Text(
-                      //       'Jakies dane',
-                      //       style: TextStyle(
-                      //         fontSize: 16,
-                      //       ),
-                      //     ),
-                      //     Text(
-                      //       'Jakies dane',
-                      //       style: TextStyle(
-                      //         fontSize: 16,
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                    ],
+                        const SizedBox(height: 10),
+                        Text(
+                          snapshot.data!['description'] ?? "Description",
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        // const Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Text(
+                        //       'Jakies dane',
+                        //       style: TextStyle(
+                        //         fontSize: 16,
+                        //       ),
+                        //     ),
+                        //     Text(
+                        //       'Jakies dane',
+                        //       style: TextStyle(
+                        //         fontSize: 16,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // const SizedBox(height: 10),
+                        // const Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Text(
+                        //       'Jakies dane',
+                        //       style: TextStyle(
+                        //         fontSize: 16,
+                        //       ),
+                        //     ),
+                        //     Text(
+                        //       'Jakies dane',
+                        //       style: TextStyle(
+                        //         fontSize: 16,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }
-        ),
-        //  Positioned(
-        //   bottom: 16,
-        //   left: 16,
-        //   right: 16,
-        //   child: MyButton(
-        //     text: isChecked ?'Zapisz się!':'Wypisz się!',
-        //     onTap: () => EventList().enrollEvent(eventID).then((value) => ScaffoldMessenger.of(context).showSnackBar(
-        //       SnackBar(
-        //         content: Text('Zapisano na wydarzenie $eventName!'),
-        //         duration: const Duration(seconds: 2),
-        //       ),
-        //     )),
-        //   ),
-        // ),
-        ],
+                ],
+              );
+            }
+          ),
+           Positioned(
+            bottom: 16,
+            left: 16,
+            right: 16,
+            child: Visibility(
+              visible: snapshot.data!['isEnrollAvailable'] == true,
+              child: MyButton(
+                text: !isChecked ?'Zapisz się!':'Wypisz się!',
+                onTap: () => EventList().enrollEvent(eventID).then((value) => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Zapisano na wydarzenie $eventName!'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                )).then((value) => setState(() {
+                  isChecked = !isChecked;
+                })),
+              ),
+            ),
+          ),
+          ],
+        );
+        },
       ),
+      
       // floatingActionButton: Stack(children: [
       //   Positioned(
       //         bottom: 16,
