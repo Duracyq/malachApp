@@ -85,7 +85,7 @@ class _ProfilePageSettingsState extends State<ProfilePageSettings> {
             'nickname': _nickname,
           });
         }
-      });
+      }).then((value) => Navigator.of(context).pop());
       print('Nickname: $_nickname');
       print('GDPR Confirmed: $_gdprConfirmed');
       print('Vulgular Confirmation: $_vulgularConfirmation');

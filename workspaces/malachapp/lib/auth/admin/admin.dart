@@ -38,11 +38,11 @@ class AuthCreateUser {
       try {
         String decTextTemp = CaesarCiph().deCaesarCipher(text);
         decText =  RailCyph().railFenceEncrypt(decTextTemp, 7);
-        print(decText);
+        print(decText.substring(0,9));
       } catch (e) {
         print(e);
       }
-      return decText;
+      return decText.substring(0,9);
     } else {
       return 'Invalid input at position 3';
     }
@@ -57,7 +57,7 @@ class AuthCreateUser {
     } catch(e) {
       print(e);
     }
-    return createdPasw;
+    return createdPasw.substring(0,9);
   } 
 
   final auth = FirebaseAuth.instance;
@@ -67,7 +67,7 @@ class AuthCreateUser {
       email = '$loginName@malach.com';
       
       try {
-        final userCredentials = await auth.createUserWithEmailAndPassword(
+        await auth.createUserWithEmailAndPassword(
           email: email,
           password: createPasswForUsers(email)
         );

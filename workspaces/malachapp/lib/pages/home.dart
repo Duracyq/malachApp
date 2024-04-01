@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
           ),
       const PollDesign(),
       //const EventListPage(),
-      const EventList(),
+      EventList(),
     ];
   }
 

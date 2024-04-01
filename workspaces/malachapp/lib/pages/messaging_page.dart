@@ -30,7 +30,6 @@ class _MessagingPageState extends State<MessagingPage> {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final AuthService _authService = AuthService();
-  bool _isSubscribed = false;
   late SubscribeNotifications _subscribeNotifications;
   late UserNotificationPreferences _notificationPreferences;
 
@@ -60,10 +59,8 @@ class _MessagingPageState extends State<MessagingPage> {
   }
 
   Future<void> _checkSubscription() async {
-    bool subscribed = await _notificationPreferences
-        .isTopicSubscribed('subscribed_${widget.groupId}');
-    setState(() {
-      _isSubscribed = subscribed;
+    setState(() async {
+      bool subscribed = await _notificationPreferences.isTopicSubscribed('subscribed_${widget.groupId}');
     });
   }
 
@@ -254,18 +251,14 @@ class _MessagingPageState extends State<MessagingPage> {
                       onPressed: () async {
                         if (_messageController.text.isNotEmpty) {
                           await _groupService.sendMessage(
-                              widget.groupId,
-                              _messageController.text,
-                              _auth.currentUser!.email!);
-                          String nickname = await NicknameFetcher()
-                              .fetchNickname(_auth.currentUser!.uid)
-                              .first;
-                          await NotificationService()
-                              .sendPersonalisedFCMMessage(
-                                  '$nickname: ${_messageController.text}',
-                                  widget.groupId,
-                                  widget.groupTitle ?? 'Group Message');
+                            widget.groupId,
+                            _messageController.text,
+                            _auth.currentUser!.email!
+                          );
+                          String nicknameTemp = _messageController.text;
                           _messageController.clear();
+                          String nickname = await NicknameFetcher().fetchNickname(_auth.currentUser!.uid).first;
+                          await NotificationService().sendPersonalisedFCMMessage('$nickname: $nicknameTemp', widget.groupId, widget.groupTitle ?? 'Group Message');
                         }
                       },
                     ),
