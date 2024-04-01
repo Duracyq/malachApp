@@ -1,10 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SubscribeNotifications {
   late FirebaseMessaging fm = FirebaseMessaging.instance;
-  final _secureStorage = const FlutterSecureStorage();
-
   SubscribeNotifications() {
     // Set up listener once in the constructor
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -26,16 +24,19 @@ class SubscribeNotifications {
 
   Future<void> subscribe(String topic) async {
     await fm.subscribeToTopic(topic);
-    await _secureStorage.write(key: 'subscribed_$topic', value: 'true');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('subscribed_$topic', true);
   }
 
   Future<void> unsubscribe(String topic) async {
     await fm.unsubscribeFromTopic(topic);
-    await _secureStorage.delete(key: 'subscribed_$topic');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('subscribed_$topic');
   }
 
   Future<bool> isSubscribedToTopic(String topic) async {
-    String? value = await _secureStorage.read(key: 'subscribed_$topic');
-    return value == 'true';
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? value = prefs.getBool('subscribed_$topic');
+    return value ?? false;
   }
 }

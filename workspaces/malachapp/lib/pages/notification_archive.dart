@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
@@ -12,6 +11,7 @@ import 'package:malachapp/pages/messaging_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationArchive extends StatefulWidget {
   const NotificationArchive({Key? key}) : super(key: key);
@@ -22,7 +22,7 @@ class NotificationArchive extends StatefulWidget {
 
 class _NotificationArchiveState extends State<NotificationArchive> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  late SharedPreferences _prefs;
   List<Map<String, dynamic>> notifications = [];
   final Logger logger = Logger();
 
@@ -34,7 +34,16 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   void initState() {
     super.initState();
     _initFirebase();
+    _initSharedPreferences();
     migrateDataIfNeeded();
+  }
+
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    // final bool? hasAcceptedTerms = prefs.getBool('accepted_terms');
+    // if (hasAcceptedTerms == null || !hasAcceptedTerms) {
+    //   await prefs.setBool('accepted_terms', true);
+    // }
   }
 
   Future<void> _initFirebase() async {
@@ -109,7 +118,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     };
 
     final String valueToStore = jsonEncode(notificationData);
-    await _secureStorage.write(key: uniqueKey, value: valueToStore); // Use the uniqueKey as the storage key
+    await _prefs.setString(uniqueKey, valueToStore);
 
     _retrieveNotifications();
     _savingNotification = false;
@@ -123,15 +132,13 @@ class _NotificationArchiveState extends State<NotificationArchive> {
 
   // Check if a unique key already exists in the storage
   Future<bool> _uniqueKeyExists(String uniqueKey) async {
-    final allKeys = await _secureStorage.readAll();
-    return allKeys.containsKey(uniqueKey);
+    return _prefs.containsKey(uniqueKey);
   }
 
   Future<bool> _isNotificationAlreadyStored(String title, String notification, String topic) async {
-    Map<String, String> allValues = await _secureStorage.readAll();
-    for (var value in allValues.values) {
+    for (var key in _prefs.getKeys()) {
       try {
-        Map<String, dynamic> storedData = jsonDecode(value);
+        Map<String, dynamic> storedData = jsonDecode(_prefs.getString(key)!);
         if (storedData['title'] == title && storedData['notification'] == notification && storedData['topic'] == topic) {
           return true;
         }
@@ -160,23 +167,20 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   //   });
   // }
   Future<void> _retrieveNotifications() async {
-    Map<String, String> allValues = await _secureStorage.readAll();
     List<Map<String, dynamic>> parsedNotifications = [];
 
-    allValues.forEach((key, value) {
+    for (var key in _prefs.getKeys()) {
       try {
-        final dynamic decodedData = jsonDecode(value);
+        final dynamic decodedData = jsonDecode(_prefs.getString(key)!);
         if (decodedData is Map<String, dynamic>) {
           parsedNotifications.add(decodedData);
         } else {
-          // Log unexpected data types for further investigation
           logger.d("Unexpected data format for key $key: Expected a Map but got ${decodedData.runtimeType}");
         }
       } catch (e) {
         logger.e("Error decoding data for key $key: $e");
       }
-    });
-
+    }
 
     parsedNotifications.sort((a, b) {
       // Assuming 'timestamp' is stored as a String in ISO 8601 format
@@ -194,16 +198,12 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   }
 
   Future<void> migrateDataIfNeeded() async {
-    final Map<String, String> allValues = await _secureStorage.readAll();
-    for (var key in allValues.keys) {
-      final dynamic decodedData = jsonDecode(allValues[key]!);
+    for (var key in _prefs.getKeys()) {
+      final dynamic decodedData = jsonDecode(_prefs.getString(key)!);
       if (decodedData is! Map<String, dynamic>) {
-        // Assume the data needs to be converted or handled differently
-        // For instance, convert boolean values to a map or handle them appropriately
         if (decodedData is bool) {
-          // Convert or handle the boolean value as needed
           final Map<String, dynamic> newData = {'isEnabled': decodedData};
-          await _secureStorage.write(key: key, value: jsonEncode(newData));
+          await _prefs.setString(key, jsonEncode(newData));
         }
       }
     }
@@ -211,7 +211,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
 
   void _deleteNotification(int index) async {
     String key = notifications[index]['key']!;
-    await _secureStorage.delete(key: key);
+    await _prefs.remove(key);
     _retrieveNotifications();
   }
 
@@ -339,7 +339,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // This button deletes all notifications
-          _secureStorage.deleteAll().then((_) {
+          _prefs.clear().then((_) {
             setState(() {
               notifications.clear();
             });
