@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:malachapp/components/MyText.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/text_field.dart';
-import 'package:malachapp/pages/Events/event_design_page.dart';
 import 'package:intl/intl.dart';
 import 'package:malachapp/services/photo_from_gallery_picker.dart';
 import 'package:malachapp/services/storage_service.dart';
@@ -19,14 +17,23 @@ class AddEvent extends StatefulWidget {
 }
 
 class _AddEventState extends State<AddEvent> {
+  static const List<String> tags = ['Wycieczka', 'Konkurs', 'Spotkanie', 'Warsztaty', 'Aula', 'Inne',];
+
+
   final formKey = GlobalKey<FormState>();
   TextEditingController eventNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   DateTime? selectedDate;
   TextEditingController photoUrlController = TextEditingController();
   File? selectedPhoto;
-
+  Map<String, bool> isSelected = {};
   bool isEnrollAvailable = false; // Default value, can be changed via UI if needed
+
+  @override
+  void initState() {
+    super.initState();
+    isSelected = { for (var tag in tags) tag : false };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +78,21 @@ class _AddEventState extends State<AddEvent> {
                       selectedPhoto = photo;
                     });
                   },
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  children: isSelected.entries.map((entry) {
+                    return ChoiceChip(
+                      label: Text(entry.key),
+                      selected: entry.value,
+                      showCheckmark: false,
+                      onSelected: (bool selected) {
+                        setState(() {
+                          isSelected[entry.key] = selected;
+                        });
+                      },
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 16),
                 ListTile(
@@ -140,6 +162,11 @@ class _AddEventState extends State<AddEvent> {
     // Convert selectedDate to Timestamp for Firestore
     final eventTimestamp = Timestamp.fromDate(selectedDate!);
 
+    List<String> selectedTags = isSelected.entries
+    .where((entry) => entry.value)
+    .map((entry) => entry.key)
+    .toList();
+
     // Step 1: Create the event document in Firestore and get the ID
     DocumentReference eventRef = await FirebaseFirestore.instance.collection('events').add({
       'eventName': eventNameController.text,
@@ -149,6 +176,7 @@ class _AddEventState extends State<AddEvent> {
       'isEnrollAvailable': isEnrollAvailable,
       // Temporarily set photoUrl to an empty string or a placeholder
       'photoUrl': '',
+      'tags': selectedTags,
     });
 
     String photoUrl = '';

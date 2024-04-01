@@ -82,6 +82,7 @@ class _EventListState extends State<EventList> {
     final currentUserEmail = widget._auth.currentUser!.email;
     // bool isUserEnrolled = data.containsKey('enrolledUsers') && data['enrolledUsers'].contains(currentUserEmail);
     bool isUserEnrolled = (snapshot.data() as Map<String, dynamic>)['enrolledUsers']?.contains(currentUserEmail) ?? false;
+    Iterable<dynamic> tags = data['tags'] ?? [];
 
 
     return Material(
@@ -99,6 +100,7 @@ class _EventListState extends State<EventList> {
                   builder: (BuildContext context) => EventDesignPage(
                     eventID: snapshot.id,
                     eventName: snapshot['eventName'],
+                    tags: tags,
                   ),
                 ),
               );
@@ -146,25 +148,41 @@ class _EventListState extends State<EventList> {
                     const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Row(
+                      child: Column(
+
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.circular(30)),
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 8),
-                              child: Text(
-                                'Tag', // replace with the event category
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10),
+                          Wrap(
+                            direction: Axis.horizontal,
+                            spacing: 3,
+                            children: [
+                              for (var value in tags)
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Visibility(
+                                  visible: data['tags'] != null && data.containsKey('tags') && data['tags'].isNotEmpty,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                    child: Wrap(
+                                      children: [
+                                        Text(
+                                          value,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(height: 8),
                           Container(
                             decoration: BoxDecoration(
                                 color: Colors.green.withOpacity(0.2),
@@ -172,12 +190,22 @@ class _EventListState extends State<EventList> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4, horizontal: 8),
-                              child: Text(
-                                formattedDate, // replace with the formatted event date
-                                style: const TextStyle(
+                              child: Wrap(
+                                children:[
+                                  const Icon(
+                                    Icons.calendar_today,
                                     color: Colors.green,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 10),
+                                    size: 12,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    formattedDate, // replace with the formatted event date
+                                    style: const TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 10),
+                                  ),
+                                ] 
                               ),
                             ),
                           )

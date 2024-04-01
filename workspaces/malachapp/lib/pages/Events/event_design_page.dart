@@ -13,10 +13,12 @@ import 'package:malachapp/services/storage_service.dart';
 class EventDesignPage extends StatefulWidget {
   final String eventID;
   final String eventName;
+  final Iterable<dynamic> tags;
   const EventDesignPage({
     Key? key,
     required this.eventID,
     required this.eventName,
+    required this.tags,
   }) : super(key: key);
 
   @override
@@ -27,11 +29,13 @@ class _EventDesignPageState extends State<EventDesignPage> {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   late String eventID;
   late String eventName;
+  late Iterable<dynamic> tags;
   late bool isChecked;
   @override
   void initState() {
     eventID = widget.eventID;
     eventName = widget.eventName;
+    tags = widget.tags;
     // isChecked = false;
     super.initState();
   }
@@ -56,22 +60,38 @@ class _EventDesignPageState extends State<EventDesignPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(eventName), actions: [
-        Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.blue, borderRadius: BorderRadius.circular(30)),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              child: Text(
-                "Tag", // replace with the event category
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15),
+        Wrap(
+          children: [
+            for (var value in tags)
+            Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.blue, borderRadius: BorderRadius.circular(30)),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  child: Visibility(
+                    visible: tags.isNotEmpty,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      child: Wrap(
+                        children: [
+                          Text(
+                            value,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ]),
       body: Stack(
