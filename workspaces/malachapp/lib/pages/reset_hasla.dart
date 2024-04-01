@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:malachapp/auth/admin/admin.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/my_button.dart';
-import 'package:malachapp/pages/adminPanel.dart';
 
 class ResetHasla extends StatefulWidget {
   const ResetHasla({super.key});
