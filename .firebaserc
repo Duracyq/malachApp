@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "malachapp"
-  }
+    "default": "malachapp",
+    "hosting": "malachapp"
+  },
+  "targets": {},
+  "etags": {}
 }

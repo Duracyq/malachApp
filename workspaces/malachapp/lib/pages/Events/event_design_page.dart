@@ -54,10 +54,6 @@ class _EventDesignPageState extends State<EventDesignPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isUserEnrolled(DocumentSnapshot<Map<String, dynamic>> snapshot, String currentUserEmail) {
-      return (snapshot.data()?['enrolledUsers'] as List<dynamic>?)?.contains(currentUserEmail) ?? false;
-    }
-    final currentUserEmail = FirebaseAuth.instance.currentUser!.email;
     return Scaffold(
       appBar: AppBar(title: Text(eventName), actions: [
         Padding(
@@ -88,152 +84,146 @@ class _EventDesignPageState extends State<EventDesignPage> {
                 child: CircularProgressIndicator(),
               );
             }
-            // bool isUserEnrolled = data.containsKey('enrolledUsers') && data['enrolledUsers'].contains(currentUserEmail);
-            // setState(() {
-            //   isChecked = isUserEnrolled(snapshot.data!, currentUserEmail!);
-            // });
             Timestamp timestamp = snapshot.data!['date'] as Timestamp;
             DateTime dateTime = timestamp.toDate();
             String formattedDate = DateFormat('dd.MM.yyyy HH:mm').format(dateTime);
-            return Container(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 140,
-                    width: double.infinity,
-                    child: FutureBuilder<String>(
-                      future: Storage().getImageUrlFromDir('event_photos/$eventID/'), // Ensure $eventID is correctly defined
-                      builder: (context, AsyncSnapshot<String> snapshot) => Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          image: DecorationImage(
-                            image: snapshot.hasData
-                              ? NetworkImage(snapshot.data!) as ImageProvider // Explicitly casting to ImageProvider
-                              : const AssetImage('assets/favicon.png') as ImageProvider, // Explicitly casting to ImageProvider
-                            fit: BoxFit.cover,
-                          ),
+            return Column(
+              children: [
+                SizedBox(
+                  height: 140,
+                  width: double.infinity,
+                  child: FutureBuilder<String>(
+                    future: Storage().getImageUrlFromDir('event_photos/$eventID/'), // Ensure $eventID is correctly defined
+                    builder: (context, AsyncSnapshot<String> snapshot) => Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        image: DecorationImage(
+                          image: snapshot.hasData
+                            ? NetworkImage(snapshot.data!) as ImageProvider // Explicitly casting to ImageProvider
+                            : const AssetImage('assets/favicon.png') as ImageProvider, // Explicitly casting to ImageProvider
+                          fit: BoxFit.cover,
                         ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent, // start with transparent color
-                                Colors.grey.shade300, // end with a specific color
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent, // start with transparent color
+                              Colors.grey.shade300, // end with a specific color
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
                           ),
                         ),
                       ),
                     ),
-        
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Expanded(
-                            //   child: GFShimmer(
-                            //     child: const MyText(
-                            //         text: "Event Name",
-                            //         rozmiar: 24,
-                            //         waga: FontWeight.bold),
-                            //     showGradient: true,
-                            //     gradient: LinearGradient(
-                            //       begin: Alignment.bottomRight,
-                            //       end: Alignment.centerLeft,
-                            //       stops: const <double>[
-                            //         0,
-                            //         0.3,
-                            //         0.6,
-                            //         0.9,
-                            //         1,
-                            //       ],
-                            //       colors: [
-                            //         Colors.teal.withOpacity(0.1),
-                            //         Colors.teal.withOpacity(0.3),
-                            //         Colors.teal.withOpacity(0.5),
-                            //         Colors.teal.withOpacity(0.7),
-                            //         Colors.teal.withOpacity(0.9),
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
-                            MyText(
-                                text: snapshot.data!['eventName'] ?? "Event Name",
-                                rozmiar: 24,
-                                waga: FontWeight.bold),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(30)),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 4, horizontal: 8),
-                                child: Text(
-                                  formattedDate, // replace with the event date
-                                  style: const TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 16),
-                                ),
+                    
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Expanded(
+                          //   child: GFShimmer(
+                          //     child: const MyText(
+                          //         text: "Event Name",
+                          //         rozmiar: 24,
+                          //         waga: FontWeight.bold),
+                          //     showGradient: true,
+                          //     gradient: LinearGradient(
+                          //       begin: Alignment.bottomRight,
+                          //       end: Alignment.centerLeft,
+                          //       stops: const <double>[
+                          //         0,
+                          //         0.3,
+                          //         0.6,
+                          //         0.9,
+                          //         1,
+                          //       ],
+                          //       colors: [
+                          //         Colors.teal.withOpacity(0.1),
+                          //         Colors.teal.withOpacity(0.3),
+                          //         Colors.teal.withOpacity(0.5),
+                          //         Colors.teal.withOpacity(0.7),
+                          //         Colors.teal.withOpacity(0.9),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
+                          MyText(
+                              text: snapshot.data!['eventName'] ?? "Event Name",
+                              rozmiar: 24,
+                              waga: FontWeight.bold),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 8),
+                              child: Text(
+                                formattedDate, // replace with the event date
+                                style: const TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16),
                               ),
-                            )
-                          ],
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        snapshot.data!['description'] ?? "Description",
+                        style: const TextStyle(
+                          fontSize: 16,
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          snapshot.data!['description'] ?? "Description",
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        // const Row(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //   children: [
-                        //     Text(
-                        //       'Jakies dane',
-                        //       style: TextStyle(
-                        //         fontSize: 16,
-                        //       ),
-                        //     ),
-                        //     Text(
-                        //       'Jakies dane',
-                        //       style: TextStyle(
-                        //         fontSize: 16,
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-                        // const SizedBox(height: 10),
-                        // const Row(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //   children: [
-                        //     Text(
-                        //       'Jakies dane',
-                        //       style: TextStyle(
-                        //         fontSize: 16,
-                        //       ),
-                        //     ),
-                        //     Text(
-                        //       'Jakies dane',
-                        //       style: TextStyle(
-                        //         fontSize: 16,
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 10),
+                      // const Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     Text(
+                      //       'Jakies dane',
+                      //       style: TextStyle(
+                      //         fontSize: 16,
+                      //       ),
+                      //     ),
+                      //     Text(
+                      //       'Jakies dane',
+                      //       style: TextStyle(
+                      //         fontSize: 16,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      // const SizedBox(height: 10),
+                      // const Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     Text(
+                      //       'Jakies dane',
+                      //       style: TextStyle(
+                      //         fontSize: 16,
+                      //       ),
+                      //     ),
+                      //     Text(
+                      //       'Jakies dane',
+                      //       style: TextStyle(
+                      //         fontSize: 16,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           }
         ),

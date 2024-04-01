@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/Events/add_event.dart';
 import 'package:malachapp/pages/Events/event_design_page.dart';
 import 'package:malachapp/services/storage_service.dart';
@@ -72,12 +73,11 @@ class _EventListState extends State<EventList> {
     }
   }
 
-  Widget _buildEventCard(BuildContext context, int i, DocumentSnapshot snapshot) {
+  Widget _buildEventCard(BuildContext context, DocumentSnapshot snapshot, bool? past) {
     var data = snapshot.data() as Map<String, dynamic>;
 
     final DateTime eventDate = snapshot['date'].toDate();
     final String formattedDate = DateFormat('dd.MM.yyyy').format(eventDate);
-    var logger = Logger();
 
     final currentUserEmail = widget._auth.currentUser!.email;
     // bool isUserEnrolled = data.containsKey('enrolledUsers') && data['enrolledUsers'].contains(currentUserEmail);
@@ -190,7 +190,9 @@ class _EventListState extends State<EventList> {
                       child: Text(
                         (snapshot.data() != null && data.containsKey('eventName'))
                           ? snapshot['eventName']
-                          : snapshot['description'], // replace with the event name
+                          : (snapshot['description'].length <= 40)
+                            ? snapshot['description']
+                            : "${snapshot['description'].substring(0,40)}...", // replace with the event name
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -198,7 +200,9 @@ class _EventListState extends State<EventList> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Text(
-                        snapshot['description'], // replace with the event description
+                        (snapshot['description'].length <= 200)
+                          ? snapshot['description']
+                          : "${snapshot['description'].substring(0,200)}...", // replace with the event description
                         style: TextStyle(
                           fontSize: 10,
                           color: Colors.grey.shade500,
@@ -240,7 +244,7 @@ class _EventListState extends State<EventList> {
                 //   height: 0,
                 // )
                 Visibility(
-                  visible: data['isEnrollAvailable'] == true, // show the button only if isEnrollAvailable is true
+                  visible: data['isEnrollAvailable'] == true && !past!, // show the button only if isEnrollAvailable is true
                   child: Center(
                     child: ElevatedButton(
                       onPressed: () {
@@ -309,36 +313,84 @@ class _EventListState extends State<EventList> {
               icon: const Icon(CupertinoIcons.add)),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: StreamBuilder(
-          stream: EventList()._db.collection('events').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final events = snapshot.data!.docs;
-              final currentDate = DateTime.now();
-
-              final upcomingEvents = events
-                  .where((event) => event['date'].toDate().isAfter(currentDate))
-                  .toList();
-
-              return GridView.builder(
-                padding: const EdgeInsets.all(8),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // number of columns
-                  crossAxisSpacing: 10, // spacing between the columns
-                  mainAxisSpacing: 10, // spacing between the rows
-                  childAspectRatio: 0.6,
-                ),
-                itemCount: upcomingEvents.length, // replace with the number of upcoming events
-                itemBuilder: (context, int i) {
-                  return _buildEventCard(context, i, upcomingEvents[i]);
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: StreamBuilder(
+                stream: EventList()._db.collection('events').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return const CircularProgressIndicator();
+                  final events = snapshot.data!.docs;
+                  final currentDate = DateTime.now();
+                  
+                  final upcomingEvents = events
+                      .where((event) => event['date'].toDate().isAfter(currentDate))
+                      .toList();
+        
+                  final pastEvents = events
+                      .where((event) => event['date'].toDate().isBefore(currentDate))
+                      .toList();
+                  
+                  return Column(
+                    children: [
+                      GridView.builder(
+                          padding: const EdgeInsets.all(8),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.6,
+                          ),
+                          itemCount: upcomingEvents.length,
+                          // Important: Wrap itemBuilder with Builder or similar to avoid context issues
+                          itemBuilder: (context, int i) => _buildEventCard(context, upcomingEvents[i], false),
+                          // Disable scrolling since it's in a scrollable view
+                          physics: const NeverScrollableScrollPhysics(),
+                          // Never grow since it's already constrained
+                          shrinkWrap: true,
+                      ),
+                      const Column(
+                        children: [
+                          SizedBox(
+                            height: 25,
+                          ),
+                           Divider(
+                            color: Colors.grey,
+                            thickness: 2,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              "Archiwum Wydarzeń",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ]
+                      ),
+                      GridView.builder(
+                          padding: const EdgeInsets.all(8),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.6,
+                          ),
+                          itemCount: pastEvents.length,
+                          itemBuilder: (context, int i) => _buildEventCard(context, pastEvents[i], true),
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                      ),
+                    ],
+                  );
                 },
-              );
-            } else {
-              return const CircularProgressIndicator();
-            }
-          },
+              ),
+            ),
+          ],
         ),
       ),
     );

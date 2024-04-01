@@ -55,7 +55,7 @@ class _PollDesign1State extends State<PollDesign1> {
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: MyText(
-              text: "1/${widget.pollCount}",
+              text: "Ilość pytań: ${widget.pollCount}",
               rozmiar: 20,
               waga: FontWeight.bold,
             ),
