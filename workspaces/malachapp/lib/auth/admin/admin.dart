@@ -67,7 +67,7 @@ class AuthCreateUser {
       email = '$loginName@malach.com';
       
       try {
-        final userCredentials = await auth.createUserWithEmailAndPassword(
+        await auth.createUserWithEmailAndPassword(
           email: email,
           password: createPasswForUsers(email)
         );
