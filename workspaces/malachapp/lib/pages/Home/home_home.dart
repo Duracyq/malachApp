@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/MyText2.dart';
+import 'package:malachapp/components/post.dart';
 import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/services/nickname_fetcher.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:malachapp/pages/Home/post.dart';
 
 class HomeHomeWidget extends StatefulWidget {
   const HomeHomeWidget({Key? key}) : super(key: key);
@@ -64,7 +67,7 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
         //! Posty
         SizedBox(
           width: screenWidth,
-          height: screenHeight - 134,
+          height: screenHeight - 140,
           child: ListView.builder(
             physics: const BouncingScrollPhysics(),
             itemCount: items.length,
@@ -215,12 +218,12 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                 //! kazdy inny element
                 return GestureDetector(
                   onTap: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => AddPost(),
-                    //   ),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Post3(),
+                      ),
+                    );
                   },
                   child: Card(
                     margin: EdgeInsets.only(bottom: 10, left: 8, right: 8),
