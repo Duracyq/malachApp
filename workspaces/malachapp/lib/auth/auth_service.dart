@@ -125,6 +125,28 @@ class AuthService {
     return _status;
   }
 
+  Future<String> getUserIdFromEmail(String email) async {
+    try {
+      // Query Firestore to find the user with the provided email
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users') // Adjust this to your collection name
+          .where('email', isEqualTo: email)
+          .get();
+
+      // Check if any user found with the given email
+      if (querySnapshot.docs.isNotEmpty) {
+        // Return the UID of the first user found
+        return querySnapshot.docs.first.id;
+      } else {
+        // User not found with provided email
+        return '';
+      }
+    } catch (e) {
+      print("Error getting user ID from email: $e");
+      return '';
+    }
+}
+
   Future<bool> isAdmin() async {
     final res = await FirebaseFirestore.instance
         .collection('admins')
