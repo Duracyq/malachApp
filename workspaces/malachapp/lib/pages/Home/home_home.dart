@@ -240,7 +240,12 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                               "https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g"),
                           child: InkWell(
                             onTap: () {
-                              print('tapped');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Post3(),
+                                ),
+                              );
                             },
                           ),
                           height: 100,

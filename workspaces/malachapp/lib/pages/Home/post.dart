@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/MyText1.dart';
+import 'package:malachapp/components/MyText2.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class Post3 extends StatefulWidget {
   const Post3({Key? key}) : super(key: key);
@@ -79,7 +81,7 @@ class _Post3 extends State<Post3> {
                     children: [
                       MyText1(
                         text: "Event Name",
-                        rozmiar: 24,
+                        rozmiar: 34,
                       ),
                       Container(
                         decoration: BoxDecoration(
@@ -100,48 +102,61 @@ class _Post3 extends State<Post3> {
                     ],
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    'Event DescriptionEvent DescriptionE vent Desc riptio nEvent De scriptionEvent Descript ionEvent Descri ption Event Descr iptionEvent DescriptionEv ent Descriptio nEvent Description',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
+                  MyText2(
+                    text:
+                        'Event DescriptionEvent DescriptionE vent Desc riptio nEvent De scriptionEvent Descript ionEvent Descri ption Event Descr iptionEvent DescriptionEv ent Descriptio nEvent Description',
+                    rozmiar: 16,
                   ),
                   SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Jakies dane',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        'Jakies dane',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
                   SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Jakies dane',
-                        style: TextStyle(
-                          fontSize: 16,
+                  // MasonryGridView.builder(
+                  //   itemCount: 6,
+                  //   gridDelegate:
+                  //       SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                  //           crossAxisCount: 2),
+                  //   itemBuilder: (context, index) => Padding(
+                  //     padding: EdgeInsets.all(8.0),
+                  //     child: ClipRRect(
+                  //       borderRadius: BorderRadius.circular(12),
+                  //       child: Image.network(
+                  //         "https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g",
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  SizedBox(height: 100),
+                  MasonryGridView.count(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            "https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g",
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Jakies dane',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
+                  // SingleChildScrollView(
+                  //   child: MasonryGridView(
+                  //       gridDelegate:
+                  //           SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                  //               crossAxisCount: 10)),
+                  // )
+                  // // MasonryGridView.count(
+                  //   crossAxisCount: 4,
+                  //   mainAxisSpacing: 4,
+                  //   crossAxisSpacing: 4,
+                  //   itemBuilder: (context, index) {
+                  //     return Container(
+                  //       color: Colors.orange,
+                  //     );
+                  //   },
+                  // )
                 ],
               ),
             ),
