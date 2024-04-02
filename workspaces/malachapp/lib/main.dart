@@ -31,6 +31,7 @@ void main() async {
   ));
   await FirebaseApi().initNotifications();
   FirebaseMessaging.instance.subscribeToTopic('all'); //this provides the app with global broadcast notifications
+  
 }
 
 class MyApp extends StatefulWidget {
