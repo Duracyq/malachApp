@@ -33,9 +33,18 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   @override
   void initState() {
     super.initState();
-    _initFirebase();
-    _initSharedPreferences();
-    migrateDataIfNeeded();
+    initializeApp();
+  }
+
+  Future<void> initializeApp() async {
+    await _initFirebase();
+    await _initSharedPreferences();
+    await migrateDataIfNeeded();
+    await _retrieveNotifications();
+  }
+
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
   }
 
   Future<void> _initSharedPreferences() async {
@@ -48,7 +57,6 @@ class _NotificationArchiveState extends State<NotificationArchive> {
 
   Future<void> _initFirebase() async {
     await Firebase.initializeApp();
-
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     _firebaseMessaging.getToken().then((token) {
       setState(() {
@@ -69,6 +77,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
           _storeNotification(message.notification!.title!, message.notification!.body!, topic);
         }
       }
+      _retrieveNotifications();
     });
 
     _retrieveNotifications();
@@ -95,34 +104,30 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   Future<void> _storeNotification(String title, String notification, String topic) async {
     if (_savingNotification) return;
     _savingNotification = true;
-
-    // Generate a unique key based on the notification's content, including a timestamp for sorting
+    
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
     final String formattedDate = formatter.format(now);
-    final uniqueKey = _generateUniqueKey(title, notification, topic, formattedDate);
-
-    // Check if this unique key already exists
-    if (await _uniqueKeyExists(uniqueKey)) {
-      logger.d("Notification already stored, skipping...");
-      _savingNotification = false;
-      return;
-    }
-
-    // Prepare the notification data with the formatted date
+    final String uniqueKey = _generateUniqueKey(title, notification, topic, formattedDate);
+    
+    logger.d("Attempting to store notification with key: $uniqueKey");
+    
     final Map<String, dynamic> notificationData = {
       "title": title,
       "notification": notification,
       "topic": topic,
-      "timestamp": formattedDate, // Save the formatted date
+      "timestamp": formattedDate,
     };
+    
+    logger.d("Storing notification with key: $uniqueKey and data: $notificationData");
 
     final String valueToStore = jsonEncode(notificationData);
     await _prefs.setString(uniqueKey, valueToStore);
-
-    _retrieveNotifications();
     _savingNotification = false;
+    _retrieveNotifications();
   }
+
+
 
 
   // Helper method to generate a unique key (this is a simple version, consider a hash for more complexity)
@@ -149,36 +154,17 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     return false;
   }
 
-
-  // Future<void> _retrieveNotifications() async {
-  //   Map<String, String> allValues = await _secureStorage.readAll();
-  //   List<Map<String, dynamic>> parsedNotifications = [];
-  //   allValues.forEach((key, value) {
-  //     Map<String, dynamic> storedData = jsonDecode(value);
-  //     int timestamp = int.tryParse(key.substring(key.lastIndexOf('_') + 1)) ?? 0;
-  //     storedData['timestamp'] = timestamp.toString();
-  //     parsedNotifications.add(storedData);
-  //   });
-
-  //   parsedNotifications.sort((a, b) => int.parse(b['timestamp']).compareTo(int.parse(a['timestamp'])));
-
-  //   setState(() {
-  //     notifications = parsedNotifications;
-  //   });
-  // }
   Future<void> _retrieveNotifications() async {
-    List<Map<String, dynamic>> parsedNotifications = [];
-
-    for (var key in _prefs.getKeys()) {
-      try {
-        final dynamic decodedData = jsonDecode(_prefs.getString(key)!);
-        if (decodedData is Map<String, dynamic>) {
+    final List<Map<String, dynamic>> parsedNotifications = [];
+    _prefs.getKeys().forEach((key) async {
+      final String? value = _prefs.getString(key);
+      if (value != null) {
+        try {
+          final Map<String, dynamic> decodedData = jsonDecode(value);
           parsedNotifications.add(decodedData);
-        } else {
-          logger.d("Unexpected data format for key $key: Expected a Map but got ${decodedData.runtimeType}");
+        } catch (e) {
+          logger.e("Error decoding notification data for key $key: $e");
         }
-      } catch (e) {
-        logger.e("Error decoding data for key $key: $e");
       }
     }
 
@@ -189,7 +175,6 @@ class _NotificationArchiveState extends State<NotificationArchive> {
       return dateB.compareTo(dateA); // Sort in descending order
     });
 
-
     if (mounted) {
       setState(() {
         notifications = parsedNotifications;
@@ -197,16 +182,28 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     }
   }
 
+
+
   Future<void> migrateDataIfNeeded() async {
-    for (var key in _prefs.getKeys()) {
-      final dynamic decodedData = jsonDecode(_prefs.getString(key)!);
-      if (decodedData is! Map<String, dynamic>) {
-        if (decodedData is bool) {
-          final Map<String, dynamic> newData = {'isEnabled': decodedData};
-          await _prefs.setString(key, jsonEncode(newData));
+    _prefs.getKeys().forEach((key) async {
+      final value = _prefs.getString(key);
+      if (value != null) {
+        try {
+          final dynamic decodedData = jsonDecode(value);
+          // No need to re-encode if it's already in the correct format
+          if (decodedData is! Map<String, dynamic>) {
+            if (decodedData is bool) {
+              final Map<String, dynamic> newData = {'isEnabled': decodedData};
+              await _prefs.setString(key, jsonEncode(newData));
+            }
+            // Consider other types if necessary
+          }
+        } catch (e) {
+          // Handle potential errors, perhaps the value was not JSON encoded
+          logger.e("Error during migration for key $key: $e");
         }
       }
-    }
+    });
   }
 
   void _deleteNotification(int index) async {

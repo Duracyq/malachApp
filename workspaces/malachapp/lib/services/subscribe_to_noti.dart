@@ -14,11 +14,11 @@ class SubscribeNotifications {
   }
 
    Future<void> subscribeToGroupTopic(String groupId) async {
-    await fm.subscribeToTopic(groupId);
+    await fm.subscribeToTopic('subscribed_$groupId');
   }
 
   Future<void> unsubscribeFromGroupTopic(String groupId) async {
-    await fm.unsubscribeFromTopic(groupId);
+    await fm.unsubscribeFromTopic('subscribed_$groupId');
   } 
 
 
