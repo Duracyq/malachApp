@@ -17,14 +17,12 @@ class _PostCreatorState extends State<PostCreator> {
     final TextEditingController _descriptionController = TextEditingController();
     File? _mainImage;
     final List<File?> _sideImage = [];
-    int _howManyImages = 1;
+    late int _howManyImages;
 
     @override
     void initState() {
       super.initState();
-      setState(() {
-        _howManyImages = 1;
-      });;
+      setHowManyImages(1);
     }
 
     void setHowManyImages(int value) {
@@ -74,7 +72,7 @@ class _PostCreatorState extends State<PostCreator> {
         String downloadUrl = await value.ref.getDownloadURL();
         postRef.update({'mainImageUrl': downloadUrl});
       });
-
+      Navigator.of(context).pop();
     }
 
     @override
@@ -83,66 +81,79 @@ class _PostCreatorState extends State<PostCreator> {
             appBar: AppBar(
                 title: const Text('Post Creator'),
             ),
-            body: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                    children: [
-                        MyTextField(hintText: 'Tytuł', controller: _titleController),
-                        const SizedBox(height: 16),
-                        MyTextField(hintText: 'Opis', controller: _descriptionController),
-                        const SizedBox(height: 16),
-                        ListTile(
-                            title: Text(_mainImage?.path ?? 'Załącz zdjęcie'),
-                            trailing: const Icon(Icons.camera_alt),
-                            onTap: () {
-                              pickAndShrinkPhoto().then((value) {
-                                setState(() {
-                                  _mainImage = value;
-                                });
-                              });
-                            },
-                        ),
-                        ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: _howManyImages,
-                            itemBuilder: (context, index) {
-                                return ListTile(
-                                    title: Text('Załącz zdjęcie poboczne $index'),
-                                    trailing: Row(
-                                      children: [
-                                        const Icon(Icons.camera_alt),
-                                        const SizedBox(width: 16),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () {
-                                            setState(() {
-                                              if (_howManyImages > 0) _howManyImages--;
-                                              _sideImage.removeAt(index);
+            body: SingleChildScrollView(
+              child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: 10,
+                      maxHeight: MediaQuery.of(context).size.height,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                        children: [
+                            MyTextField(hintText: 'Tytuł', controller: _titleController),
+                            const SizedBox(height: 16),
+                            MyTextField(hintText: 'Opis', controller: _descriptionController),
+                            const SizedBox(height: 16),
+                            ListTile(
+                                title: Text(_mainImage?.path ?? 'Załącz zdjęcie'),
+                                trailing: const Icon(Icons.camera_alt),
+                                onTap: () {
+                                  pickAndShrinkPhoto().then((value) {
+                                    setState(() {
+                                      _mainImage = value;
+                                    });
+                                  });
+                                },
+                            ),
+                            Expanded(
+                              child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: _howManyImages,
+                                  itemBuilder: (context, index) {
+                                      return ListTile(
+                                          title: Text('Załącz zdjęcie poboczne $index'),
+                                          trailing: Wrap(
+                                            alignment: WrapAlignment.start,
+                                            spacing: 6,
+                                            children: [
+                                              const Icon(Icons.camera_alt),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    if (_howManyImages > 0) _howManyImages--;
+                                                    _sideImage.removeAt(index);
+                                                  });
+                                                  debugPrint('Removed image at index $index');
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                          onTap: () {
+                                            pickAndShrinkPhoto().then((value) {
+                                              setState(() {
+                                                _sideImage.add(value);
+                                              });
                                             });
-                                            debugPrint('Removed image at index $index');
                                           },
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      pickAndShrinkPhoto().then((value) {
-                                        setState(() {
-                                          _sideImage.add(value);
-                                        });
-                                      });
-                                    },
-                                );
-                            },
-                        ),
-                        MyButton(text: 'Dodaj zdjęcie poboczne', onTap: () => setHowManyImages(_howManyImages++)),
-
-                        const SizedBox(height: 16),                        
-                        MyButton(text: 'Wyślij', onTap: () {
-                            debugPrint(_titleController.text);
-                            _sendPost();
-                        }),
-                    ],
-                ),
+                                      );
+                                  },
+                              ),
+                            ),
+                            MyButton(text: 'Dodaj zdjęcie poboczne', onTap: () => setHowManyImages(_howManyImages++)),
+                                  
+                            const SizedBox(height: 16),                        
+                            MyButton(text: 'Wyślij', onTap: () {
+                                debugPrint(_titleController.text);
+                                _sendPost();
+                            }),
+                        ],
+                    ),
+                  ),
+              ),
             ),
         );
     }

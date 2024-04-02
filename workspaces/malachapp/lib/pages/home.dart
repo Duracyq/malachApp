@@ -127,33 +127,7 @@ class _HomePageState extends State<HomePage> {
         //   },
         // ),
 
-        floatingActionButton: FutureBuilder(
-          future: auth.isAdmin(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
-
-            if (snapshot.hasError) {
-              return const Text('Wystąpił błąd');
-            }
-
-            if (snapshot.data == true) {
-              return FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PostCreator(),
-                    ),
-                  );
-                },
-                child: const Icon(Icons.add),
-              );
-            }
-
-            return const SizedBox.shrink();
-          },
-        ),
+        // floatingActionButton: 
       ),
     );
   }
