@@ -31,14 +31,12 @@ class _MessagingPageState extends State<MessagingPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final AuthService _authService = AuthService();
   late SubscribeNotifications _subscribeNotifications;
-  late UserNotificationPreferences _notificationPreferences;
 
   @override
   void initState() {
     super.initState();
     _subscribeNotifications = SubscribeNotifications();
-    _notificationPreferences = UserNotificationPreferences();
-    _checkSubscription();
+    isMemberSubscribed();
   }
 
   Future<bool> isAdminAsync() async {
@@ -56,12 +54,6 @@ class _MessagingPageState extends State<MessagingPage> {
           .isSubscribedToTopic('subscribed_${widget.groupId}');
     }
     return false;
-  }
-
-  Future<void> _checkSubscription() async {
-    setState(() async {
-      bool subscribed = await _notificationPreferences.isTopicSubscribed('subscribed_${widget.groupId}');
-    });
   }
 
   @override
