@@ -47,6 +47,14 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     _prefs = await SharedPreferences.getInstance();
   }
 
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    // final bool? hasAcceptedTerms = prefs.getBool('accepted_terms');
+    // if (hasAcceptedTerms == null || !hasAcceptedTerms) {
+    //   await prefs.setBool('accepted_terms', true);
+    // }
+  }
+
   Future<void> _initFirebase() async {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -112,7 +120,9 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     };
     
     logger.d("Storing notification with key: $uniqueKey and data: $notificationData");
-    await _prefs.setString(uniqueKey, jsonEncode(notificationData));
+
+    final String valueToStore = jsonEncode(notificationData);
+    await _prefs.setString(uniqueKey, valueToStore);
     _savingNotification = false;
     _retrieveNotifications();
   }
@@ -156,11 +166,14 @@ class _NotificationArchiveState extends State<NotificationArchive> {
           logger.e("Error decoding notification data for key $key: $e");
         }
       }
-    });
+    }
 
-    // Ensure the sorting operation is correct
-    parsedNotifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
-    logger.d("Retrieved ${parsedNotifications.length} notifications");
+    parsedNotifications.sort((a, b) {
+      // Assuming 'timestamp' is stored as a String in ISO 8601 format
+      var dateA = DateTime.tryParse(a['timestamp'] ?? '') ?? DateTime.now();
+      var dateB = DateTime.tryParse(b['timestamp'] ?? '') ?? DateTime.now();
+      return dateB.compareTo(dateA); // Sort in descending order
+    });
 
     if (mounted) {
       setState(() {
