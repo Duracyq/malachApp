@@ -163,11 +163,14 @@ class _NotificationArchiveState extends State<NotificationArchive> {
           logger.e("Error decoding notification data for key $key: $e");
         }
       }
-    });
+    }
 
-    // Ensure the sorting operation is correct
-    parsedNotifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
-    logger.d("Retrieved ${parsedNotifications.length} notifications");
+    parsedNotifications.sort((a, b) {
+      // Assuming 'timestamp' is stored as a String in ISO 8601 format
+      var dateA = DateTime.tryParse(a['timestamp'] ?? '') ?? DateTime.now();
+      var dateB = DateTime.tryParse(b['timestamp'] ?? '') ?? DateTime.now();
+      return dateB.compareTo(dateA); // Sort in descending order
+    });
 
     if (mounted) {
       _setHasNotifications(true);
