@@ -10,6 +10,7 @@ import 'package:malachapp/components/drawer.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/Events/event_design.dart';
+import 'package:malachapp/pages/Home/post_creator.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/Home/home_home.dart';
@@ -125,6 +126,34 @@ class _HomePageState extends State<HomePage> {
         //     });
         //   },
         // ),
+
+        floatingActionButton: FutureBuilder(
+          future: auth.isAdmin(),
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            if (snapshot.hasError) {
+              return const Text('Wystąpił błąd');
+            }
+
+            if (snapshot.data == true) {
+              return FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => PostCreator(),
+                    ),
+                  );
+                },
+                child: const Icon(Icons.add),
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
@@ -394,15 +423,6 @@ class _HomePageState extends State<HomePage> {
 //           ),
 //         ],
 //       ),
-//       floatingActionButton:
-//           FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
-//               ? FloatingActionButton(
-//                   onPressed: () {
-//                     Navigator.of(context).push(MaterialPageRoute(
-//                         builder: (context) => const CreatorPage()));
-//                   },
-//                 )
-//               : null,
-//     );
+//       
 //   }
 // }
