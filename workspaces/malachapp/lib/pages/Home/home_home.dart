@@ -27,9 +27,9 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   // ];
   int current = 0;
   PageController pageController = PageController();
-  // final FirebaseFirestore _db = FirebaseFirestore.instance;
-  // final FirebaseAuth auth = FirebaseAuth.instance;
-  // String userId = FirebaseAuth.instance.currentUser!.uid;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
   List<String> tytul = ['Rada nauczycielska', 'Dni otwarte', 'Studniówka 2024'];
   List<String> imagePaths = [
     'assets/zd1.jpg', // Ścieżka do pierwszego obrazka
@@ -106,12 +106,7 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                                         text: "Witaj ",
                                         rozmiar: 26,
                                       ),
-                                      MyText1(
-                                        text: "Szymon",
-                                        rozmiar: 26,
-                                      ),
-                                      // NicknameFetcher()
-                                      //     .buildNickname(context, userId),
+                                      NicknameFetcher().buildNickname(context, userId),
                                       Text(
                                         "!",
                                         style: GoogleFonts.nunito(
