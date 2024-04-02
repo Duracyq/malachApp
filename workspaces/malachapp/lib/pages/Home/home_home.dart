@@ -53,6 +53,7 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
         ? Color.fromARGB(255, 133, 196, 255)
         : Colors.blueGrey;
 
+    final isDarkMode = themeProvider.currentThemeKey == 'dark';
     return Container(
       width: screenWidth,
       height: double.infinity,
@@ -222,7 +223,7 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                     // );
                   },
                   child: Card(
-                    margin: EdgeInsets.only(top: 5, left: 8, right: 8),
+                    margin: EdgeInsets.only(bottom: 10, left: 8, right: 8),
                     borderOnForeground: true,
                     elevation: 1,
                     clipBehavior: Clip.antiAlias,
@@ -231,33 +232,46 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                     ),
                     child: Column(
                       children: [
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Ink.image(
-                              image: NetworkImage(
-                                  "https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g"),
-                              child: InkWell(
-                                onTap: () {
-                                  print('tapped');
-                                },
-                              ),
-                              height: 120,
-                              fit: BoxFit.cover,
-                            ),
-                            Center(
-                              child: Text(
-                                "Co tam",
-                                style: TextStyle(
-                                    fontSize: 30,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
+                        Ink.image(
+                          image: NetworkImage(
+                              "https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g"),
+                          child: InkWell(
+                            onTap: () {
+                              print('tapped');
+                            },
+                          ),
+                          height: 100,
+                          fit: BoxFit.cover,
+                          colorFilter: isDarkMode
+                              ? ColorFilter.mode(Colors.black.withOpacity(0.2),
+                                  BlendMode.darken)
+                              : null,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 10, top: 10, right: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              MyText1(text: "Tytuł Posta", rozmiar: 40),
+                            ],
+                          ),
+                        ),
+                        Divider(
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          thickness: 1,
+                          indent: 15,
+                          endIndent: 15,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, right: 10, top: 5),
+                          child: MyText2(
+                              text:
+                                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc nec varius pharetra, nibh mi ornare lorem, vitae iaculis nisl nibh in lacus. Fusce volutpat.',
+                              rozmiar: 18),
                         ),
                         SizedBox(
-                          height: 100,
+                          height: 10,
                         ),
                       ],
                     ),
