@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
         key: _scaffoldKey,
         appBar: CustomAppBar(),
         drawer: null,
-        endDrawer: const CustomDrawer(),
+        endDrawer: CustomDrawer(),
         body: IndexedStack(
           index: _currentIndex,
           children: tabs,

@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart' show Uint8List;
@@ -13,6 +16,31 @@ class NotificationService {
   factory NotificationService() => _instance;
 
   NotificationService._internal();
+
+  void setupOnMessageHandler(BuildContext context) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+
+    if (notification != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(notification.title!),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(notification.body!),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+  });
+  }
 
   Future<String> getOAuth2TokenFromFirebaseStorage() async {
     try {

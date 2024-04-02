@@ -25,6 +25,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   late SharedPreferences _prefs;
   List<Map<String, dynamic>> notifications = [];
   final Logger logger = Logger();
+  bool _hasNotifications = false;
 
 
   String? _currentToken;
@@ -47,12 +48,9 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<void> _initSharedPreferences() async {
-    _prefs = await SharedPreferences.getInstance();
-    // final bool? hasAcceptedTerms = prefs.getBool('accepted_terms');
-    // if (hasAcceptedTerms == null || !hasAcceptedTerms) {
-    //   await prefs.setBool('accepted_terms', true);
-    // }
+  Future<void> _setHasNotifications(bool value) async {
+    _hasNotifications = value;
+    await _prefs.setBool('hasNotifications', value);
   }
 
   Future<void> _initFirebase() async {
@@ -75,6 +73,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
         logger.d("Received message: ${message.notification!.body}");
         if (!await _isNotificationAlreadyStored(message.notification!.title!, message.notification!.body!, topic)) {
           _storeNotification(message.notification!.title!, message.notification!.body!, topic);
+          _setHasNotifications(true);
         }
       }
       _retrieveNotifications();
@@ -120,9 +119,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     };
     
     logger.d("Storing notification with key: $uniqueKey and data: $notificationData");
-
-    final String valueToStore = jsonEncode(notificationData);
-    await _prefs.setString(uniqueKey, valueToStore);
+    await _prefs.setString(uniqueKey, jsonEncode(notificationData));
     _savingNotification = false;
     _retrieveNotifications();
   }
@@ -176,6 +173,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     });
 
     if (mounted) {
+      _setHasNotifications(true);
       setState(() {
         notifications = parsedNotifications;
       });
@@ -210,6 +208,8 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     String key = notifications[index]['key']!;
     await _prefs.remove(key);
     _retrieveNotifications();
+    _setHasNotifications(false);
+
   }
 
   Future<void> _refresh() async {
