@@ -78,6 +78,8 @@ flutter:
      - assets/zd11.jpg
      - assets/zd12.jpg
      - assets/favicon.png
+     - assets/background_dark.jpg
+     - assets/background_light.jpg
 
   
   
