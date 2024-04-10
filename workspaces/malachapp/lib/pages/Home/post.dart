@@ -10,6 +10,7 @@ import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:smooth_sheets/smooth_sheets.dart';
 
 class Post3 extends StatefulWidget {
   const Post3({Key? key}) : super(key: key);
@@ -21,6 +22,47 @@ class Post3 extends StatefulWidget {
 class _Post3 extends State<Post3> {
   @override
   Widget build(BuildContext context) {
+    // final content = Expanded(
+    //   child: MasonryGridView.builder(
+    //     mainAxisSpacing: 4,
+    //     crossAxisSpacing: 4,
+    //     gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+    //       crossAxisCount: 2,
+    //     ),
+    //     itemBuilder: (BuildContext context, int index) {
+    //       return ClipRRect(
+    //         borderRadius: BorderRadius.circular(10), // Zaokrąglenie rogów
+    //         child: Image.asset(
+    //           'assets/zd${index + 1}.jpg',
+    //           fit: BoxFit.cover,
+    //         ),
+    //       );
+    //     },
+    //     itemCount: 6, // Number of images
+    //   ),
+    // );
+    // final sheet = ScrollableSheet(
+    //   Widget buildSheetBackground(BuildContext context, Widget content) {
+    //     // Define the implementation of the 'buildSheetBackground' method here
+    //     // ...
+    //   },
+
+    //   child: buildSheetBackground(context, content),
+
+    //   minExtent: const Extent.proportional(0.2),
+    //   physics: StretchingSheetPhysics(
+    //     parent: SnappingSheetPhysics(
+    //       snappingBehavior: SnapToNearest(
+    //         snapTo: [
+    //           const Extent.proportional(0.2),
+    //           const Extent.proportional(0.5),
+    //           const Extent.proportional(1),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
+
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     // Ustal kolory na podstawie motywu
@@ -32,18 +74,72 @@ class _Post3 extends State<Post3> {
         : Colors.grey.shade900;
 
     final isDarkMode = themeProvider.currentThemeKey == 'dark';
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Event Name'), actions: [
-        Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {
-              // share the event
+      appBar: AppBar(
+        title: const Text('Event Name'),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                builder: (BuildContext context) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.9,
+                      child: MasonryGridView.builder(
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 4,
+                        gridDelegate:
+                            SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                        ),
+                        itemBuilder: (BuildContext context, int index) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: Image.asset(
+                              'assets/zd${index + 1}.jpg',
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                        itemCount: 12, // Number of images
+                      ),
+                    ),
+                  );
+                },
+              );
             },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 14.0, bottom: 14, left: 8),
+              child: SizedBox(
+                width: 70.0,
+                height: 70.0,
+                child: Shimmer.fromColors(
+                  period: Duration(milliseconds: 1000),
+                  baseColor: Colors.teal.withOpacity(0.9),
+                  highlightColor: Colors.teal.withOpacity(0.3),
+                  child: MyText1(
+                    text: 'Zdjęcia',
+                    rozmiar: 20,
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
-      ]),
+          Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () {
+                // share the event
+              },
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           SizedBox(
@@ -123,19 +219,19 @@ class _Post3 extends State<Post3> {
                   //     rozmiar: 24,
                   //   ),
                   // ),
-                  SizedBox(
-                    width: 200.0,
-                    height: 100.0,
-                    child: Shimmer.fromColors(
-                      period: Duration(milliseconds: 1000),
-                      baseColor: Colors.teal.withOpacity(0.9),
-                      highlightColor: Colors.teal.withOpacity(0.3),
-                      child: MyText1(
-                        text: 'Zdjęcia',
-                        rozmiar: 40,
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: 200.0,
+                  //   height: 100.0,
+                  //   child: Shimmer.fromColors(
+                  //     period: Duration(milliseconds: 1000),
+                  //     baseColor: Colors.teal.withOpacity(0.9),
+                  //     highlightColor: Colors.teal.withOpacity(0.3),
+                  //     child: MyText1(
+                  //       text: 'Zdjęcia',
+                  //       rozmiar: 40,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ))
         ],

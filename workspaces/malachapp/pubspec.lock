@@ -1077,6 +1077,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  smooth_sheets:
+    dependency: "direct main"
+    description:
+      name: smooth_sheets
+      sha256: "8713933c662cafd8497d56fccf9141c5caf29e07dfe276196aaffc2f76da6c8f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1"
   sortedmap:
     dependency: transitive
     description:
