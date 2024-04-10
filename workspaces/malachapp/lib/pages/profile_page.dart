@@ -210,6 +210,12 @@ class _ProfilePageState extends State<ProfilePage> {
       .map((snapshot) => snapshot.data()?['nickname'] as String? ?? '');
   }
 
+  Stream<String> fetchClass() {
+    String? userId = auth.currentUser?.uid;
+    return _db.collection('users').doc(userId).snapshots()
+      .map((snapshot) => snapshot.data()?['class'] as String? ?? '');
+  }
+
   Widget _buildCancelButton() {
   return Visibility(
     visible: NicknameFetcher().fetchNickname(auth.currentUser!.uid) != '',
@@ -277,6 +283,211 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<void> _setClassDropdown() async {
+    String classValue = 'A'; // Initial class value
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Class'),
+          content: StatefulBuilder( // Use StatefulBuilder to update the state inside the dialog
+            builder: (BuildContext context, StateSetter setState) {
+              return DropdownButton<String>(
+                value: classValue, // Set the initial value
+                onChanged: (String? newValue) {
+                  setState(() { // Use the StateSetter to update the dropdown's state
+                    classValue = newValue!;
+                  });
+                },
+                items: <String>['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value, // Correct value assignment
+                    child: Text(
+                      value,
+                      style: Provider.of<ThemeProvider>(context).themeData == darkMode
+                          ? const TextStyle(color: Colors.white)
+                          : const TextStyle(color: Colors.black),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel', style: TextStyle(color: Theme.of(context).textTheme.labelLarge?.color)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Save', style: TextStyle(color: Theme.of(context).textTheme.labelLarge?.color)),
+              onPressed: () {
+                _db.collection('users').doc(auth.currentUser?.uid).set({
+                  'class': classValue,
+                }, SetOptions(merge: true));
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _setYearDropdown() {
+    String yearValue = '2024/2025'; // Assuming '1' is a valid initial value
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Year'),
+          content: FutureBuilder<DocumentSnapshot>(
+            future: _db.collection('academicYears').doc('exT9bo4N0RNOPXHTDxFL').get(), // Fetching the data
+            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // Show loading indicator while waiting for data
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}'); // Error handling
+              } else if (snapshot.hasData && snapshot.data!.data() != null) {
+                // Once data is fetched, use StatefulBuilder to allow for updating the dropdown's state
+                List<String> years = List<String>.from((snapshot.data!.data() as Map<String, dynamic>)['years']);
+                return StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return DropdownButton<String>(
+                      value: yearValue, // Set the initial value
+                      onChanged: (String? newValue) {
+                        setState(() { // Update the dropdown's state
+                          yearValue = newValue!;
+                        });
+                      },
+                      items: years.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value, // Correct value assignment
+                          child: Text(
+                            value,
+                            style: Provider.of<ThemeProvider>(context).themeData == darkMode
+                                ? const TextStyle(color: Colors.white)
+                                : const TextStyle(color: Colors.black),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                );
+              } else {
+                return const Text('No years found'); // Handle the case where no data is available
+              }
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel', style: TextStyle(color: Theme.of(context).textTheme.labelLarge?.color)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Save', style: TextStyle(color: Theme.of(context).textTheme.labelLarge?.color)),
+              onPressed: () {
+                // Assuming `_db` and `auth.currentUser?.uid` are correctly defined and available
+                _db.collection('users').doc(auth.currentUser?.uid).set({
+                  'year': yearValue,
+                }, SetOptions(merge: true));
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Widget _buildListTileClass(BuildContext context) {
+    return StreamBuilder(
+      stream: fetchClass(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const ListTile(
+            title: Text('Class: (loading)'),
+            leading: Icon(Icons.school),
+          );
+        }
+        if (snapshot.hasError) {
+          return ListTile(
+            title: Text('Error: ${snapshot.error}'),
+            leading: const Icon(Icons.error),
+          );
+        }
+        if (snapshot.data == '') {
+            return ListTile(
+            title: const Text('Class: (not set)'),
+            leading: const Icon(Icons.school),
+            trailing: const Icon(Icons.edit),
+            onTap: () {
+              _setClassDropdown();
+            },
+          );
+        }
+        return ListTile(
+          title: Text('Class: ${snapshot.data}'),
+          leading: const Icon(Icons.school),
+          trailing: const Icon(Icons.edit),
+          onTap: () async {
+            await _setClassDropdown();
+          },
+        );
+      },
+    );
+  }
+  Stream<String> fetchYear() {
+    String? userId = auth.currentUser?.uid;
+    return _db.collection('users').doc(userId).snapshots()
+      .map((snapshot) => snapshot.data()?['year'] as String? ?? '');
+  }
+
+  Widget _buildListTileYear(BuildContext context) {
+    return StreamBuilder(
+      stream: fetchYear(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const ListTile(
+            title: Text('Year: (loading)'),
+            leading: Icon(Icons.school),
+          );
+        }
+        if (snapshot.hasError) {
+          return ListTile(
+            title: Text('Error: ${snapshot.error}'),
+            leading: const Icon(Icons.error),
+          );
+        }
+        if (snapshot.data == '') {
+            return ListTile(
+            title: const Text('Year: (not set)'),
+            leading: const Icon(Icons.school),
+            trailing: const Icon(Icons.edit),
+            onTap: () {
+              _setYearDropdown();
+            },
+          );
+        }
+        return ListTile(
+          title: Text('Year: ${snapshot.data}'),
+          leading: const Icon(Icons.school),
+          trailing: const Icon(Icons.edit),
+          onTap: () {
+            _setYearDropdown();
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String email = auth.currentUser?.email ?? '';
@@ -296,10 +507,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     leading: const Icon(Icons.email),
                     title: Text('Email: $email'),
                   ),
-                  const ListTile(
-                    title: Text('Class: (not implemented)'),
-                    leading: const Icon(Icons.class_rounded),
-                  ),
+                  _buildListTileClass(context),
+                  _buildListTileYear(context),
                   ListTile(
                     leading: const Icon(Icons.settings),
                     title: const Text('Settings'),
