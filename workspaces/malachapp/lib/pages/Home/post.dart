@@ -228,8 +228,8 @@ class _Post3 extends State<Post3> {
                     color: Colors.grey,
                     image: DecorationImage(
                       image: NetworkImage(
-                        'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
-                      ),
+                          // 'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
+                          ),
                       fit: BoxFit.cover,
                     ),
                   ),
