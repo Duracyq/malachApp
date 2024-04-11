@@ -78,245 +78,257 @@ class _Post3 extends State<Post3> {
     final isDarkMode = themeProvider.currentThemeKey == 'dark';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Event Name'),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext context) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.9,
-                      child: MasonryGridView.builder(
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 4,
-                        gridDelegate:
-                            SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                        ),
-                        itemBuilder: (BuildContext context, int index) {
-                          return GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Stack(
-                                    children: [
-                                      // Rozmycie i przyciemnienie tła
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.pop(
-                                              context); // Zamknij dialog po kliknięciu na tło
-                                        },
-                                        child: BackdropFilter(
-                                          filter: ImageFilter.blur(
-                                              sigmaX: 5, sigmaY: 5),
-                                          child: Container(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
+        appBar: AppBar(
+          title: const Text('Event Name'),
+          actions: [
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.9,
+                        child: MasonryGridView.builder(
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 4,
+                          gridDelegate:
+                              SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                          ),
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Stack(
+                                      children: [
+                                        // Rozmycie i przyciemnienie tła
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.pop(
+                                                context); // Zamknij dialog po kliknięciu na tło
+                                          },
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(
+                                                sigmaX: 5, sigmaY: 5),
+                                            child: Container(
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      // Dialog z obrazem
-                                      Dialog(
-                                        backgroundColor: Colors
-                                            .transparent, // Ustaw tło na przezroczyste
-                                        insetPadding: EdgeInsets.all(
-                                            10), // Dodaj padding do Dialog
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(24),
-                                                topRight: Radius.circular(24),
-                                              ),
+                                        // Dialog z obrazem
+                                        Dialog(
+                                          backgroundColor: Colors
+                                              .transparent, // Ustaw tło na przezroczyste
+                                          insetPadding: EdgeInsets.all(
+                                              10), // Dodaj padding do Dialog
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(24),
+                                                  topRight: Radius.circular(24),
+                                                ),
 
-                                              /// Zaokrąglenie rogu
-                                              child: FittedBox(
-                                                child: Image.asset(
-                                                  'assets/zd${index + 1}.jpg',
-                                                  fit: BoxFit.contain,
+                                                /// Zaokrąglenie rogu
+                                                child: FittedBox(
+                                                  child: Image.asset(
+                                                    'assets/zd${index + 1}.jpg',
+                                                    fit: BoxFit.contain,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(
-                                                Icons.download,
-                                                color: Colors.white,
-                                              ), // Ikona do pobrania
-                                              onPressed: () {
-                                                // Kod do pobrania zdjęcia
-                                              },
-                                            ),
-                                          ],
+                                              IconButton(
+                                                icon: Icon(
+                                                  Icons.download,
+                                                  color: Colors.white,
+                                                ), // Ikona do pobrania
+                                                onPressed: () {
+                                                  // Kod do pobrania zdjęcia
+                                                },
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: Image.asset(
-                                'assets/zd${index + 1}.jpg',
-                                fit: BoxFit.cover,
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(24),
+                                child: Image.asset(
+                                  'assets/zd${index + 1}.jpg',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        itemCount: 12, // Number of images
+                            );
+                          },
+                          itemCount: 12, // Number of images
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 14.0, bottom: 14, left: 8),
-              child: SizedBox(
-                width: 70.0,
-                height: 70.0,
-                child: Shimmer.fromColors(
-                  period: Duration(milliseconds: 1000),
-                  baseColor: Colors.teal.withOpacity(0.9),
-                  highlightColor: Colors.teal.withOpacity(0.3),
-                  child: MyText1(
-                    text: 'Zdjęcia',
-                    rozmiar: 20,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(6.0),
-            child: IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: () {
-                // share the event
+                    );
+                  },
+                );
               },
-            ),
-          ),
-        ],
-      ),
-      body: Stack(children: <Widget>[
-        Image.asset("assets/background_light.jpg"),
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent, // start with transparent color
-                Colors.black.withOpacity(0.2) // end with a specific color
-              ],
-            ),
-          ),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 140,
-                width: double.infinity,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.grey,
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent, // start with transparent color
-                          color // end with a specific color
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 14.0, bottom: 14, left: 8),
+                child: SizedBox(
+                  width: 70.0,
+                  height: 70.0,
+                  child: Shimmer.fromColors(
+                    period: Duration(milliseconds: 1000),
+                    baseColor: Colors.teal.withOpacity(0.9),
+                    highlightColor: Colors.teal.withOpacity(0.3),
+                    child: MyText1(
+                      text: 'Zdjęcia',
+                      rozmiar: 20,
                     ),
                   ),
                 ),
               ),
-              Container(
-                  padding: EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          MyText1(
-                            text: "Event Name",
-                            rozmiar: 34,
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 8),
-                              child: Text(
-                                "11.05.2024", // replace with the event date
-                                style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      MyText2(
-                        text:
-                            'Event DescriptionEvent DescriptionE vent Desc riptio nEvent De scriptionEvent Descript ionEvent Descri ption Event Descr iptionEvent DescriptionEv ent Descriptio nEvent Description',
-                        rozmiar: 16,
-                      ),
-                      SizedBox(height: 10),
-                      Divider(
-                        color: Colors.grey,
-                        indent: 5,
-                        endIndent: 5,
-                        thickness: 4,
-                      ),
-                      // Padding(
-                      //   padding: EdgeInsets.all(8.0),
-                      //   child: MyText1(
-                      //     text: "Zdjęcia",
-                      //     rozmiar: 24,
-                      //   ),
-                      // ),
-                      // SizedBox(
-                      //   width: 200.0,
-                      //   height: 100.0,
-                      //   child: Shimmer.fromColors(
-                      //     period: Duration(milliseconds: 1000),
-                      //     baseColor: Colors.teal.withOpacity(0.9),
-                      //     highlightColor: Colors.teal.withOpacity(0.3),
-                      //     child: MyText1(
-                      //       text: 'Zdjęcia',
-                      //       rozmiar: 40,
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  ))
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: IconButton(
+                icon: const Icon(Icons.share),
+                onPressed: () {
+                  // share the event
+                },
+              ),
+            ),
+          ],
         ),
-      ]),
-    );
+        body: Column(
+          children: [
+            SizedBox(
+              height: 140,
+              width: double.infinity,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.grey,
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      'https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent, // start with transparent color
+                        color // end with a specific color
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height - 223.7,
+              color: Colors.white,
+              child: Container(
+                decoration: const BoxDecoration(
+                  // color: Colors.white,
+                  image: DecorationImage(
+                    image: AssetImage("assets/background_light.jpg"),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      stops: [0.5, 1.0],
+                      colors: [
+                        Colors.transparent, // start with transparent color
+                        Colors.white // end with a specific color
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                  child: Column(children: [
+                    Container(
+                        padding: EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                MyText1(
+                                  text: "Event Name",
+                                  rozmiar: 34,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.green.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4, horizontal: 8),
+                                    child: Text(
+                                      "11.05.2024", // replace with the event date
+                                      style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            MyText2(
+                              text:
+                                  'Event DescriptionEvent DescriptionE vent Desc riptio nEvent De scriptionEvent Descript ionEvent Descri ption Event Descr iptionEvent DescriptionEv ent Descriptio nEvent Description',
+                              rozmiar: 16,
+                            ),
+                            SizedBox(height: 10),
+                            Divider(
+                              color: Colors.grey,
+                              indent: 5,
+                              endIndent: 5,
+                              thickness: 4,
+                            ),
+                            // Padding(
+                            //   padding: EdgeInsets.all(8.0),
+                            //   child: MyText1(
+                            //     text: "Zdjęcia",
+                            //     rozmiar: 24,
+                            //   ),
+                            // ),
+                            // SizedBox(
+                            //   width: 200.0,
+                            //   height: 100.0,
+                            //   child: Shimmer.fromColors(
+                            //     period: Duration(milliseconds: 1000),
+                            //     baseColor: Colors.teal.withOpacity(0.9),
+                            //     highlightColor: Colors.teal.withOpacity(0.3),
+                            //     child: MyText1(
+                            //       text: 'Zdjęcia',
+                            //       rozmiar: 40,
+                            //     ),
+                            //   ),
+                            // ),
+                          ],
+                        ))
+                  ]),
+                ),
+              ),
+            ),
+          ],
+        ));
   }
   // https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g
 }
