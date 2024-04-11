@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:malachapp/auth/admin_settings_page.dart';
 import 'package:malachapp/auth/auth_service.dart';
-import 'package:malachapp/pages/message_broadcast_page.dart';
+import 'package:malachapp/pages/Messages/message_broadcast_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:malachapp/pages/profile_page.dart';
 import 'package:malachapp/services/notification_service.dart';
@@ -27,9 +27,8 @@ class _SettingsPageState extends State<SettingsPage> {
     return Column(
       children: [
         Divider(
-          color: themeProvider.themeData == darkMode
-              ? Colors.white
-              : Colors.black,
+          color:
+              themeProvider.themeData == darkMode ? Colors.white : Colors.black,
           height: 20,
           thickness: 2,
           indent: 20,
@@ -61,7 +60,7 @@ class _SettingsPageState extends State<SettingsPage> {
             return Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [ 
+                children: [
                   ListTile(
                     title: const Text('Notifications Settings'),
                     leading: const Icon(Icons.notifications),

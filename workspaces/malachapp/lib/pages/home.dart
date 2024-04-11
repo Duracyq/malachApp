@@ -13,7 +13,7 @@ import 'package:malachapp/pages/Events/event_design.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/Home/home_home.dart';
-import 'package:malachapp/pages/message_broadcast_page.dart';
+import 'package:malachapp/pages/Messages/message_broadcast_page.dart';
 import 'package:malachapp/pages/Poll/poll_list_design.dart';
 // import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/Poll/poll_page.dart';
