@@ -90,111 +90,140 @@ class _Post3 extends State<Post3> {
                   isScrollControlled: true,
                   context: context,
                   builder: (BuildContext context) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        height: MediaQuery.of(context).size.height * 0.9,
-                        child: MasonryGridView.builder(
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 4,
-                          gridDelegate:
-                              SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: color.withOpacity(0.5), // Kolor obramowania
+                            width: 3, // Grubość obramowania
                           ),
-                          itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Stack(
-                                      children: [
-                                        // Rozmycie i przyciemnienie tła
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.pop(
-                                                context); // Zamknij dialog po kliknięciu na tło
-                                          },
-                                          child: BackdropFilter(
-                                            filter: ImageFilter.blur(
-                                                sigmaX: 5, sigmaY: 5),
-                                            child: Container(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
+                          left: BorderSide(
+                            color: color.withOpacity(0.5), // Kolor obramowania
+                            width: 3, // Grubość obramowania
+                          ),
+                          right: BorderSide(
+                            color: color.withOpacity(0.5), // Kolor obramowania
+                            width: 3, // Grubość obramowania
+                          ),
+                          bottom: BorderSide.none, // Brak obramowania na dole
+                        ),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(
+                              28), // Zaokrąglenie lewego górnego rogu
+                          topRight: Radius.circular(
+                              28), // Zaokrąglenie prawego górnego rogu
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.9,
+                          child: MasonryGridView.builder(
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 4,
+                            gridDelegate:
+                                SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                            ),
+                            itemBuilder: (BuildContext context, int index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Stack(
+                                        children: [
+                                          // Rozmycie i przyciemnienie tła
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.pop(
+                                                  context); // Zamknij dialog po kliknięciu na tło
+                                            },
+                                            child: BackdropFilter(
+                                              filter: ImageFilter.blur(
+                                                  sigmaX: 5, sigmaY: 5),
+                                              child: Container(
+                                                color: Colors.black
+                                                    .withOpacity(0.5),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        // Dialog z obrazem
-                                        Dialog(
-                                          backgroundColor: Colors
-                                              .transparent, // Ustaw tło na przezroczyste
-                                          insetPadding: EdgeInsets.all(
-                                              10), // Dodaj padding do Dialog
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(24),
-                                                  topRight: Radius.circular(24),
-                                                ),
+                                          // Dialog z obrazem
+                                          Dialog(
+                                            backgroundColor: Colors
+                                                .transparent, // Ustaw tło na przezroczyste
+                                            insetPadding: EdgeInsets.all(
+                                                10), // Dodaj padding do Dialog
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(24),
+                                                    topRight:
+                                                        Radius.circular(24),
+                                                  ),
 
-                                                /// Zaokrąglenie rogu
-                                                child: FittedBox(
-                                                  child: Image.asset(
-                                                    'assets/zd${index + 1}.jpg',
-                                                    fit: BoxFit.contain,
+                                                  /// Zaokrąglenie rogu
+                                                  child: FittedBox(
+                                                    child: Image.asset(
+                                                      'assets/zd${index + 1}.jpg',
+                                                      fit: BoxFit.contain,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              IconButton(
-                                                icon: Icon(
-                                                  Icons.download,
-                                                  color: Colors.white,
-                                                ), // Ikona do pobrania
-                                                onPressed: () async {
-                                                  final String url =
-                                                      'assets/zd${index + 1}.jpg'; // URL do zdjęcia
-                                                  final String savePath =
-                                                      '/path/to/save/image.jpg'; // Ścieżka, gdzie chcesz zapisać zdjęcie
+                                                IconButton(
+                                                  icon: Icon(
+                                                    Icons.download,
+                                                    color: Colors.white,
+                                                  ), // Ikona do pobrania
+                                                  onPressed: () async {
+                                                    final String url =
+                                                        'assets/zd${index + 1}.jpg'; // URL do zdjęcia
+                                                    final String savePath =
+                                                        '/path/to/save/image.jpg'; // Ścieżka, gdzie chcesz zapisać zdjęcie
 
-                                                  await FlutterDownloader
-                                                      .enqueue(
-                                                    url: url,
-                                                    savedDir: savePath,
-                                                    showNotification:
-                                                        true, // pokazuje powiadomienie, gdy pobieranie jest zakończone
-                                                    openFileFromNotification:
-                                                        true, // otwiera plik po zakończeniu pobierania
-                                                  );
+                                                    await FlutterDownloader
+                                                        .enqueue(
+                                                      url: url,
+                                                      savedDir: savePath,
+                                                      showNotification:
+                                                          true, // pokazuje powiadomienie, gdy pobieranie jest zakończone
+                                                      openFileFromNotification:
+                                                          true, // otwiera plik po zakończeniu pobierania
+                                                    );
 
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                          'Zdjęcie zostało pobrane'),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            'Zdjęcie zostało pobrane'),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(24),
-                                child: Image.asset(
-                                  'assets/zd${index + 1}.jpg',
-                                  fit: BoxFit.cover,
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Image.asset(
+                                    'assets/zd${index + 1}.jpg',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          itemCount: 12, // Number of images
+                              );
+                            },
+                            itemCount: 12, // Number of images
+                          ),
                         ),
                       ),
                     );
