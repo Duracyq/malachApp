@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/MyText1.dart';
+import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
@@ -329,90 +330,95 @@ class _GroupPageState extends State<GroupPage> {
                     // Refresh logic here
                   });
                 },
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: _db.collection('groups').snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    }
-                    final groups = snapshot.data!.docs.map((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
-                      return {
-                        ...data,
-                        'groupTitle': data['groupTitle'] ?? 'No title'
-                      };
-                    }).toList();
-
-                    if (groups.isEmpty) {
-                      return const Center(
-                          child: Text('No groups available...'));
-                    }
-                    return ListView.builder(
-                      itemCount: groups.length,
-                      itemBuilder: (context, index) {
-                        final doc = groups[index];
-
-                        return Container(
-                          padding:
-                              const EdgeInsets.all(10), // Zwiększ padding do 10
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 5,
-                              horizontal: 10), // Dodaj margines poziomy
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(
-                                15), // Zwiększ promień zaokrąglenia
-                            boxShadow: [
-                              // Dodaj cień
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ListTile(
-                                title: MyText1(
-                                  text: doc['groupTitle'],
-                                  rozmiar: 18,
-                                ),
-                                // title: Text(
-                                //   ,
-                                //   style: const TextStyle(
-                                //     fontWeight: FontWeight.bold,
-                                //     fontSize: 18,
-                                //   ),
-                                // ),
-                                onTap: () async {
-                                  String groupId =
-                                      await _groupIDGetter(doc['groupTitle']);
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => MessagingPage(
-                                            groupId: groupId,
-                                            groupTitle: doc['groupTitle'],
-                                          )));
-                                },
-                              ),
-                            ],
-                          ),
+                // child: SingleChildScrollView(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: _db.collection('groups').snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
                         );
-                      },
-                    );
-                  },
+                      }
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error: ${snapshot.error}'),
+                        );
+                      }
+                      final groups = snapshot.data!.docs.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        return {
+                          ...data,
+                          'groupTitle': data['groupTitle'] ?? 'No title'
+                        };
+                      }).toList();
+                  
+                      if (groups.isEmpty) {
+                        return const Center(
+                          child: Text('No groups available...'),
+                        );
+                      }
+                  
+                      return ListView.builder(
+                        itemCount: groups.length,
+                        itemBuilder: (context, index) {
+                          final doc = groups[index];
+                          // return FutureBuilder<DocumentSnapshot>(
+                          //   future: _db.collection('users').doc(_auth.currentUser!.uid).get(),
+                          //   builder: (context, userDataSnapshot) {
+                          //     if (userDataSnapshot.connectionState == ConnectionState.waiting) {
+                          //       return const Center(child: CircularProgressIndicator());
+                          //     }
+                          //     if (userDataSnapshot.hasError) {
+                          //       return Text('Error fetching user data: ${userDataSnapshot.error}');
+                          //     }
+                          //     final userDataMap = userDataSnapshot.data?.data() as Map<String, dynamic>?;
+                          
+                          //     if (userDataMap != null) {
+                          //       final usersClassRaw = userDataMap['class'];
+                          //       final usersYearRaw = userDataMap['year'];
+                          
+                          //       final usersClass = (usersClassRaw is List<dynamic>)
+                          //           ? (usersClassRaw).cast<String>()
+                          //           : [];
+                          //       final usersYear = (usersYearRaw is List<dynamic>)
+                          //           ? (usersYearRaw).cast<String>()
+                          //           : (usersYearRaw != null) ? [usersYearRaw as String] : [];
+                                
+                          //       // Determine visibility based on condition
+                          //       bool isVisible = usersClass.contains(doc['class']) && usersYear.contains(doc['year']);
+                                
+                          //       // return Visibility(
+                          //       //   visible: isVisible,
+                          //       //   child: Column(
+                          //       //     children: [
+                          //       //       const Divider(),
+                          //       //       ListTile(
+                          //       //         title: Text('${doc['groupTitle']}'),
+                          //       //         onTap: () async {
+                          //       //           String groupId = await _groupIDGetter(doc['groupTitle']);
+                          //       //           Navigator.of(context).push(MaterialPageRoute(builder: (context) => MessagingPage(groupId: groupId, groupTitle: doc['groupTitle'])));
+                          //       //         },
+                          //       //       ),
+                          //       //     ],
+                          //       //   ),
+                          //       // );
+                          //     }
+                              return ListTile(
+                                title: Text('${doc['groupTitle']}'),
+                                onTap: () async {
+                                  String groupId = await _groupIDGetter(doc['groupTitle']);
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MessagingPage(groupId: groupId, groupTitle: doc['groupTitle'])));
+                                },
+                              );
+                            },
+                          // );
+                        // },  
+                      );
+                    },
+                      ),
+                  ),
                 ),
-              ),
-            ),
+              // ),
             floatingActionButton: isAdmin
                 ? FloatingActionButton(
                     onPressed: () => Navigator.of(context).push(
