@@ -234,7 +234,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
         'members': [_auth.currentUser!.email],
       }); 
     } else {
-      await _db.collection('groups').add({
+      await _db.collection('groupsForClass').add({
         'groupTitle': 'Klasa ${selectedClass!}_${selectedYear!}',
         'members': [_auth.currentUser!.email],
         'class': selectedClass,
