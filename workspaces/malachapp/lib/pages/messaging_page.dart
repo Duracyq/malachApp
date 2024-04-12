@@ -309,36 +309,56 @@ class _GroupPageState extends State<GroupPage> {
     return false;
   }
 
-  Stream<List<Map<String, dynamic>>> getCombinedStream() {
-    // Stream from 'groups' collection
-    Stream<List<Map<String, dynamic>>> groupStream = _db.collection('groups')
-      .orderBy('groupTitle', descending: false) // Sort by groupTitle field in ascending order
-      .snapshots()
-      .map(
-        (snapshot) => snapshot.docs.map(
-        (doc) => {
-          ...doc.data(),
-          'collection': 'groups',
-          'id': doc.id,  // Include document ID for unique identification if needed
-        }
-        ).toList()
-      );
+  Stream<List<Map<String, dynamic>>> getCombinedStream() async* {
+    // Fetch streams from Firestore collections
+    var groupStream = _db.collection('groups').snapshots().map((snapshot) =>
+      snapshot.docs.map((doc) => {
+        ...doc.data(),
+        'id': doc.id,
+        'collection': 'groups',
+      }).toList());
 
-    // Stream from 'groupsForClass' collection
-    Stream<List<Map<String, dynamic>>> groupForClassStream = _db.collection('groupsForClass').snapshots().map(
-      (snapshot) => snapshot.docs.map(
-        (doc) => {
-          ...doc.data(),
-          'collection': 'groupsForClass',
-          'id': doc.id,
-        }
-      ).toList()
-    );
+    var groupForClassStream = _db.collection('groupsForClass').snapshots().map((snapshot) =>
+      snapshot.docs.map((doc) => {
+        ...doc.data(),
+        'id': doc.id,
+        'collection': 'groupsForClass',
+      }).toList());
 
-    return StreamZip([groupStream, groupForClassStream]).map(
-      (List<List<Map<String, dynamic>>> data) => data.expand((x) => x).toList()
-    );
+    // Combine and process each group to include membership status
+    List<Map<String, dynamic>> combinedList = await StreamZip([groupStream, groupForClassStream])
+      .map((List<List<Map<String, dynamic>>> data) => data.expand((x) => x).toList())
+      .first;
+
+    for (var group in combinedList) {
+      group['isMember'] = await isMember(group['id']);
+    }
+
+    yield combinedList;
   }
+
+
+  Future<bool> isMember(String groupId) async {
+    try {
+      var currentUserEmail = _auth.currentUser?.email;
+      if (currentUserEmail == null) return false; // Early exit if no user is logged in
+
+      // Adjusted to handle both groups and groupsForClass
+      DocumentSnapshot groupDoc = await _db.collection('groups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        groupDoc = await _db.collection('groupsForClass').doc(groupId).get();
+        if (!groupDoc.exists) return false;
+      }
+
+      Map<String, dynamic>? groupData = groupDoc.data() as Map<String, dynamic>?;
+      List<dynamic> members = groupData?['members'] as List<dynamic>? ?? [];
+      return members.contains(currentUserEmail);
+    } catch (e) {
+      print("Error checking membership: $e");
+      return false;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -371,70 +391,79 @@ class _GroupPageState extends State<GroupPage> {
                     children: [
                       Expanded(
                         child: StreamBuilder<List<Map<String, dynamic>>>(
-                          stream: getCombinedStream(),
-                            builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
-                            }
-                            if (snapshot.hasError) {
-                              return Center(child: Text('Error: ${snapshot.error}'));
-                            }
-                            if (snapshot.data?.isEmpty ?? true) {
-                              return const Center(child: Text('No groups available...'));
+                        stream: getCombinedStream(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasError) {
+                            return Center(child: Text('Error: ${snapshot.error}'));
+                          }
+                          if (!snapshot.hasData || snapshot.data == null) {
+                            return const Center(child: Text('No groups available...'));
+                          }
+
+                          List<Widget> children = [];
+                          for (int i = 0; i < snapshot.data!.length; i++) {
+                            final data = snapshot.data![i];
+                            String prefix = data['collection'] == 'groupsForClass' ? 'GFC ' : '';
+
+                            // Safely handle the members list and check if the current user is a member
+                            List<dynamic> members = data['members'] as List<dynamic>? ?? [];
+                            bool isUserMember(String userEmail) {
+                              return members.isNotEmpty && members.contains(userEmail);
                             }
 
-                            List<Widget> children = [];
-                            for (int i = 0; i < snapshot.data!.length; i++) {
-                              final data = snapshot.data![i];
-                              String prefix = data['collection'] == 'groupsForClass' ? 'GFC ' : '';
-
-                              // Add the ListTile
-                              children.add(
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ListTile(
-                                      title: Text('$prefix${data['groupTitle']}'),
-                                      onTap: () async {
-                                        String groupId = await _groupIDGetter(data['groupTitle']);
-                                        Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
-                                        ));
-                                      },
-                                    ),
+                            // Add the ListTile
+                            children.add(
+                              Card(
+                                color: !isUserMember(_auth.currentUser?.email ?? '')
+                                    ? (Provider.of<ThemeProvider>(context, listen: false).themeData == darkMode ? Colors.black54 : Colors.grey)
+                                    : (Provider.of<ThemeProvider>(context, listen: false).themeData == darkMode ? Colors.grey[700] : Colors.white), //isn't a member : is a member
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ListTile(
+                                    title: Text('$prefix${data['groupTitle']}'),
+                                    onTap: () async {
+                                      String groupId = await _groupIDGetter(data['groupTitle']);
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
+                                      ));
+                                    },
                                   ),
-                                )
-                              );
+                                ),
+                              )
+                            );
 
-                              // Check if a Divider is needed
-                              if (i < snapshot.data!.length - 1) {
-                              // Check if next item is from a different collection
+                            // Check if a Divider is needed
+                            if (i < snapshot.data!.length - 1) {
                               if (data['collection'] != snapshot.data![i + 1]['collection']) {
                                 children.add(Wrap(
                                   direction: Axis.horizontal,
                                   children: [
                                     const MyText2(text: 'Czaty Klasowe', rozmiar: 21),
                                     Divider(
-                                    color: Provider.of<ThemeProvider>(context).themeData == darkMode
-                                    ? Colors.white
-                                    : Colors.black, thickness: 2),
+                                      color: Provider.of<ThemeProvider>(context).themeData == darkMode
+                                      ? Colors.white
+                                      : Colors.black, thickness: 2),
                                   ]
                                 ));
                               }
-                              }
                             }
+                          }
 
-                            return Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: ListView(
+                          return Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: ListView(
                               children: [
                                 ...children,
                                 const SizedBox(height: 20), // Add a SizedBox with desired height
                               ],
-                              ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
+                      ),
+
                       ),
                     ],
                   )
