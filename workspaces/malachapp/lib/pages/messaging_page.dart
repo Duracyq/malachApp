@@ -318,24 +318,47 @@ class _GroupPageState extends State<GroupPage> {
         'collection': 'groups',
       }).toList());
 
-    var groupForClassStream = _db.collection('groupsForClass').snapshots().map((snapshot) =>
-      snapshot.docs.map((doc) => {
-        ...doc.data(),
-        'id': doc.id,
-        'collection': 'groupsForClass',
-      }).toList());
+    // Check if user is an admin
+    bool isAdmin = await AuthService().isAdmin();
 
-    // Combine and process each group to include membership status
-    List<Map<String, dynamic>> combinedList = await StreamZip([groupStream, groupForClassStream])
-      .map((List<List<Map<String, dynamic>>> data) => data.expand((x) => x).toList())
-      .first;
+    // If the user is an admin, include all groups from 'groupsForClass' without filtering
+    Stream<List<Map<String, dynamic>>> groupForClassStream;
+    if (isAdmin) {
+      groupForClassStream = _db.collection('groupsForClass').snapshots().map((snapshot) =>
+        snapshot.docs.map((doc) => {
+          ...doc.data(),
+          'id': doc.id,
+          'collection': 'groupsForClass',
+        }).toList());
+    } else {
+      // Fetch the user's class and year once
+      var userDoc = await _db.collection('users').doc(_auth.currentUser!.uid).get();
+      var userClass = userDoc.data()?['class'];
+      var userYear = userDoc.data()?['year'];
 
-    for (var group in combinedList) {
-      group['isMember'] = await isMember(group['id']);
+      // Prepare the filtered stream for groupsForClass
+      groupForClassStream = _db.collection('groupsForClass').snapshots().map((snapshot) =>
+        snapshot.docs.where((doc) => doc.data()['class'] == userClass && doc.data()['year'] == userYear).map((doc) => {
+          ...doc.data(),
+          'id': doc.id,
+          'collection': 'groupsForClass',
+        }).toList());
     }
 
-    yield combinedList;
+    // Combine the streams into a single list
+    var combinedStream = StreamZip([groupStream, groupForClassStream])
+        .map((List<List<Map<String, dynamic>>> combinedData) => combinedData.expand((x) => x).toList());
+
+    // Process each group to include membership status
+    await for (var combinedList in combinedStream) {
+      for (var group in combinedList) {
+        group['isMember'] = await isMember(group['id']);
+      }
+      yield combinedList;
+    }
   }
+
+
 
 
   Future<bool> isMember(String groupId) async {
@@ -406,7 +429,7 @@ class _GroupPageState extends State<GroupPage> {
                           List<Widget> children = [];
                           for (int i = 0; i < snapshot.data!.length; i++) {
                             final data = snapshot.data![i];
-                            String prefix = data['collection'] == 'groupsForClass' ? 'GFC ' : '';
+                            String prefix = data['collection'] == 'groupsForClass' ? '' : '';
 
                             // Safely handle the members list and check if the current user is a member
                             List<dynamic> members = data['members'] as List<dynamic>? ?? [];
@@ -425,10 +448,24 @@ class _GroupPageState extends State<GroupPage> {
                                   child: ListTile(
                                     title: Text('$prefix${data['groupTitle']}'),
                                     onTap: () async {
-                                      String groupId = await _groupIDGetter(data['groupTitle']);
-                                      Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
-                                      ));
+                                      if (isUserMember(_auth.currentUser?.email ?? '') || isAdmin) {
+                                        if (data['collection'] == 'groupsForClass') {
+                                          // If the group is from 'groupsForClass', get the group ID
+                                          String groupId = data['id'];
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                            builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
+                                          ));
+                                          return;
+                                        }
+                                        String groupId = await _groupIDGetter(data['groupTitle']);
+                                        Navigator.of(context).push(MaterialPageRoute(
+                                          builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
+                                        ));
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Nie możesz zobaczyć zawartości!'))
+                                        );
+                                      }
                                     },
                                   ),
                                 ),
