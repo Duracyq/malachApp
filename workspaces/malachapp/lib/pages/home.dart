@@ -14,7 +14,7 @@ import 'package:malachapp/pages/Home/post_creator.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/Home/home_home.dart';
-import 'package:malachapp/pages/message_broadcast_page.dart';
+import 'package:malachapp/pages/Messages/message_broadcast_page.dart';
 import 'package:malachapp/pages/Poll/poll_list_design.dart';
 // import 'package:malachapp/pages/home_home.dart';
 import 'package:malachapp/pages/Poll/poll_page.dart';
@@ -73,6 +73,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    // Ustal kolory na podstawie motywu
+    final color = themeProvider.currentThemeKey == 'light'
+        ? Colors.grey.shade200
+        : Colors.blueGrey;
+    final color2 = themeProvider.currentThemeKey == 'light'
+        ? Color.fromARGB(255, 133, 196, 255)
+        : Colors.grey.shade900;
+
+    final isDarkMode = themeProvider.currentThemeKey == 'dark';
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ThemeProvider>(context).themeData,
@@ -88,10 +99,10 @@ class _HomePageState extends State<HomePage> {
         bottomNavigationBar: Consumer<ThemeProvider>(
           builder: (context, themeProvider, _) => CurvedNavigationBar(
             animationDuration: const Duration(milliseconds: 200),
-            color: themeProvider.themeData
-                .primaryColor, // Ustaw kolor elementów nawigacji na podstawie aktualnego motywu
-            backgroundColor: themeProvider.themeData.colorScheme
-                .background, // Ustaw kolor tła na podstawie aktualnego motywu
+            color: color,
+            // Ustaw kolor elementów nawigacji na podstawie aktualnego motywu
+            backgroundColor:
+                color2, // Ustaw kolor tła na podstawie aktualnego motywu
             height: 49,
             items: const [
               Icon(Icons.home_rounded),

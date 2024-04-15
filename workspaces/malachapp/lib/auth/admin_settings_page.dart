@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:malachapp/pages/adminPanel.dart';
-import 'package:malachapp/pages/message_broadcast_page.dart';
+import 'package:malachapp/pages/Messages/message_broadcast_page.dart';
 import 'package:malachapp/services/notification_service.dart';
 
 class AdminSettingsPage extends StatelessWidget {
@@ -13,13 +13,15 @@ class AdminSettingsPage extends StatelessWidget {
       body: ListView(
         children: [
           const SizedBox(height: 20),
-          const Center(child: Text(
-            'Broadcast Settings',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          const Center(
+            child: Text(
+              'Broadcast Settings',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            ),),
+          ),
           ListTile(
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(

@@ -17,9 +17,11 @@ class MyText1 extends StatelessWidget {
       text,
       style: GoogleFonts.robotoCondensed(
         textStyle: TextStyle(
-            fontStyle: FontStyle.normal,
-            fontSize: rozmiar,
-            fontWeight: FontWeight.bold),
+          fontStyle: FontStyle.normal,
+          fontSize: rozmiar,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.0,
+        ),
       ),
     );
   }
