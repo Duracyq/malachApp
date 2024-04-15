@@ -23,8 +23,9 @@ import 'package:provider/provider.dart';
 class MessagingPage extends StatefulWidget {
   final String groupId;
   final String? groupTitle;
+  final bool isGFC;
 
-  const MessagingPage({super.key, required this.groupId, this.groupTitle});
+  const MessagingPage({super.key, required this.groupId, this.groupTitle, required this.isGFC});
 
   @override
   _MessagingPageState createState() => _MessagingPageState();
@@ -37,10 +38,12 @@ class _MessagingPageState extends State<MessagingPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final AuthService _authService = AuthService();
   late SubscribeNotifications _subscribeNotifications;
+  late bool isGFC;
 
   @override
   void initState() {
     super.initState();
+    isGFC = widget.isGFC;
     _subscribeNotifications = SubscribeNotifications();
     isMemberSubscribed();
   }
@@ -84,7 +87,7 @@ class _MessagingPageState extends State<MessagingPage> {
                 child: Row(
                   children: [
                     Visibility(
-                      visible: isAdmin,
+                      visible: isAdmin && !isGFC,
                       child: IconButton(
                         icon: const Icon(Icons.person_add),
                         onPressed: () {
@@ -453,14 +456,14 @@ class _GroupPageState extends State<GroupPage> {
                                           // If the group is from 'groupsForClass', get the group ID
                                           String groupId = data['id'];
                                           Navigator.of(context).push(MaterialPageRoute(
-                                            builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
+                                            builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'], isGFC: true,)
                                           ));
                                           return;
                                         }
                                         if (isUserMember(_auth.currentUser?.email ?? '') || isAdmin) {
                                           String groupId = await _groupIDGetter(data['groupTitle']);
                                           Navigator.of(context).push(MaterialPageRoute(
-                                            builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
+                                            builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'], isGFC: false,)
                                           ));
                                         } else {
                                           ScaffoldMessenger.of(context).showSnackBar(

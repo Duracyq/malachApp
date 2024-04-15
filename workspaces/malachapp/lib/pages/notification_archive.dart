@@ -306,7 +306,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                                           visible: notification['topic'] != {'all', 'polls', 'posts', 'events'},
                                           child: TextButton(
                                             onPressed: () => Navigator.of(context).push(
-                                              MaterialPageRoute(builder: ((context) => MessagingPage(groupId: notification['topic'] ?? '')))
+                                              MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
                                             ),
                                             child: Text('Otwórz czat', style: TextStyle(color: themeColor)),
                                           ),
@@ -318,7 +318,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                               }
                               if(notification['topic'] != {'all', 'polls', 'posts', 'events'}) {
                                 Navigator.of(context).push(
-                                  MaterialPageRoute(builder: ((context) => MessagingPage(groupId: notification['topic'] ?? '')))
+                                  MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
                                 );
                               }
                             },

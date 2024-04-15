@@ -387,8 +387,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
                           trailing: IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () {
-                              final _auth = FirebaseAuth.instance;
-                              if (members[index] != _auth.currentUser!.email) {
+                              final auth = FirebaseAuth.instance;
+                              if (members[index] != auth.currentUser!.email) {
                                 _db.collection('groups').doc(groupID).update({
                                 'members': FieldValue.arrayRemove([members[index]]),
                               });

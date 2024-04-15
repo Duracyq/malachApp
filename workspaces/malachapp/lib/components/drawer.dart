@@ -14,10 +14,15 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
-class CustomDrawer extends StatelessWidget {
-  CustomDrawer({super.key});
+class CustomDrawer extends StatefulWidget {
+  const CustomDrawer({super.key});
+
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
   late SharedPreferences _prefs;
-  
 
   void initApp() async {
     await initPrefs();
@@ -27,9 +32,9 @@ class CustomDrawer extends StatelessWidget {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<bool> getPref() async {
-    initPrefs();
-    return _prefs.getBool('hasNotifications') ?? false;
+  Stream<bool> getPref() {
+    return Stream.fromFuture(initPrefs())
+        .map((_) => _prefs.getBool('hasNotifications') ?? false);
   }
 
   Widget buildtheme(BuildContext context) {
@@ -105,8 +110,8 @@ class CustomDrawer extends StatelessWidget {
                   MaterialPageRoute(builder: ((context) => const SettingsPage())));
             },
           ),
-          FutureBuilder(
-            future: getPref(),
+          StreamBuilder(
+            stream: getPref(),
             builder: (context, snapshot) => ListTile(
               leading: const Icon(Icons.archive),
               title: const Text('Notifications Archive'),
