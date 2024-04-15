@@ -24,7 +24,7 @@ class NicknameFetcher {
           final nickname = snapshot.data ?? '';
           return MyText1(
             text: nickname,
-            rozmiar: 26,
+            rozmiar: 33,
           );
         }
       },
