@@ -25,7 +25,6 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   late SharedPreferences _prefs;
   List<Map<String, dynamic>> notifications = [];
   final Logger logger = Logger();
-  bool _hasNotifications = false;
 
 
   String? _currentToken;
@@ -49,7 +48,6 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   }
 
   Future<void> _setHasNotifications(bool value) async {
-    _hasNotifications = value;
     await _prefs.setBool('hasNotifications', value);
   }
 
@@ -88,22 +86,19 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   //   return topic;
   // }
 
-  Future<void> _firebaseMessagingBackgroundHandler(
-      RemoteMessage message) async {
+
+  Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     final topic = message.data['topic'] ?? 'Unknown';
     if (message.notification != null && message.from != _currentToken) {
       logger.d("Received message: ${message.notification!.body}");
-      if (!await _isNotificationAlreadyStored(
-          message.notification!.title!, message.notification!.body!, topic)) {
-        _storeNotification(
-            message.notification!.title!, message.notification!.body!, topic);
+      if (!await _isNotificationAlreadyStored(message.notification!.title!, message.notification!.body!, topic)) {
+        _storeNotification(message.notification!.title!, message.notification!.body!, topic);
       }
       debugPrint("Handling a background message: ${message.messageId}");
     }
   }
 
-  Future<void> _storeNotification(
-      String title, String notification, String topic) async {
+  Future<void> _storeNotification(String title, String notification, String topic) async {
     if (_savingNotification) return;
     _savingNotification = true;
     
@@ -131,8 +126,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
 
 
   // Helper method to generate a unique key (this is a simple version, consider a hash for more complexity)
-  String _generateUniqueKey(
-      String title, String notification, String topic, String formattedDate) {
+  String _generateUniqueKey(String title, String notification, String topic, String formattedDate) {
     return "$title-$notification-$topic-$formattedDate";
   }
 
@@ -223,8 +217,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   //   return formatter.format(dateTime);
   // }
 
-  Widget _buildNotificationDescription(
-      BuildContext context, String notification) {
+  Widget _buildNotificationDescription(BuildContext context, String notification) {
     if (notification.length > 200) {
       return Text('${notification.substring(0, 100)}...');
     } else {
@@ -234,9 +227,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = Provider.of<ThemeProvider>(context).themeData == darkMode
-        ? Colors.white
-        : Colors.black;
+    final themeColor = Provider.of<ThemeProvider>(context).themeData == darkMode ? Colors.white : Colors.black;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notification Archive'),
@@ -245,40 +236,36 @@ class _NotificationArchiveState extends State<NotificationArchive> {
         child: notifications.isEmpty
             ? const Text('No notifications saved.')
             : ReloadableWidget(
-                onRefresh: _refresh,
-                child: ListView.builder(
-                  itemCount: notifications.length,
-                  itemBuilder: (context, index) {
-                    final notification = notifications[index];
-                    // Ensure key is never null
-                    final String itemKey = notification['key'] ?? 'item_$index';
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(6.0, 2.0, 6.0, 0),
-                      child: Card(
-                        child: Dismissible(
-                          key: Key(itemKey),
-                          onDismissed: (direction) {
-                            _deleteNotification(index);
-                          },
-                          background: Container(
-                            color: Colors.red,
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child:
-                                const Icon(Icons.delete, color: Colors.white),
+              onRefresh: _refresh,
+              child: ListView.builder(
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final notification = notifications[index];
+                  // Ensure key is never null
+                  final String itemKey = notification['key'] ?? 'item_$index';
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(6.0, 2.0, 6.0, 0),
+                    child: Card(
+                      child: Dismissible(
+                        key: Key(itemKey),
+                        onDismissed: (direction) {
+                          _deleteNotification(index);
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            notification['title'] ?? 'No Title', // Use ?? to provide a fallback
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                           ),
-                          child: ListTile(
-                            title: Text(
-                              notification['title'] ??
-                                  'No Title', // Use ?? to provide a fallback
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildNotificationDescription(
-                                    context, notification['notification']),
+                                _buildNotificationDescription(context, notification['notification']), 
                                 const SizedBox(height: 4),
                                 // Text(
                                 //   'Topic: ${notification['topic'] ?? 'Unknown'}', // Already correctly handled
@@ -287,51 +274,34 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                                 // SizedBox(height: 4),
                                 Text(
                                   'Saved at: ${notification['timestamp']}', // Safe parsing with fallback
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.grey),
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                                 ),
                                 Text(
                                   'Topic: ${notification['topic'] ?? ''}', // Already correctly handled
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.grey),
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                                 ),
                               ],
                             ),
+                                  
                             onTap: () {
-                              if (notification['notification']
-                                      .toString()
-                                      .split('')
-                                      .length >=
-                                  100) {
+                              if(notification['notification'].toString().split('').length >= 100) {
                                 showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text(
-                                          notification['title'] ?? 'No Title'),
+                                      title: Text(notification['title'] ?? 'No Title'),
                                       content: SingleChildScrollView(
-                                        child: Text(
-                                            notification['notification'] ??
-                                                'No Details'),
+                                        child: Text(notification['notification'] ?? 'No Details'),
                                       ),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: Text(
-                                            'Zamknij',
-                                            style: TextStyle(color: themeColor),
-                                          ),
+                                          child: Text('Zamknij', style: TextStyle(color: themeColor),),
                                         ),
                                         Visibility(
-                                          visible: notification['topic'] !=
-                                              {
-                                                'all',
-                                                'polls',
-                                                'posts',
-                                                'events'
-                                              },
+                                          visible: notification['topic'] != {'all', 'polls', 'posts', 'events'},
                                           child: TextButton(
                                             onPressed: () => Navigator.of(context).push(
                                               MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
@@ -353,10 +323,10 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                           ),
                         ),
                       ),
-                    );
+                  );
                   },
                 ),
-              ),
+            ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
