@@ -7,6 +7,7 @@ import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/MyText2.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/text_field.dart';
+import 'package:malachapp/services/nickname_fetcher.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -284,6 +285,25 @@ class _AddMemberPageState extends State<AddMemberPage> {
     });
   }
 
+  
+
+  Widget _buildNickname(BuildContext context, List members, int index) {
+    final nicknameFetcher = NicknameFetcher();
+    return StreamBuilder<String>(
+      stream: nicknameFetcher.fetchNickname(members[index]),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.data == null) {
+          return Text(members[index]);
+        } else {
+          final nickname = snapshot.data;
+          return Text('${nickname!} (${members[index].split('@').first})');
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -329,6 +349,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
                         'members': FieldValue.arrayUnion(['${memberEmailController.text}@malach.com']),
                       });
                     }
+                    memberEmailController.clear();
                   },
                 ),
               ),
@@ -348,7 +369,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
                   itemCount: members.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(members[index]),
+                      title: _buildNickname(context, members, index),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {

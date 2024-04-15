@@ -1,11 +1,9 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:malachapp/components/MyText1.dart';
 
 class NicknameFetcher {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-
   Stream<String> fetchNickname(String userId) {
     return FirebaseFirestore.instance
         .collection('users')
@@ -21,7 +19,7 @@ class NicknameFetcher {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         } else if (snapshot.data == null) {
-          return Text('');
+          return const Text('');
         } else {
           final nickname = snapshot.data ?? '';
           return MyText1(
@@ -31,5 +29,18 @@ class NicknameFetcher {
         }
       },
     );
+  }
+
+  Future<String?> fetchUserIdByEmail(String email) async {
+    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('getUserIdByEmail');
+    try {
+      final result = await callable.call(<String, dynamic>{
+        'email': email,
+      });
+      return result.data['userId'];
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
   }
 }

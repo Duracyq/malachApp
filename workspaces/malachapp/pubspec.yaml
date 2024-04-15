@@ -42,6 +42,7 @@ dependencies:
   calendar_view: ^1.1.0
   image_picker: ^1.0.7
   async: ^2.11.0
+  cloud_functions: ^4.7.1
 
 flutter_icons:
   image_path: "assets/favicon.png"
