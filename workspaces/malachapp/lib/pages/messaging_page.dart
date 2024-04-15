@@ -40,6 +40,7 @@ class _MessagingPageState extends State<MessagingPage> {
   late SubscribeNotifications _subscribeNotifications;
   late bool isGFC;
 
+
   @override
   void initState() {
     super.initState();
