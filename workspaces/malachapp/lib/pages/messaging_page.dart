@@ -438,17 +438,17 @@ class _GroupPageState extends State<GroupPage> {
                             }
 
                             // Add the ListTile
-                            children.add(
-                              Card(
-                                color: !isUserMember(_auth.currentUser?.email ?? '')
+                            if (data['collection'] == 'groupsForClass' || isUserMember(_auth.currentUser?.email ?? '') || isAdmin) {
+                              children.add(
+                                Card(
+                                  color: !(data['collection'] == 'groupsForClass' || isUserMember(_auth.currentUser?.email ?? ''))
                                     ? (Provider.of<ThemeProvider>(context, listen: false).themeData == darkMode ? Colors.black54 : Colors.grey)
                                     : (Provider.of<ThemeProvider>(context, listen: false).themeData == darkMode ? Colors.grey[700] : Colors.white), //isn't a member : is a member
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: ListTile(
-                                    title: Text('$prefix${data['groupTitle']}'),
-                                    onTap: () async {
-                                      if (isUserMember(_auth.currentUser?.email ?? '') || isAdmin) {
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ListTile(
+                                      title: Text('$prefix${data['groupTitle']}'),
+                                      onTap: () async {
                                         if (data['collection'] == 'groupsForClass') {
                                           // If the group is from 'groupsForClass', get the group ID
                                           String groupId = data['id'];
@@ -457,21 +457,23 @@ class _GroupPageState extends State<GroupPage> {
                                           ));
                                           return;
                                         }
-                                        String groupId = await _groupIDGetter(data['groupTitle']);
-                                        Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
-                                        ));
-                                      } else {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Nie możesz zobaczyć zawartości!'))
-                                        );
-                                      }
-                                    },
+                                        if (isUserMember(_auth.currentUser?.email ?? '') || isAdmin) {
+                                          String groupId = await _groupIDGetter(data['groupTitle']);
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                            builder: (context) => MessagingPage(groupId: groupId, groupTitle: data['groupTitle'])
+                                          ));
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Nie możesz zobaczyć zawartości!'))
+                                          );
+                                        }
+                                      },
+                                    ),
                                   ),
-                                ),
-                              )
-                            );
-
+                                )
+                              );
+                            }
+                          
                             // Check if a Divider is needed
                             if (i < snapshot.data!.length - 1) {
                               if (data['collection'] != snapshot.data![i + 1]['collection']) {
