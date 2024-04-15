@@ -54,11 +54,11 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
 
     // Ustal kolory na podstawie motywu
     final color = themeProvider.currentThemeKey == 'light'
-        ? Color.fromARGB(255, 133, 196, 255)
+        ? const Color.fromARGB(255, 133, 196, 255)
         : Colors.blueGrey;
 
     final isDarkMode = themeProvider.currentThemeKey == 'dark';
-    return Container(
+    return SizedBox(
       width: screenWidth,
       height: double.infinity,
       child: Column(children: [
@@ -85,10 +85,10 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                   child: GFCarousel(
                     items: [
                       // Tutaj dodaj swoje karty
-                      Container(
+                      SizedBox(
                         width: screenWidth,
                         child: Card(
-                          shape: RoundedRectangleBorder(
+                          shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           color: color,
@@ -111,12 +111,12 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                                         text: "Witaj ",
                                         rozmiar: 33,
                                       ),
-                                      MyText1(
-                                        text: "Szymon",
-                                        rozmiar: 33,
-                                      ),
-                                      // NicknameFetcher()
-                                      //     .buildNickname(context, userId),
+                                      // const MyText1(
+                                      //   text: "Szymon",
+                                      //   rozmiar: 33,
+                                      // ),
+                                      NicknameFetcher()
+                                          .buildNickname(context, userId),
                                       Text(
                                         "!",
                                         style: GoogleFonts.nunito(
@@ -135,10 +135,10 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: screenWidth,
                         child: Card(
-                          shape: RoundedRectangleBorder(
+                          shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           color: color,
@@ -155,12 +155,12 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: screenWidth,
                         child: Card(
-                          shape: RoundedRectangleBorder(
+                          shape: const RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
+                                 BorderRadius.all(Radius.circular(10))),
                           color: color,
                           child: Padding(
                             padding: const EdgeInsets.all(15.0),
@@ -175,10 +175,10 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: screenWidth,
                         child: Card(
-                          shape: RoundedRectangleBorder(
+                          shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           color: color,
@@ -196,13 +196,13 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                         ),
                       ),
                     ],
-                    pauseAutoPlayOnTouch: Duration(seconds: 1),
+                    pauseAutoPlayOnTouch: const Duration(seconds: 1),
                     height: itemHeight,
                     aspectRatio: 16 / 9,
                     viewportFraction: 0.9,
                     autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 8),
-                    autoPlayAnimationDuration: Duration(seconds: 1),
+                    autoPlayInterval: const Duration(seconds: 8),
+                    autoPlayAnimationDuration: const Duration(seconds: 1),
                     autoPlayCurve: Curves.fastOutSlowIn,
                     enlargeMainPage: true,
                     hasPagination: true,
@@ -222,12 +222,12 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Post3(),
+                        builder: (context) => const Post3(),
                       ),
                     );
                   },
                   child: Card(
-                    margin: EdgeInsets.only(bottom: 10, left: 8, right: 8),
+                    margin: const EdgeInsets.only(bottom: 10, left: 8, right: 8),
                     borderOnForeground: true,
                     elevation: 1,
                     clipBehavior: Clip.antiAlias,
@@ -237,27 +237,27 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                     child: Column(
                       children: [
                         Ink.image(
-                          image: NetworkImage(
+                          image: const NetworkImage(
                               "https://fastly.picsum.photos/id/90/3000/1992.jpg?hmac=v_xO0GFiGn3zpcKzWIsZ3WoSoxJuAEXukrYJUdo2S6g"),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Post3(),
-                                ),
-                              );
-                            },
-                          ),
                           height: 100,
                           fit: BoxFit.cover,
                           colorFilter: isDarkMode
                               ? ColorFilter.mode(Colors.black.withOpacity(0.2),
                                   BlendMode.darken)
                               : null,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Post3(),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(
+                        const Padding(
+                          padding: EdgeInsets.only(
                               left: 10, top: 10, right: 10),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -272,14 +272,14 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                           indent: 15,
                           endIndent: 15,
                         ),
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.only(left: 10, right: 10, top: 5),
                           child: MyText2(
                               text:
                                   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc nec varius pharetra, nibh mi ornare lorem, vitae iaculis nisl nibh in lacus. Fusce volutpat.',
                               rozmiar: 18),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                       ],
@@ -287,6 +287,7 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                   ),
                 );
               }
+              return null;
             },
           ),
         ),
