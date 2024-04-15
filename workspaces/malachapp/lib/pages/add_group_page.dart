@@ -287,22 +287,33 @@ class _AddMemberPageState extends State<AddMemberPage> {
 
   
 
-  Widget _buildNickname(BuildContext context, List members, int index) {
-    final nicknameFetcher = NicknameFetcher();
+  Future<Widget> _buildNickname(BuildContext context, List members, int index) async {
+    final NicknameFetcher nicknameFetcher = NicknameFetcher();
+    String? userId = await nicknameFetcher.fetchUserIdByEmail(members[index]);
+    if (userId == null || userId.isEmpty) {
+      return Text(members[index]); // Handle case where no user ID could be fetched
+    }
     return StreamBuilder<String>(
-      stream: nicknameFetcher.fetchNickname(members[index]),
+      stream: nicknameFetcher.fetchNickname(userId),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.data == null) {
-          return Text(members[index]);
-        } else {
-          final nickname = snapshot.data;
-          return Text('${nickname!} (${members[index].split('@').first})');
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}'); // Display errors if any
+        }
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const CircularProgressIndicator(); // Waiting for data
+          default:
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Text(members[index]); // Handle case where no nickname is available
+            } else {
+              final String nickname = snapshot.data!;
+              return Text('$nickname (${members[index].split('@').first})'); // Display nickname
+            }
         }
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -368,25 +379,30 @@ class _AddMemberPageState extends State<AddMemberPage> {
                 return ListView.builder(
                   itemCount: members.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: _buildNickname(context, members, index),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          final _auth = FirebaseAuth.instance;
-                          if (members[index] != _auth.currentUser!.email) {
-                            _db.collection('groups').doc(groupID).update({
-                            'members': FieldValue.arrayRemove([members[index]]),
-                          });
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('You cannot remove yourself from the group'),
-                              ),
-                            );
-                          }
-                        },
-                      ),
+                    return FutureBuilder(
+                      future: _buildNickname(context, members, index),
+                      builder: (context, snapshot) {
+                        return ListTile(
+                          title: snapshot.data,
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              final _auth = FirebaseAuth.instance;
+                              if (members[index] != _auth.currentUser!.email) {
+                                _db.collection('groups').doc(groupID).update({
+                                'members': FieldValue.arrayRemove([members[index]]),
+                              });
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('You cannot remove yourself from the group'),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        );
+                      }
                     );
                   },
                 );
