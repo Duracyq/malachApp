@@ -48,6 +48,8 @@ dependencies:
   smooth_sheets: ^0.4.1
   flutter_downloader: ^1.11.7
   path_provider: ^2.1.3
+  android_path_provider: ^0.3.0
+  flutter_file_downloader: ^1.2.1
 
 flutter_icons:
   image_path: "assets/favicon.png"

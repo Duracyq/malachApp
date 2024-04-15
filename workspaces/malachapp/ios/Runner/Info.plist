@@ -45,5 +45,12 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Permissions for photo library access -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your photo library to save images.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>We need access to add photos to your photo library.</string>
+    
 </dict>
 </plist>

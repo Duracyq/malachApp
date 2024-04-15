@@ -2,6 +2,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:malachapp/auth/admin/firebase_api.dart';
 import 'package:malachapp/auth/auth_page.dart';
 import 'package:malachapp/firebase_options.dart';
@@ -30,6 +31,7 @@ void main() async {
     child: const MyApp(),
   ));
   await FirebaseApi().initNotifications();
+  FlutterDownloader.initialize();
   FirebaseMessaging.instance.subscribeToTopic('all'); //this provides the app with global broadcast notifications
 }
 

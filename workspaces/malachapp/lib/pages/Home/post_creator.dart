@@ -48,7 +48,7 @@ class _PostCreatorState extends State<PostCreator> {
         index++; // Increment the index for each side image
       }
     }
-    await postRef.update({'sideImagesUrls': sideImageUrls});
+    await postRef.update({'sideImageUrls': sideImageUrls});
 
     if (_mainImage != null) {
       String mainFileName = 'mainImage_${DateTime.now().millisecondsSinceEpoch}.jpg'; // Similar naming convention for main image
