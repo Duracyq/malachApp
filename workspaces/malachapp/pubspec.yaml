@@ -34,7 +34,6 @@ dependencies:
   provider: ^6.1.1
   permission_handler: ^11.3.0
   http: ^0.13.6
-  flutter_secure_storage: ^9.0.0
   uuid: ^4.3.3
   intl: ^0.18.1
   googleapis_auth: ^1.4.1
@@ -42,6 +41,8 @@ dependencies:
   getwidget: ^4.0.0
   calendar_view: ^1.1.0
   image_picker: ^1.0.7
+  async: ^2.11.0
+  cloud_functions: ^4.7.1
   flutter_staggered_grid_view: ^0.7.0
   shimmer: ^3.0.0
   smooth_sheets: ^0.4.1

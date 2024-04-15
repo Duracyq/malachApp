@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/herb.dart';
@@ -9,9 +12,31 @@ import 'package:malachapp/pages/settings_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class CustomDrawer extends StatelessWidget {
+
+class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
+
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
+  late SharedPreferences _prefs;
+
+  void initApp() async {
+    await initPrefs();
+  }
+
+  Future<void> initPrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  Stream<bool> getPref() {
+    return Stream.fromFuture(initPrefs())
+        .map((_) => _prefs.getBool('hasNotifications') ?? false);
+  }
 
   Widget buildtheme(BuildContext context) {
     return IconButton(
@@ -59,9 +84,10 @@ class CustomDrawer extends StatelessWidget {
             title: const Text('Messages'),
             onTap: () {
               Navigator.of(context).push(
-                  //BrHkbwqGH0Fzp1zPbIgc
-                  // MessagingPage(groupId: 'EHi1zf3LgyvIQdHACwmw')
-                  MaterialPageRoute(builder: (context) => GroupPage()));
+                //BrHkbwqGH0Fzp1zPbIgc
+                // MessagingPage(groupId: 'EHi1zf3LgyvIQdHACwmw')
+                MaterialPageRoute(builder: (context) => const GroupPage())
+              );
               // Navigator.pop(context);
             },
           ),
@@ -83,13 +109,18 @@ class CustomDrawer extends StatelessWidget {
                   builder: ((context) => const SettingsPage())));
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.archive),
-            title: const Text('Notifications Archive'),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: ((context) => NotificationArchive())));
-            },
+          StreamBuilder(
+            stream: getPref(),
+            builder: (context, snapshot) => ListTile(
+              leading: const Icon(Icons.archive),
+              title: const Text('Notifications Archive'),
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: ((context) => NotificationArchive()))
+                );
+              },
+              trailing: snapshot.data == true ? const Icon(Icons.notification_important) : null,
+            ),
           ),
           const SizedBox(height: 60),
           Align(

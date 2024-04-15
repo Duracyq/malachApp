@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
@@ -12,6 +11,7 @@ import 'package:malachapp/pages/Messages/messaging_page.dart';
 import 'package:malachapp/themes/dark_mode.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationArchive extends StatefulWidget {
   const NotificationArchive({Key? key}) : super(key: key);
@@ -22,9 +22,11 @@ class NotificationArchive extends StatefulWidget {
 
 class _NotificationArchiveState extends State<NotificationArchive> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  late SharedPreferences _prefs;
   List<Map<String, dynamic>> notifications = [];
   final Logger logger = Logger();
+  bool _hasNotifications = false;
+
 
   String? _currentToken;
   bool _savingNotification = false;
@@ -32,13 +34,27 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   @override
   void initState() {
     super.initState();
-    _initFirebase();
-    migrateDataIfNeeded();
+    initializeApp();
+  }
+
+  Future<void> initializeApp() async {
+    await _initFirebase();
+    await _initSharedPreferences();
+    await migrateDataIfNeeded();
+    await _retrieveNotifications();
+  }
+
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  Future<void> _setHasNotifications(bool value) async {
+    _hasNotifications = value;
+    await _prefs.setBool('hasNotifications', value);
   }
 
   Future<void> _initFirebase() async {
     await Firebase.initializeApp();
-
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     _firebaseMessaging.getToken().then((token) {
       setState(() {
@@ -55,12 +71,12 @@ class _NotificationArchiveState extends State<NotificationArchive> {
       logger.d("Topic: $topic");
       if (message.notification != null && message.from != _currentToken) {
         logger.d("Received message: ${message.notification!.body}");
-        if (!await _isNotificationAlreadyStored(
-            message.notification!.title!, message.notification!.body!, topic)) {
-          _storeNotification(
-              message.notification!.title!, message.notification!.body!, topic);
+        if (!await _isNotificationAlreadyStored(message.notification!.title!, message.notification!.body!, topic)) {
+          _storeNotification(message.notification!.title!, message.notification!.body!, topic);
+          _setHasNotifications(true);
         }
       }
+      _retrieveNotifications();
     });
 
     _retrieveNotifications();
@@ -90,37 +106,29 @@ class _NotificationArchiveState extends State<NotificationArchive> {
       String title, String notification, String topic) async {
     if (_savingNotification) return;
     _savingNotification = true;
-
-    // Generate a unique key based on the notification's content, including a timestamp for sorting
+    
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
     final String formattedDate = formatter.format(now);
-    final uniqueKey =
-        _generateUniqueKey(title, notification, topic, formattedDate);
-
-    // Check if this unique key already exists
-    if (await _uniqueKeyExists(uniqueKey)) {
-      logger.d("Notification already stored, skipping...");
-      _savingNotification = false;
-      return;
-    }
-
-    // Prepare the notification data with the formatted date
+    final String uniqueKey = _generateUniqueKey(title, notification, topic, formattedDate);
+    
+    logger.d("Attempting to store notification with key: $uniqueKey");
+    
     final Map<String, dynamic> notificationData = {
       "title": title,
       "notification": notification,
       "topic": topic,
-      "timestamp": formattedDate, // Save the formatted date
+      "timestamp": formattedDate,
     };
-
-    final String valueToStore = jsonEncode(notificationData);
-    await _secureStorage.write(
-        key: uniqueKey,
-        value: valueToStore); // Use the uniqueKey as the storage key
-
-    _retrieveNotifications();
+    
+    logger.d("Storing notification with key: $uniqueKey and data: $notificationData");
+    await _prefs.setString(uniqueKey, jsonEncode(notificationData));
     _savingNotification = false;
+    _retrieveNotifications();
   }
+
+
+
 
   // Helper method to generate a unique key (this is a simple version, consider a hash for more complexity)
   String _generateUniqueKey(
@@ -130,19 +138,14 @@ class _NotificationArchiveState extends State<NotificationArchive> {
 
   // Check if a unique key already exists in the storage
   Future<bool> _uniqueKeyExists(String uniqueKey) async {
-    final allKeys = await _secureStorage.readAll();
-    return allKeys.containsKey(uniqueKey);
+    return _prefs.containsKey(uniqueKey);
   }
 
-  Future<bool> _isNotificationAlreadyStored(
-      String title, String notification, String topic) async {
-    Map<String, String> allValues = await _secureStorage.readAll();
-    for (var value in allValues.values) {
+  Future<bool> _isNotificationAlreadyStored(String title, String notification, String topic) async {
+    for (var key in _prefs.getKeys()) {
       try {
-        Map<String, dynamic> storedData = jsonDecode(value);
-        if (storedData['title'] == title &&
-            storedData['notification'] == notification &&
-            storedData['topic'] == topic) {
+        Map<String, dynamic> storedData = jsonDecode(_prefs.getString(key)!);
+        if (storedData['title'] == title && storedData['notification'] == notification && storedData['topic'] == topic) {
           return true;
         }
       } catch (e) {
@@ -152,75 +155,62 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     return false;
   }
 
-  // Future<void> _retrieveNotifications() async {
-  //   Map<String, String> allValues = await _secureStorage.readAll();
-  //   List<Map<String, dynamic>> parsedNotifications = [];
-  //   allValues.forEach((key, value) {
-  //     Map<String, dynamic> storedData = jsonDecode(value);
-  //     int timestamp = int.tryParse(key.substring(key.lastIndexOf('_') + 1)) ?? 0;
-  //     storedData['timestamp'] = timestamp.toString();
-  //     parsedNotifications.add(storedData);
-  //   });
-
-  //   parsedNotifications.sort((a, b) => int.parse(b['timestamp']).compareTo(int.parse(a['timestamp'])));
-
-  //   setState(() {
-  //     notifications = parsedNotifications;
-  //   });
-  // }
   Future<void> _retrieveNotifications() async {
-    Map<String, String> allValues = await _secureStorage.readAll();
-    List<Map<String, dynamic>> parsedNotifications = [];
-
-    allValues.forEach((key, value) {
-      try {
-        final dynamic decodedData = jsonDecode(value);
-        if (decodedData is Map<String, dynamic>) {
+    final List<Map<String, dynamic>> parsedNotifications = [];
+    _prefs.getKeys().forEach((key) async {
+      final String? value = _prefs.getString(key);
+      if (value != null) {
+        try {
+          final Map<String, dynamic> decodedData = jsonDecode(value);
           parsedNotifications.add(decodedData);
-        } else {
-          // Log unexpected data types for further investigation
-          logger.d(
-              "Unexpected data format for key $key: Expected a Map but got ${decodedData.runtimeType}");
+        } catch (e) {
+          logger.e("Error decoding notification data for key $key: $e");
         }
-      } catch (e) {
-        logger.e("Error decoding data for key $key: $e");
       }
     });
 
-    parsedNotifications.sort((a, b) {
-      // Assuming 'timestamp' is stored as a String in ISO 8601 format
-      var dateA = DateTime.tryParse(a['timestamp'] ?? '') ?? DateTime.now();
-      var dateB = DateTime.tryParse(b['timestamp'] ?? '') ?? DateTime.now();
-      return dateB.compareTo(dateA); // Sort in descending order
-    });
+    // Ensure the sorting operation is correct
+    parsedNotifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+    logger.d("Retrieved ${parsedNotifications.length} notifications");
 
     if (mounted) {
+      _setHasNotifications(true);
       setState(() {
         notifications = parsedNotifications;
       });
     }
   }
 
+
+
   Future<void> migrateDataIfNeeded() async {
-    final Map<String, String> allValues = await _secureStorage.readAll();
-    for (var key in allValues.keys) {
-      final dynamic decodedData = jsonDecode(allValues[key]!);
-      if (decodedData is! Map<String, dynamic>) {
-        // Assume the data needs to be converted or handled differently
-        // For instance, convert boolean values to a map or handle them appropriately
-        if (decodedData is bool) {
-          // Convert or handle the boolean value as needed
-          final Map<String, dynamic> newData = {'isEnabled': decodedData};
-          await _secureStorage.write(key: key, value: jsonEncode(newData));
+    _prefs.getKeys().forEach((key) async {
+      final value = _prefs.getString(key);
+      if (value != null) {
+        try {
+          final dynamic decodedData = jsonDecode(value);
+          // No need to re-encode if it's already in the correct format
+          if (decodedData is! Map<String, dynamic>) {
+            if (decodedData is bool) {
+              final Map<String, dynamic> newData = {'isEnabled': decodedData};
+              await _prefs.setString(key, jsonEncode(newData));
+            }
+            // Consider other types if necessary
+          }
+        } catch (e) {
+          // Handle potential errors, perhaps the value was not JSON encoded
+          logger.e("Error during migration for key $key: $e");
         }
       }
-    }
+    });
   }
 
   void _deleteNotification(int index) async {
     String key = notifications[index]['key']!;
-    await _secureStorage.delete(key: key);
+    await _prefs.remove(key);
     _retrieveNotifications();
+    _setHasNotifications(false);
+
   }
 
   Future<void> _refresh() async {
@@ -343,17 +333,10 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                                                 'events'
                                               },
                                           child: TextButton(
-                                            onPressed: () => Navigator.of(
-                                                    context)
-                                                .push(MaterialPageRoute(
-                                                    builder: ((context) =>
-                                                        MessagingPage(
-                                                            groupId: notification[
-                                                                    'topic'] ??
-                                                                '')))),
-                                            child: Text('Otwórz czat',
-                                                style: TextStyle(
-                                                    color: themeColor)),
+                                            onPressed: () => Navigator.of(context).push(
+                                              MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
+                                            ),
+                                            child: Text('Otwórz czat', style: TextStyle(color: themeColor)),
                                           ),
                                         )
                                       ],
@@ -361,12 +344,10 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                                   },
                                 );
                               }
-                              if (notification['topic'] !=
-                                  {'all', 'polls', 'posts', 'events'}) {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: ((context) => MessagingPage(
-                                        groupId:
-                                            notification['topic'] ?? ''))));
+                              if(notification['topic'] != {'all', 'polls', 'posts', 'events'}) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
+                                );
                               }
                             },
                           ),
@@ -380,7 +361,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // This button deletes all notifications
-          _secureStorage.deleteAll().then((_) {
+          _prefs.clear().then((_) {
             setState(() {
               notifications.clear();
             });

@@ -4,9 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/MyText2.dart';
-import 'package:malachapp/components/post.dart';
+import 'package:malachapp/pages/Home/post_creator.dart';
 import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/services/nickname_fetcher.dart';
 import 'package:malachapp/themes/theme_provider.dart';
@@ -30,9 +31,9 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   // ];
   int current = 0;
   PageController pageController = PageController();
-  // final FirebaseFirestore _db = FirebaseFirestore.instance;
-  // final FirebaseAuth auth = FirebaseAuth.instance;
-  // String userId = FirebaseAuth.instance.currentUser!.uid;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
   List<String> tytul = ['Rada nauczycielska', 'Dni otwarte', 'Studniówka 2024'];
   List<String> imagePaths = [
     'assets/zd1.jpg', // Ścieżka do pierwszego obrazka
