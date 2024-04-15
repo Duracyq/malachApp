@@ -62,6 +62,7 @@ class _MyAppState extends State<MyApp> {
           '/notifications': (context) => NotificationsSubscriptionPage(),
           '/messages_page': (context) => const MessagingPage(
                 groupId: '',
+                isGFC: false,
               ),
         },
       ),

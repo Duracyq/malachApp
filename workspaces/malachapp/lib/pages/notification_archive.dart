@@ -163,14 +163,11 @@ class _NotificationArchiveState extends State<NotificationArchive> {
           logger.e("Error decoding notification data for key $key: $e");
         }
       }
-    }
-
-    parsedNotifications.sort((a, b) {
-      // Assuming 'timestamp' is stored as a String in ISO 8601 format
-      var dateA = DateTime.tryParse(a['timestamp'] ?? '') ?? DateTime.now();
-      var dateB = DateTime.tryParse(b['timestamp'] ?? '') ?? DateTime.now();
-      return dateB.compareTo(dateA); // Sort in descending order
     });
+
+    // Ensure the sorting operation is correct
+    parsedNotifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+    logger.d("Retrieved ${parsedNotifications.length} notifications");
 
     if (mounted) {
       _setHasNotifications(true);
@@ -309,7 +306,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                                           visible: notification['topic'] != {'all', 'polls', 'posts', 'events'},
                                           child: TextButton(
                                             onPressed: () => Navigator.of(context).push(
-                                              MaterialPageRoute(builder: ((context) => MessagingPage(groupId: notification['topic'] ?? '')))
+                                              MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
                                             ),
                                             child: Text('Otwórz czat', style: TextStyle(color: themeColor)),
                                           ),
@@ -321,7 +318,7 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                               }
                               if(notification['topic'] != {'all', 'polls', 'posts', 'events'}) {
                                 Navigator.of(context).push(
-                                  MaterialPageRoute(builder: ((context) => MessagingPage(groupId: notification['topic'] ?? '')))
+                                  MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
                                 );
                               }
                             },

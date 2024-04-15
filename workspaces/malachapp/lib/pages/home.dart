@@ -10,6 +10,7 @@ import 'package:malachapp/components/drawer.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/components/topbar.dart';
 import 'package:malachapp/pages/Events/event_design.dart';
+import 'package:malachapp/pages/Home/post_creator.dart';
 import 'package:malachapp/pages/creator.dart';
 import 'package:malachapp/pages/event_page.dart';
 import 'package:malachapp/pages/Home/home_home.dart';
@@ -125,6 +126,8 @@ class _HomePageState extends State<HomePage> {
         //     });
         //   },
         // ),
+
+        // floatingActionButton: 
       ),
     );
   }
@@ -394,15 +397,6 @@ class _HomePageState extends State<HomePage> {
 //           ),
 //         ],
 //       ),
-//       floatingActionButton:
-//           FirebaseAuth.instance.currentUser?.email == "00011@malach.com"
-//               ? FloatingActionButton(
-//                   onPressed: () {
-//                     Navigator.of(context).push(MaterialPageRoute(
-//                         builder: (context) => const CreatorPage()));
-//                   },
-//                 )
-//               : null,
-//     );
+//       
 //   }
 // }

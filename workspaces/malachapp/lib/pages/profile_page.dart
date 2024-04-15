@@ -58,7 +58,7 @@ class _ProfilePageSettingsState extends State<ProfilePageSettings> {
   /// Builds the title widget for the dialog.
   Widget _buildTitle() {
     return Text(
-      _newTitle.isNotEmpty ? _newTitle : 'Profile',
+      _newTitle.isNotEmpty ? _newTitle : 'Profil',
       style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
     );
   }
@@ -87,27 +87,27 @@ class _ProfilePageSettingsState extends State<ProfilePageSettings> {
         }
       }).then((value) => Navigator.of(context).pop());
       print('Nickname: $_nickname');
-      print('GDPR Confirmed: $_gdprConfirmed');
+      print('RODO Confirmed: $_gdprConfirmed');
       print('Vulgular Confirmation: $_vulgularConfirmation');
     } else {
-      String consequence = _gdprConfirmed ? 'vulgular' 
+      String consequence = _gdprConfirmed ? 'konsekwencje wulgarnych pseudonimów' 
         : _vulgularConfirmation 
-          ? 'GDPR' 
-          : 'GDPR and vulgular';
+          ? 'RODO' 
+          : 'RODO i konsekwencje wulgarnych pseudonimów';
       showDialog(
         context: context,
         builder: (BuildContext context) {
           // Add title variable
           if (!_gdprConfirmed && !_vulgularConfirmation) {
-            _setTitle('GDPR and Vulgular Confirmation');
+            _setTitle('Potwierdzenie GDPR i wulgarnych');
           } else if (!_gdprConfirmed) {
-            _setTitle('GDPR Confirmation');
+            _setTitle('Potwierdzenie GDPR');
           } else {
-            _setTitle('Vulgular Confirmation');
+            _setTitle('Potwierdzenie wulgarnych pseudonimów');
           }
           return AlertDialog(
             title: _buildTitle(),
-            content: Text('Please confirm that you understand the $consequence consequences.'),
+            content: Text('Potwierdź, że rozumiesz $consequence.'),
             actions: [
               TextButton(
                 child: Text(
@@ -131,7 +131,7 @@ class _ProfilePageSettingsState extends State<ProfilePageSettings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Profil'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -139,24 +139,24 @@ class _ProfilePageSettingsState extends State<ProfilePageSettings> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Change Nickname',
+              'Zmień pseudonim',
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
                 TextField(
                   onChanged: _updateNickname,
                   decoration: const InputDecoration(
-                    hintText: 'Enter new nickname',
+                    hintText: 'Wprowadź nowy pseudonim',
                   ),
                 ),
             const SizedBox(height: 16.0),
             CheckboxListTile(
-              title: const Text('I understand the GDPR consequences'),
+              title: const Text('Rozumiem RODO'),
               value: _gdprConfirmed,
               onChanged: (bool? value) => _toggleGdprConfirmation(value ?? false),
             ),
             CheckboxListTile(
-              title: const Text('I understand having the vulgular nickname consequences'),
+              title: const Text('Rozumiem konsekwencje posiadania wulgarnego pseudonimu'),
               value: _vulgularConfirmation,
               onChanged: (bool? value) => _toggleVulgularNicknameConfirmation(value ?? false),
             ),
@@ -174,7 +174,7 @@ class _ProfilePageSettingsState extends State<ProfilePageSettings> {
                             : Colors.white,
                       ),
                       child: Text(
-                        'Save Profile',
+                        'Zapisz profil',
                         style: TextStyle(
                           color: Provider.of<ThemeProvider>(context).themeData == darkMode
                               ? Colors.white
@@ -208,6 +208,12 @@ class _ProfilePageState extends State<ProfilePage> {
     String? userId = auth.currentUser?.uid;
     return _db.collection('users').doc(userId).snapshots()
       .map((snapshot) => snapshot.data()?['nickname'] as String? ?? '');
+  }
+
+  Stream<String> fetchClass() {
+    String? userId = auth.currentUser?.uid;
+    return _db.collection('users').doc(userId).snapshots()
+      .map((snapshot) => snapshot.data()?['class'] as String? ?? '');
   }
 
   Widget _buildCancelButton() {
@@ -250,28 +256,241 @@ class _ProfilePageState extends State<ProfilePage> {
           (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const ListTile(
-            title: Text('Nickname: (loading)'),
+            title: Text('Pseudonim: (wczytywanie)'),
             leading: Icon(Icons.person),
           );
         }
         if (snapshot.hasError) {
           return ListTile(
-            title: Text('Error: ${snapshot.error}'),
+            title: Text('Błąd: ${snapshot.error}'),
             leading: const Icon(Icons.error),
           );
         }
         if (snapshot.data == '') {
-          return Container();
+          return ListTile(
+            title: const Text('Pseudonim: (nie ustawiony)'),
+            leading: const Icon(Icons.person),
+            trailing: const Icon(Icons.edit),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ProfilePageSettings(),
+              ),
+            )
+          );
         }
         return ListTile(
           title: Row(
             children: [
-              Text('Nickname: ${snapshot.data}'),
-              const SizedBox(width: 5),
-              _buildCancelButton(),
+              Text('Pseudonim: ${snapshot.data}'),
             ],
           ),
           leading: const Icon(Icons.person),
+          trailing: _buildCancelButton(),
+        );
+      },
+    );
+  }
+
+  Future<void> _setClassDropdown() async {
+    String classValue = 'A'; // Initial class value
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Wybierz klasę'),
+          content: StatefulBuilder( // Use StatefulBuilder to update the state inside the dialog
+            builder: (BuildContext context, StateSetter setState) {
+              return DropdownButton<String>(
+                value: classValue, // Set the initial value
+                onChanged: (String? newValue) {
+                  setState(() { // Use the StateSetter to update the dropdown's state
+                    classValue = newValue!;
+                  });
+                },
+                items: <String>['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value, // Correct value assignment
+                    child: Text(
+                      value,
+                      style: Provider.of<ThemeProvider>(context).themeData == darkMode
+                          ? const TextStyle(color: Colors.white)
+                          : const TextStyle(color: Colors.black),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Anuluj', style: TextStyle(color: Theme.of(context).textTheme.labelLarge?.color)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Zapisz', style: TextStyle(color: Theme.of(context).textTheme.labelLarge?.color)),
+              onPressed: () {
+                _db.collection('users').doc(auth.currentUser?.uid).set({
+                  'class': classValue,
+                }, SetOptions(merge: true));
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _setYearDropdown() {
+    String yearValue = '2024/2025'; // Assuming '1' is a valid initial value
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Wybierz rok'),
+          content: FutureBuilder<DocumentSnapshot>(
+            future: _db.collection('academicYears').doc('exT9bo4N0RNOPXHTDxFL').get(), // Fetching the data
+            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // Show loading indicator while waiting for data
+              } else if (snapshot.hasError) {
+                return Text('Błąd: ${snapshot.error}'); // Error handling
+              } else if (snapshot.hasData && snapshot.data!.data() != null) {
+                // Once data is fetched, use StatefulBuilder to allow for updating the dropdown's state
+                List<String> years = List<String>.from((snapshot.data!.data() as Map<String, dynamic>)['years']);
+                return StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return DropdownButton<String>(
+                      value: yearValue, // Set the initial value
+                      onChanged: (String? newValue) {
+                        setState(() { // Update the dropdown's state
+                          yearValue = newValue!;
+                        });
+                      },
+                      items: years.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value, // Correct value assignment
+                          child: Text(
+                            value,
+                            style: Provider.of<ThemeProvider>(context).themeData == darkMode
+                                ? const TextStyle(color: Colors.white)
+                                : const TextStyle(color: Colors.black),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                );
+              } else {
+                return const Text('Brak dostępnych lat'); // Handle the case where no data is available
+              }
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Anuluj', style: TextStyle(color: Theme.of(context).textTheme.labelLarge?.color)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Zapisz', style: TextStyle(color: Theme.of(context).textTheme.labelLarge?.color)),
+              onPressed: () {
+                // Assuming `_db` and `auth.currentUser?.uid` are correctly defined and available
+                _db.collection('users').doc(auth.currentUser?.uid).set({
+                  'year': yearValue,
+                }, SetOptions(merge: true));
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Widget _buildListTileClass(BuildContext context) {
+    return StreamBuilder(
+      stream: fetchClass(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const ListTile(
+            title: Text('Klasa: (wczytywanie)'),
+            leading: Icon(Icons.school),
+          );
+        }
+        if (snapshot.hasError) {
+          return ListTile(
+            title: Text('Błąd: ${snapshot.error}'),
+            leading: const Icon(Icons.error),
+          );
+        }
+        if (snapshot.data == '') {
+            return ListTile(
+            title: const Text('Klasa: (nie ustawiona)'),
+            leading: const Icon(Icons.school),
+            trailing: const Icon(Icons.edit),
+            onTap: () {
+              _setClassDropdown();
+            },
+          );
+        }
+        return ListTile(
+          title: Text('Klasa: ${snapshot.data}'),
+          leading: const Icon(Icons.school),
+          trailing: const Icon(Icons.edit),
+          onTap: () async {
+            await _setClassDropdown();
+          },
+        );
+      },
+    );
+  }
+  Stream<String> fetchYear() {
+    String? userId = auth.currentUser?.uid;
+    return _db.collection('users').doc(userId).snapshots()
+      .map((snapshot) => snapshot.data()?['year'] as String? ?? '');
+  }
+
+  Widget _buildListTileYear(BuildContext context) {
+    return StreamBuilder(
+      stream: fetchYear(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const ListTile(
+            title: Text('Rok: (wczytywanie)'),
+            leading: Icon(Icons.school),
+          );
+        }
+        if (snapshot.hasError) {
+          return ListTile(
+            title: Text('Błąd: ${snapshot.error}'),
+            leading: const Icon(Icons.error),
+          );
+        }
+        if (snapshot.data == '') {
+            return ListTile(
+            title: const Text('Rok: (nie ustawiony)'),
+            leading: const Icon(Icons.school),
+            trailing: const Icon(Icons.edit),
+            onTap: () {
+              _setYearDropdown();
+            },
+          );
+        }
+        return ListTile(
+          title: Text('Rok: ${snapshot.data}'),
+          leading: const Icon(Icons.school),
+          trailing: const Icon(Icons.edit),
+          onTap: () {
+            _setYearDropdown();
+          },
         );
       },
     );
@@ -282,7 +501,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String email = auth.currentUser?.email ?? '';
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Profil'),
       ),
       body: Center(
         child: Column(
@@ -296,13 +515,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     leading: const Icon(Icons.email),
                     title: Text('Email: $email'),
                   ),
-                  const ListTile(
-                    title: Text('Class: (not implemented)'),
-                    leading: const Icon(Icons.class_rounded),
-                  ),
+                  _buildListTileClass(context),
+                  _buildListTileYear(context),
                   ListTile(
                     leading: const Icon(Icons.settings),
-                    title: const Text('Settings'),
+                    title: const Text('Ustawienia'),
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(

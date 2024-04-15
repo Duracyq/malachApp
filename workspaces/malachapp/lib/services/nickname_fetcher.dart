@@ -1,10 +1,9 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:malachapp/components/MyText1.dart';
 
 class NicknameFetcher {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-
   Stream<String> fetchNickname(String userId) {
     return FirebaseFirestore.instance
         .collection('users')
@@ -19,23 +18,29 @@ class NicknameFetcher {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error fetching nickname');
+        } else if (snapshot.data == null) {
+          return const Text('');
         } else {
           final nickname = snapshot.data ?? '';
-          return Text(
-            nickname,
-            style: GoogleFonts.nunito(
-              textStyle: const TextStyle(
-                fontFamily: 'Nunito',
-                fontStyle: FontStyle.normal,
-                fontSize: 26,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+          return MyText1(
+            text: nickname,
+            rozmiar: 26,
           );
         }
       },
     );
+  }
+
+  Future<String?> fetchUserIdByEmail(String email) async {
+    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('getUserIdByEmail');
+    try {
+      final result = await callable.call(<String, dynamic>{
+        'email': email,
+      });
+      return result.data['userId'];
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
   }
 }

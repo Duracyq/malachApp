@@ -12,10 +12,15 @@ class Storage {
   Future<String> uploadPhoto(File file, String targetPath) async {
     try {
       firebase_storage.Reference ref = storage.ref().child('$targetPath/${Path.basename(file.path)}');
-      firebase_storage.UploadTask uploadTask = ref.putFile(file);
+      firebase_storage.SettableMetadata metadata = firebase_storage.SettableMetadata(contentType: 'image/jpeg');
+      firebase_storage.UploadTask uploadTask = ref.putFile(file, metadata);
       await uploadTask;
       String downloadUrl = await ref.getDownloadURL();
       return downloadUrl;
+      // firebase_storage.UploadTask uploadTask = ref.putFile(file);
+      // await uploadTask;
+      // String downloadUrl = await ref.getDownloadURL();
+      // return downloadUrl;
     } on firebase_storage.FirebaseException catch (e) {
       // Log the error or use a more user-friendly message depending on the error
       logger.d("Firebase Storage error: ${e.code} - ${e.message}");
