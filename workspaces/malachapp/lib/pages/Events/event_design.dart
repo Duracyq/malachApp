@@ -104,6 +104,13 @@ class _EventListState extends State<EventList> {
     final color =
         themeProvider.currentThemeKey == 'light' ? Colors.white : Colors.black;
 
+    final color1 = themeProvider.currentThemeKey == 'light'
+        ? const Color.fromARGB(255, 0, 174, 184)
+        : const Color.fromARGB(255, 0, 174, 184);
+    final color2 = themeProvider.currentThemeKey == 'light'
+        ? const Color.fromARGB(255, 133, 196, 255)
+        : Color.fromARGB(255, 235, 137, 0);
+
     return Material(
       elevation: 3,
       color: color,
@@ -243,7 +250,8 @@ class _EventListState extends State<EventList> {
                           for (var value in tags)
                             Container(
                               decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 23, 190, 187),
+                                color:
+                                    color1, //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: Visibility(
@@ -289,82 +297,52 @@ class _EventListState extends State<EventList> {
                 ),
               ],
             ),
-
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   children: [
-            //     GFCheckbox(
-            //       activeBgColor: const Color.fromRGBO(16, 220, 96, 1),
-            //       size: GFSize.SMALL,
-            //       type: GFCheckboxType.circle,
-            //       onChanged: (value) {
-            //         setState(() {
-            //           isChecked = value;
-            //         });
-            //       },
-            //       value: isChecked,
-            //       inactiveIcon: null,
-            //     ),
-            //     SizedBox(
-            //       width: 3,
-            //     ),
-            //     Text(
-            //       "Zapisz się!", // replace with the event price
-            //       style: TextStyle(
-            //           fontSize: 16,
-            //           color: Colors.black,
-            //           fontWeight: FontWeight.w700),
-            //     ),
-            //   ],
-            // ),
-            // SizedBox(
-            //   height: 0,
-            // )
             Visibility(
               visible: data['isEnrollAvailable'] == true &&
                   !past!, // show the button only if isEnrollAvailable is true
               child: Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isChecked =
-                          !isChecked; // toggle isChecked when the button is pressed
-                    });
-                    EventList().enrollEvent(snapshot
-                        .id); // call the function to enroll the user in the event
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        // MaterialStateProperty.resolveWith<Color>(
-                        //   (Set<MaterialState> states) {
-                        //     if (states.contains(MaterialState.pressed) || isChecked || isUserEnrolled) {
-                        //       return Colors.transparent; // the color when button is pressed or isChecked is true
-                        //     }
-                        //     return Colors.blue; // the default color
-                        //   },
-                        // ),
-                        isUserEnrolled
-                            ? MaterialStateProperty.all<Color>(
-                                Colors.transparent)
-                            : MaterialStateProperty.all<Color>(
-                                Color.fromARGB(255, 255, 131, 96)),
-                    fixedSize: MaterialStateProperty.all<Size>(
-                      const Size(118, 25),
-                    ),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(13.0), // round the corners
+                child: Container(
+                  width: 160,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isChecked =
+                            !isChecked; // toggle isChecked when the button is pressed
+                      });
+                      EventList().enrollEvent(snapshot
+                          .id); // call the function to enroll the user in the event
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          // MaterialStateProperty.resolveWith<Color>(
+                          //   (Set<MaterialState> states) {
+                          //     if (states.contains(MaterialState.pressed) || isChecked || isUserEnrolled) {
+                          //       return Colors.transparent; // the color when button is pressed or isChecked is true
+                          //     }
+                          //     return Colors.blue; // the default color
+                          //   },
+                          // ),
+                          isUserEnrolled
+                              ? MaterialStateProperty.all<Color>(
+                                  Colors.transparent)
+                              : MaterialStateProperty.all<Color>(color2),
+                      fixedSize: MaterialStateProperty.all<Size>(
+                        const Size(118, 25),
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(13.0), // round the corners
+                        ),
                       ),
                     ),
-                  ),
-                  child: const Text(
-                    "Zapisz się!",
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700),
+                    child: const Text(
+                      "Zapisz się!",
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ),
               ),
