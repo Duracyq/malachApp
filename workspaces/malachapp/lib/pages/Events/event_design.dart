@@ -220,9 +220,9 @@ class _EventListState extends State<EventList> {
                       text: (snapshot.data() != null &&
                               data.containsKey('eventName'))
                           ? snapshot['eventName']
-                          : (snapshot['description'].length <= 40)
+                          : (snapshot['description'].length <= 10)
                               ? snapshot['description']
-                              : "${snapshot['description'].substring(0, 40)}...",
+                              : "${snapshot['description'].substring(0, 10)}...",
                       rozmiar: 18),
                 ),
                 // Padding(
@@ -295,57 +295,63 @@ class _EventListState extends State<EventList> {
                     ),
                   ),
                 ),
-              ],
-            ),
-            Visibility(
-              visible: data['isEnrollAvailable'] == true &&
-                  !past!, // show the button only if isEnrollAvailable is true
-              child: Center(
-                child: Container(
-                  width: 160,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        isChecked =
-                            !isChecked; // toggle isChecked when the button is pressed
-                      });
-                      EventList().enrollEvent(snapshot
-                          .id); // call the function to enroll the user in the event
-                    },
-                    style: ButtonStyle(
-                      backgroundColor:
-                          // MaterialStateProperty.resolveWith<Color>(
-                          //   (Set<MaterialState> states) {
-                          //     if (states.contains(MaterialState.pressed) || isChecked || isUserEnrolled) {
-                          //       return Colors.transparent; // the color when button is pressed or isChecked is true
-                          //     }
-                          //     return Colors.blue; // the default color
-                          //   },
-                          // ),
-                          isUserEnrolled
-                              ? MaterialStateProperty.all<Color>(
-                                  Colors.transparent)
-                              : MaterialStateProperty.all<Color>(color2),
-                      fixedSize: MaterialStateProperty.all<Size>(
-                        const Size(118, 25),
-                      ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(13.0), // round the corners
+                // Expanded(
+                //     child: SizedBox(
+                //   width: 10,
+                // )), // Dodaj to, aby wypełnić dostępną przestrzeń
+
+                Visibility(
+                  visible: data['isEnrollAvailable'] == true &&
+                      !past!, // show the button only if isEnrollAvailable is true
+                  child: Center(
+                    child: Container(
+                      width: 160,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            isChecked =
+                                !isChecked; // toggle isChecked when the button is pressed
+                          });
+                          EventList().enrollEvent(snapshot
+                              .id); // call the function to enroll the user in the event
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              // MaterialStateProperty.resolveWith<Color>(
+                              //   (Set<MaterialState> states) {
+                              //     if (states.contains(MaterialState.pressed) || isChecked || isUserEnrolled) {
+                              //       return Colors.transparent; // the color when button is pressed or isChecked is true
+                              //     }
+                              //     return Colors.blue; // the default color
+                              //   },
+                              // ),
+                              isUserEnrolled
+                                  ? MaterialStateProperty.all<Color>(
+                                      Colors.transparent)
+                                  : MaterialStateProperty.all<Color>(color2),
+                          fixedSize: MaterialStateProperty.all<Size>(
+                            const Size(118, 25),
+                          ),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  13.0), // round the corners
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          "Zapisz się!",
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w700),
                         ),
                       ),
                     ),
-                    child: const Text(
-                      "Zapisz się!",
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700),
-                    ),
                   ),
                 ),
-              ),
+              ],
             ),
             const SizedBox(height: 3)
           ],
