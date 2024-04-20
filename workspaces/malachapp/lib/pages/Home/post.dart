@@ -98,7 +98,7 @@ class _Post3State extends State<Post3> {
   }
 
   Widget _buildTopImage(Color gradientColor) {
-    String mainImageUrl = data['mainImageUrl'] as String? ?? 'default_image_path.jpg';  // Provide a default image path if null
+    String mainImageUrl = data['mainImageUrl'] as String? ?? '';  // Provide a default image path if null
 
     return SizedBox(
       height: 140,
@@ -107,7 +107,7 @@ class _Post3State extends State<Post3> {
         decoration: BoxDecoration(
           color: Colors.grey,
           image: DecorationImage(
-            image: CachedNetworkImageProvider(mainImageUrl),  // Use the validated or default image URL
+            image: (mainImageUrl != '') ? CachedNetworkImageProvider(mainImageUrl) : const CachedNetworkImageProvider('https://firebasestorage.googleapis.com/v0/b/malachapp.appspot.com/o/favicon.png?alt=media&token=5b974a23-3b18-4a6d-a41b-4a9e78dd91b0'),  // Use the validated or default image URL
             fit: BoxFit.cover,
           ),
         ),

@@ -76,7 +76,7 @@ Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> dat
             child: Column(
                 children: [
                     Ink.image(
-                        image: CachedNetworkImageProvider(data[index]['mainImageUrl']),
+                        image: data[index]['mainImageUrl'] != '' ? CachedNetworkImageProvider(data[index]['mainImageUrl']) : const CachedNetworkImageProvider('https://firebasestorage.googleapis.com/v0/b/malachapp.appspot.com/o/favicon.png?alt=media&token=5b974a23-3b18-4a6d-a41b-4a9e78dd91b0'),
                         height: 100,
                         fit: BoxFit.cover,
                         colorFilter: isDarkMode
@@ -162,10 +162,13 @@ Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> dat
                       // Other elements, the post tiles
                       return SizedBox(
                         height:  455, // nie zmieniaj tej wartości!!!!!
-                        child: Column(
-                          children: [
-                            _buildPostTile(context),
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Column(
+                            children: [
+                              _buildPostTile(context),
+                            ],
+                          ),
                         ),
                       );
                     }
