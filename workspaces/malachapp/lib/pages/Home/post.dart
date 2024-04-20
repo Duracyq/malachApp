@@ -75,6 +75,7 @@ class _Post3State extends State<Post3> {
   }
 
   Widget _buildPhotoAction(Color color) {
+    if(data['sideImageUrl'] == null) return Container();
     return GestureDetector(
       onTap: () => _showPhotoGallery(context, color),
       child: Padding(
@@ -195,7 +196,7 @@ class _Post3State extends State<Post3> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Container(
+        child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.9,
           child: MasonryGridView.count(
             crossAxisCount: 2,
