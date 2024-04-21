@@ -351,7 +351,9 @@ class _Post3State extends State<Post3> {
 
       final externalDir = await getExternalStorageDirectory();
       if (externalDir != null) {
-        await FlutterDownloader.enqueue(url: url, savedDir: externalDir.path,
+        await FlutterDownloader.enqueue(
+          url: url,
+          savedDir: externalDir.path,
           showNotification: true,
           openFileFromNotification: true,
         );
