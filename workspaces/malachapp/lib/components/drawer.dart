@@ -6,6 +6,7 @@ import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/pages/Messages/group_page.dart';
 import 'package:malachapp/pages/Messages/messaging_page.dart';
+import 'package:malachapp/pages/founders_page.dart';
 import 'package:malachapp/pages/notification_archive.dart';
 import 'package:malachapp/pages/profile_page.dart';
 import 'package:malachapp/pages/settings_page.dart';
@@ -121,6 +122,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
               trailing: snapshot.data == true ? const Icon(Icons.notification_important) : null,
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.terminal_rounded),
+            title: const Text('Founders '),
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: ((context) => FoundersPage())));
+            },
           ),
           const SizedBox(height: 60),
           Align(
