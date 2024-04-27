@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/text_field.dart';
+import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/photo_from_gallery_picker.dart';
 
 class PostCreator extends StatefulWidget {
@@ -57,6 +58,7 @@ class _PostCreatorState extends State<PostCreator> {
       String mainImageUrl = await mainImageUploadTask.ref.getDownloadURL();
       await postRef.update({'mainImageUrl': mainImageUrl});
     }
+    NotificationService().sendPersonalisedFCMMessage('Sprawdź teraz!', 'posts', 'Nowy post! 🎉');
     Navigator.of(context).pop();
   }
 
