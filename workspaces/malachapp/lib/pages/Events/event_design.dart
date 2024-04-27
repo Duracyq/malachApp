@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/Events/add_event.dart';
 import 'package:malachapp/pages/Events/event_design_page.dart';
@@ -149,12 +150,12 @@ class _EventListState extends State<EventList> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Column(
-
                         children: [
                           Wrap(
                             direction: Axis.horizontal,
                             spacing: 3,
                             children: [
+                              if(tags.length <= 3)
                               for (var value in tags)
                               Container(
                                 decoration: BoxDecoration(
@@ -180,6 +181,58 @@ class _EventListState extends State<EventList> {
                                   ),
                                 ),
                               ),
+                              if(tags.length > 3)
+                              for (var value in tags.take(3))
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Visibility(
+                                  visible: data['tags'] != null && data.containsKey('tags') && data['tags'].isNotEmpty,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                    child: Wrap(
+                                      children: [
+                                        Text(
+                                          value,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if(tags.length > 3)
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Visibility(
+                                  visible: data['tags'] != null && data.containsKey('tags') && data['tags'].isNotEmpty,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                    child: Wrap(
+                                      children: [
+                                        Text(
+                                          '+${tags.length - 3}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -328,16 +381,24 @@ class _EventListState extends State<EventList> {
       appBar: AppBar(
         title: const Text("Events"),
         actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (BuildContext context) => const AddEvent(),
-                  ),
-                );
-              },
-              icon: const Icon(CupertinoIcons.add)),
+          FutureBuilder(
+            future: AuthService().isAdmin(),
+            builder: (context, snapshot) {
+              return Visibility(
+                visible: snapshot.hasData && snapshot.data == true,
+                child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) => const AddEvent(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(CupertinoIcons.add)),
+              );
+            }
+          ),
         ],
       ),
       body: SingleChildScrollView(

@@ -1,13 +1,4 @@
-
-
-
-import 'package:getwidget/getwidget.dart';
-import 'package:malachapp/components/MyText1.dart';
-import 'package:malachapp/pages/Events/event_design_page.dart';
-import 'package:calendar_view/calendar_view.dart';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:malachapp/components/my_button.dart';
