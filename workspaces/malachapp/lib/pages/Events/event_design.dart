@@ -270,20 +270,23 @@ class _EventListState extends State<EventList> {
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Text(
                         (snapshot.data() != null && data.containsKey('eventName'))
-                          ? snapshot['eventName']
-                          : (snapshot['description'].length <= 40)
+                          ? (snapshot['eventName'].length <= 20)
+                            ? snapshot['eventName']
+                            : "${snapshot['eventName'].substring(0,20)}..." // replace with the event name
+                          : (snapshot['description'].length <= 20)
                             ? snapshot['description']
-                            : "${snapshot['description'].substring(0,40)}...", // replace with the event name
+                            : "${snapshot['description'].substring(0,20)}...", // replace with the event name
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
+                    if(snapshot['isEnrollAvailable'] == false)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Text(
-                        (snapshot['description'].length <= 200)
+                        (snapshot['description'].length <= 70)
                           ? snapshot['description']
-                          : "${snapshot['description'].substring(0,200)}...", // replace with the event description
+                          : "${snapshot['description'].substring(0,70)}...", // replace with the event description
                         style: TextStyle(
                           fontSize: 10,
                           color: Colors.grey.shade500,
