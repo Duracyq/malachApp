@@ -50,6 +50,7 @@ dependencies:
   path_provider: ^2.1.3
   android_path_provider: ^0.3.0
   flutter_file_downloader: ^1.2.1
+  multiselect_formfield: ^0.1.7
 
 flutter_icons:
   image_path: "assets/favicon.png"

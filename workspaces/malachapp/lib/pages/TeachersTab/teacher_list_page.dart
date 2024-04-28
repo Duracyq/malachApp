@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/text_field.dart';
+import 'package:malachapp/pages/TeachersTab/add_teacher_to_the_list.dart';
 
 class TeacherListPage extends StatefulWidget {
   @override
@@ -24,7 +25,11 @@ class _TeacherListPageState extends State<TeacherListPage> {
                 visible: snapshot.hasData && snapshot.data!,
                 child: IconButton(
                   onPressed: () {
-                    // Add teacher button tap
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => AddTeacherToListPage(),
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.add),
                 ),
