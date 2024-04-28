@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:malachapp/pages/TeachersTab/workhours_selector.dart';
 
 class TeacherTab extends StatefulWidget {
   final DocumentSnapshot teacherSnapshot;
+  final teacherId;
 
-  TeacherTab({required this.teacherSnapshot});
+  TeacherTab({required this.teacherSnapshot, required this.teacherId});
 
   @override
   State<TeacherTab> createState() => _TeacherTabState();
@@ -29,7 +31,14 @@ class _TeacherTabState extends State<TeacherTab> {
             title: Text('Email: ${widget.teacherSnapshot['accountMail']}'),
           ),
           ListTile(
-            // title: Text('Avaiblability: ${widget.teacherSnapshot['workHours'] ?? 'Brak danych'}'),
+            title: const Text('work hours creator'),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => WorkHoursCreator(teacherId: widget.teacherId,),
+                ),
+              );
+            },
           )
         ],
       ),

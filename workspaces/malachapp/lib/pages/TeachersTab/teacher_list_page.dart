@@ -132,7 +132,7 @@ class _TeacherListPageState extends State<TeacherListPage> {
                                     onTap: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                          builder: (context) => TeacherTab(teacherSnapshot: snapshot.data!.docs[index])
+                                          builder: (context) => TeacherTab(teacherSnapshot: snapshot.data!.docs[index], teacherId: snapshot.data!.docs[index].id)
                                         ),
                                       );
                                     },

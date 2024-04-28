@@ -136,6 +136,7 @@ class _AddTeacherToListPageState extends State<AddTeacherToListPage> {
       'surname': _surnameController.text,
       'subject': _subjects,
       'accountMail': '$nameInRoman.$surnameInRoman@malachowianka.edu.pl',
+      
     }).then((value) => debugPrint('Teacher added: ${_nameController.text} ${_surnameController.text}'));
 
     try {
