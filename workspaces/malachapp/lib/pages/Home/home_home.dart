@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,15 +8,13 @@ import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/components/MyText2.dart';
 import 'package:malachapp/pages/Home/post_creator.dart';
-import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/services/nickname_fetcher.dart';
 import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:malachapp/pages/Home/post.dart';
 
 class HomeHomeWidget extends StatefulWidget {
-  const HomeHomeWidget({Key? key}) : super(key: key);
+  const HomeHomeWidget({super.key});
 
   @override
   State<HomeHomeWidget> createState() => _HomeHomeWidgetState();
@@ -33,26 +30,27 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
 
   Widget _buildPostTile(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-final isDarkMode = themeProvider.currentThemeKey == 'dark';
+    final isDarkMode = themeProvider.currentThemeKey == 'dark';
 
-return StreamBuilder<QuerySnapshot>(
-    stream: _db.collection('posts').snapshots(),
-    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+    return StreamBuilder<QuerySnapshot>(
+        stream: _db.collection('posts').snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+            }
+            var data = snapshot.data!.docs;
+            return Flexible(
+                fit: FlexFit.loose,
+                child: ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                        return buildPostCard(context, index, data, isDarkMode);
+                    },
+                ),
+            );
         }
-        var data = snapshot.data!.docs;
-        return Flexible(
-            fit: FlexFit.loose,
-            child: ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                    return buildPostCard(context, index, data, isDarkMode);
-                },
-            ),
-        );
-    }
-);
+    );
+}
 
 Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> data, bool isDarkMode) {
     return GestureDetector(

@@ -215,254 +215,215 @@ class _EventListState extends State<EventList> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12.0, top: 8.0, right: 12.0),
-                      child: MyText1(
-                        text: (snapshot.data() != null && data.containsKey('eventName'))
-                            ? snapshot['eventName']
-                            : (snapshot['description'].length <= 10)
-                                ? snapshot['description']
-                                : "${snapshot['description'].substring(0, 10)}...",
-                        rozmiar: 18,
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(left: 12.0, top: 8.0, right: 12.0),
+                    //   child: MyText1(
+                    //     text: (snapshot.data() != null && data.containsKey('eventName'))
+                    //         ? snapshot['eventName']
+                    //         : (snapshot['description'].length <= 10)
+                    //             ? snapshot['description']
+                    //             : "${snapshot['description'].substring(0, 10)}...",
+                    //     rozmiar: 18,
+                    //   ),
+                    // ),
                     const SizedBox(height: 0),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Column(
-                        children: [
-                          Wrap(
-                            direction: Axis.horizontal,
-                            spacing: 3,
-                            runSpacing: 3,
-                            children: [
-                              for (var value in tags)
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: color1, // Customize this color
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  child: Visibility(
-                                    visible: data['tags'] != null &&
-                                        data.containsKey('tags') &&
-                                        data['tags'].isNotEmpty,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
-                                      child: Wrap(
-                                        children: [
-                                          Text(
-                                            value,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w800,
-                                              fontSize: 10,
-                                            ),
-                                          ),
-                                        ],
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    //   child: Column(
+                    //     children: [
+                    //       Wrap(
+                    //         direction: Axis.horizontal,
+                    //         spacing: 3,
+                    //         runSpacing: 3,
+                    //         children: [
+                    //           for (var value in tags)
+                    //             Container(
+                    //               decoration: BoxDecoration(
+                    //                 color: color1, // Customize this color
+                    //                 borderRadius: BorderRadius.circular(30),
+                    //               ),
+                    //               child: Visibility(
+                    //                 visible: data['tags'] != null &&
+                    //                     data.containsKey('tags') &&
+                    //                     data['tags'].isNotEmpty,
+                    //                 child: Padding(
+                    //                   padding: const EdgeInsets.symmetric(
+                    //                       vertical: 4, horizontal: 8),
+                    //                   child: Wrap(
+                    //                     children: [
+                    //                       Text(
+                    //                         value,
+                    //                         style: const TextStyle(
+                    //                           color: Colors.white,
+                    //                           fontWeight: FontWeight.w800,
+                    //                           fontSize: 10,
+                    //                         ),
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //         ],
+                    //       ),
+                    //     ],
+                    //   ),
+                    // 
+                            ],
+                          ),
+                      const SizedBox(height: 8),
+                      // tags display
+                  Center(
+                    child: Wrap(
+                      direction: Axis.horizontal,
+                      spacing: 3,
+                      runSpacing: 3,
+                      children: [
+                        if (tags.length > 3)
+                          for (var value in tags.take(3))
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Visibility(
+                                visible: data['tags'] != null &&
+                                    data.containsKey('tags') &&
+                                    data['tags'].isNotEmpty,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 4, horizontal: 8),
+                                  child: Wrap(
+                                    children: [
+                                      Text(
+                                        value,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 10,
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )
-
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-                              if(tags.length > 3)
-                              for (var value in tags.take(3))
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: Visibility(
-                                  visible: data['tags'] != null && data.containsKey('tags') && data['tags'].isNotEmpty,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                                    child: Wrap(
-                                      children: [
-                                        Text(
-                                          value,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w800,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              if(tags.length > 3)
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: Visibility(
-                                  visible: data['tags'] != null && data.containsKey('tags') && data['tags'].isNotEmpty,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                                    child: Wrap(
-                                      children: [
-                                        Text(
-                                          '+${tags.length - 3}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w800,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                            ],
-                          ),
-                          const SizedBox(height: 8),
+                            ),
+                        if (tags.length > 3)
                           Container(
                             decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 8),
-                              child: Wrap(
-                                children:[
-                                  const Icon(
-                                    Icons.calendar_today,
-                                    color: Colors.green,
-                                    size: 12,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    formattedDate, // replace with the formatted event date
-                                    style: const TextStyle(
-                                        color: Colors.green,
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Visibility(
+                              visible: data['tags'] != null &&
+                                  data.containsKey('tags') &&
+                                  data['tags'].isNotEmpty,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 8),
+                                child: Wrap(
+                                  children: [
+                                    Text(
+                                      '+${tags.length - 3}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
                                         fontWeight: FontWeight.w800,
-                                        fontSize: 10),
-                                  ),
-                                ] 
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Text(
-                    (snapshot['description'].length <= 200)
-                        ? snapshot['description']
-                        : "${snapshot['description'].substring(0, 200)}...", // replace with the event description
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey.shade500,
+                          ),
+                      ],
                     ),
                   ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Text(
-                        (snapshot.data() != null && data.containsKey('eventName'))
-                          ? (snapshot['eventName'].length <= 20)
-                            ? snapshot['eventName']
-                            : "${snapshot['eventName'].substring(0,20)}..." // replace with the event name
-                          : (snapshot['description'].length <= 20)
-                            ? snapshot['description']
-                            : "${snapshot['description'].substring(0,20)}...", // replace with the event name
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    if(snapshot['isEnrollAvailable'] == false)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Text(
-                        (snapshot['description'].length <= 70)
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Text(
+                      (snapshot.data() != null && data.containsKey('eventName'))
+                        ? (snapshot['eventName'].length <= 20)
+                          ? snapshot['eventName']
+                          : "${snapshot['eventName'].substring(0,20)}..." // replace with the event name
+                        : (snapshot['description'].length <= 20)
                           ? snapshot['description']
-                          : "${snapshot['description'].substring(0,70)}...", // replace with the event description
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey.shade500,
-                        ),
+                          : "${snapshot['description'].substring(0,20)}...", // replace with the event name
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  if(snapshot['isEnrollAvailable'] == false)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Text(
+                      (snapshot['description'].length <= 70)
+                        ? snapshot['description']
+                        : "${snapshot['description'].substring(0,70)}...", // replace with the event description
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey.shade500,
                       ),
                     ),
+                  ),
                   ],
                 ),
-                // Expanded(
-                //     child: SizedBox(
-                //   width: 10,
-                // )), // Dodaj to, aby wypełnić dostępną przestrzeń
 
-                Visibility(
-                  visible: data['isEnrollAvailable'] == true &&
-                      !past!, // show the button only if isEnrollAvailable is true
-                  child: Center(
-                    child: Container(
-                      width: 160,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            isChecked =
-                                !isChecked; // toggle isChecked when the button is pressed
-                          });
-                          EventList().enrollEvent(snapshot
-                              .id); // call the function to enroll the user in the event
-                        },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              // MaterialStateProperty.resolveWith<Color>(
-                              //   (Set<MaterialState> states) {
-                              //     if (states.contains(MaterialState.pressed) || isChecked || isUserEnrolled) {
-                              //       return Colors.transparent; // the color when button is pressed or isChecked is true
-                              //     }
-                              //     return Colors.blue; // the default color
-                              //   },
-                              // ),
-                              isUserEnrolled
-                                  ? MaterialStateProperty.all<Color>(
-                                      Colors.transparent)
-                                  : MaterialStateProperty.all<Color>(color2),
-                          fixedSize: MaterialStateProperty.all<Size>(
-                            const Size(118, 25),
-                          ),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  13.0), // round the corners
+                Padding(
+                  padding: const EdgeInsets.all(22.0),
+                  child: Visibility(
+                    visible: data['isEnrollAvailable'] == true &&
+                        !past!, // show the button only if isEnrollAvailable is true
+                    child: Center(
+                      child: Container(
+                        width: 160,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              isChecked =
+                                  !isChecked; // toggle isChecked when the button is pressed
+                            });
+                            EventList().enrollEvent(snapshot
+                                .id); // call the function to enroll the user in the event
+                          },
+                          style: ButtonStyle(
+                            backgroundColor:
+                                // MaterialStateProperty.resolveWith<Color>(
+                                //   (Set<MaterialState> states) {
+                                //     if (states.contains(MaterialState.pressed) || isChecked || isUserEnrolled) {
+                                //       return Colors.transparent; // the color when button is pressed or isChecked is true
+                                //     }
+                                //     return Colors.blue; // the default color
+                                //   },
+                                // ),
+                                isUserEnrolled
+                                    ? MaterialStateProperty.all<Color>(
+                                        Colors.transparent)
+                                    : MaterialStateProperty.all<Color>(color2),
+                            fixedSize: MaterialStateProperty.all<Size>(
+                              const Size(118, 25),
+                            ),
+                            shape:
+                                MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    13.0), // round the corners
+                              ),
                             ),
                           ),
-                        ),
-                        child: const Text(
-                          "Zapisz się!",
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700),
+                          child: const Text(
+                            "Zapisz się!",
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 3)
           ],
         ),
       ),
