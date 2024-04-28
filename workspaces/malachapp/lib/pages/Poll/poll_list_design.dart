@@ -20,6 +20,20 @@ class PollDesign extends StatelessWidget {
     String? pollListTitle,
     String pollListId,
   ) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final color = themeProvider.currentThemeKey == 'light'
+        ? const Color.fromARGB(255, 133, 196, 255)
+        : Colors.blueGrey;
+    final color1 = themeProvider.currentThemeKey == 'light'
+        ? Colors.grey.withOpacity(0.3)
+        : (Colors.grey[750] ?? Colors.grey).withOpacity(0.3);
+    final color3 = themeProvider.currentThemeKey == 'light'
+        ? const Color.fromARGB(255, 133, 196, 255)
+        : (Colors.grey[750] ?? Colors.grey).withOpacity(0.3);
+    final color2 = themeProvider.currentThemeKey == 'light'
+        ? Colors.black
+        : Colors.blueGrey;
+
     return Container(
       width: screenWidth,
       padding: const EdgeInsets.all(0),
@@ -54,13 +68,10 @@ class PollDesign extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: Provider.of<ThemeProvider>(context).themeData ==
-                              darkMode
-                          ? Colors.grey[750]!.withOpacity(0.3)
-                          : Colors.grey.withOpacity(0.3),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3),
+                      color: color3,
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: const Offset(3, 3),
                     ),
                   ],
                 ),
@@ -81,7 +92,7 @@ class PollDesign extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Provider.of<ThemeProvider>(context).themeData ==
                             darkMode
-                        ? Colors.grey[600]
+                        ? Colors.blueGrey
                         : Colors.grey[200],
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(8),

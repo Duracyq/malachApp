@@ -33,27 +33,26 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
 
   Widget _buildPostTile(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.currentThemeKey == 'dark';
+final isDarkMode = themeProvider.currentThemeKey == 'dark';
 
-    return StreamBuilder<QuerySnapshot>(
-        stream: _db.collection('posts').snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-            }
-            var data = snapshot.data!.docs;
-            return Flexible(
-              fit: FlexFit.loose,
-              child: ListView.builder(
+return StreamBuilder<QuerySnapshot>(
+    stream: _db.collection('posts').snapshots(),
+    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+        }
+        var data = snapshot.data!.docs;
+        return Flexible(
+            fit: FlexFit.loose,
+            child: ListView.builder(
                 itemCount: data.length,
                 itemBuilder: (context, index) {
-                  return buildPostCard(context, index, data, isDarkMode);
+                    return buildPostCard(context, index, data, isDarkMode);
                 },
-              ),
-            );
-        }
-    );
-  }
+            ),
+        );
+    }
+);
 
 Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> data, bool isDarkMode) {
     return GestureDetector(
@@ -99,7 +98,7 @@ Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> dat
                         endIndent: 15,
                     ),
                     Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
                         child: MyText2(text: data[index]['description'].toString(), rozmiar: 18),
                     ),
                     const SizedBox(height: 10),
@@ -108,7 +107,6 @@ Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> dat
         ),
     );
 }
-
 
   @override
   Widget build(BuildContext context) {

@@ -377,6 +377,4 @@ class _Post3State extends State<Post3> {
       }
     }
   }
-
-
 }
