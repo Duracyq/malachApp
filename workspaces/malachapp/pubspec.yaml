@@ -23,13 +23,13 @@ dependencies:
   google_fonts: ^4.0.4
   firebase_admin: any
   logger: ^2.0.2+1
-  file_picker: ^6.0.0
+  file_picker: ^8.0.1
   firebase_storage: ^11.3.1
   cloud_firestore: ^4.13.3
   curved_navigation_bar: ^1.0.3
   cached_network_image: ^3.3.0
   firebase_app_check: any
-  flutter_local_notifications: ^16.3.0
+  flutter_local_notifications: ^17.1.0
   firebase_messaging: ^14.7.10
   provider: ^6.1.1
   permission_handler: ^11.3.0
@@ -85,6 +85,7 @@ flutter:
      - assets/favicon.png
      - assets/background_dark.png
      - assets/background_light.jpg
+     - assets/founders_images/IMG_0158_-selected_-removebg-cropped-removebg-preview.png
 
   
   

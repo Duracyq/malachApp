@@ -75,6 +75,7 @@ class _Post3State extends State<Post3> {
   }
 
   Widget _buildPhotoAction(Color color) {
+    if(data['sideImageUrl'] == null) return Container();
     return GestureDetector(
       onTap: () => _showPhotoGallery(context, color),
       child: Padding(
@@ -97,7 +98,7 @@ class _Post3State extends State<Post3> {
   }
 
   Widget _buildTopImage(Color gradientColor) {
-    String mainImageUrl = data['mainImageUrl'] as String? ?? 'default_image_path.jpg';  // Provide a default image path if null
+    String mainImageUrl = data['mainImageUrl'] as String? ?? '';  // Provide a default image path if null
 
     return SizedBox(
       height: 140,
@@ -106,7 +107,7 @@ class _Post3State extends State<Post3> {
         decoration: BoxDecoration(
           color: Colors.grey,
           image: DecorationImage(
-            image: CachedNetworkImageProvider(mainImageUrl),  // Use the validated or default image URL
+            image: (mainImageUrl != '') ? CachedNetworkImageProvider(mainImageUrl) : const CachedNetworkImageProvider('https://firebasestorage.googleapis.com/v0/b/malachapp.appspot.com/o/favicon.png?alt=media&token=5b974a23-3b18-4a6d-a41b-4a9e78dd91b0'),  // Use the validated or default image URL
             fit: BoxFit.cover,
           ),
         ),
@@ -195,7 +196,7 @@ class _Post3State extends State<Post3> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Container(
+        child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.9,
           child: MasonryGridView.count(
             crossAxisCount: 2,
@@ -350,7 +351,9 @@ class _Post3State extends State<Post3> {
 
       final externalDir = await getExternalStorageDirectory();
       if (externalDir != null) {
-        await FlutterDownloader.enqueue(url: url, savedDir: externalDir.path,
+        await FlutterDownloader.enqueue(
+          url: url,
+          savedDir: externalDir.path,
           showNotification: true,
           openFileFromNotification: true,
         );
@@ -374,6 +377,4 @@ class _Post3State extends State<Post3> {
       }
     }
   }
-
-
 }

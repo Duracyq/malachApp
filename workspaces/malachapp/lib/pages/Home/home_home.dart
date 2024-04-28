@@ -33,92 +33,80 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
 
   Widget _buildPostTile(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+final isDarkMode = themeProvider.currentThemeKey == 'dark';
 
-    // Ustal kolory na podstawie motywu
-    final isDarkMode = themeProvider.currentThemeKey == 'dark';
-    return StreamBuilder<QuerySnapshot>(
-      stream: _db.collection('posts').snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+return StreamBuilder<QuerySnapshot>(
+    stream: _db.collection('posts').snapshots(),
+    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+            return const Center(child: CircularProgressIndicator());
         }
         var data = snapshot.data!.docs;
-        return GestureDetector(
-          onTap: () {
+        return Flexible(
+            fit: FlexFit.loose,
+            child: ListView.builder(
+                itemCount: data.length,
+                itemBuilder: (context, index) {
+                    return buildPostCard(context, index, data, isDarkMode);
+                },
+            ),
+        );
+    }
+);
+
+Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> data, bool isDarkMode) {
+    return GestureDetector(
+        onTap: () {
             Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Post3(
-                  snapshot: data[0],
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Post3(snapshot: data[index]),
                 ),
-              ),
             );
-          },
-          child: Card(
+        },
+        child: Card(
             margin: const EdgeInsets.only(bottom: 10, left: 8, right: 8),
             borderOnForeground: true,
             elevation: 1,
             clipBehavior: Clip.antiAlias,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
-              children: [
-                Ink.image(
-                  image: CachedNetworkImageProvider(snapshot.data!.docs[0]['mainImageUrl']),
-                  height: 100,
-                  fit: BoxFit.cover,
-                  colorFilter: isDarkMode
-                      ? ColorFilter.mode(Colors.black.withOpacity(0.2),
-                          BlendMode.darken)
-                      : null,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Post3(
-                            snapshot: data[0],
-                          ),
+                children: [
+                    Ink.image(
+                        image: data[index]['mainImageUrl'] != '' ? CachedNetworkImageProvider(data[index]['mainImageUrl']) : const CachedNetworkImageProvider('https://firebasestorage.googleapis.com/v0/b/malachapp.appspot.com/o/favicon.png?alt=media&token=5b974a23-3b18-4a6d-a41b-4a9e78dd91b0'),
+                        height: 100,
+                        fit: BoxFit.cover,
+                        colorFilter: isDarkMode
+                            ? ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.darken)
+                            : null,
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                                MyText1(text: data[index]['title'].toString(), rozmiar: 40),
+                            ],
                         ),
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      MyText1(text: snapshot.data!.docs[0]['title'].toString(), rozmiar: 40),
-                    ],
-                  ),
-                ),
-                Divider(
-                  color: isDarkMode ? Colors.white : Colors.black,
-                  thickness: 1,
-                  indent: 15,
-                  endIndent: 15,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
-                  child: MyText2(
-                      text: data[0]['description'].toString(),
-                      rozmiar: 18),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-              ],
+                    ),
+                    Divider(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        thickness: 1,
+                        indent: 15,
+                        endIndent: 15,
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
+                        child: MyText2(text: data[index]['description'].toString(), rozmiar: 18),
+                    ),
+                    const SizedBox(height: 10),
+                ],
             ),
-          ),
-        );
-      }
+        ),
     );
-  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +158,17 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
                       );
                     } else {
                       // Other elements, the post tiles
-                      return _buildPostTile(context);
+                      return SizedBox(
+                        height:  455, // nie zmieniaj tej wartości!!!!!
+                        child: Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Column(
+                            children: [
+                              _buildPostTile(context),
+                            ],
+                          ),
+                        ),
+                      );
                     }
                   },
                 ),
