@@ -16,7 +16,8 @@ class MessagingPage extends StatefulWidget {
   final String? groupTitle;
   final bool isGFC;
 
-  const MessagingPage({super.key, required this.groupId, this.groupTitle, required this.isGFC});
+  const MessagingPage(
+      {super.key, required this.groupId, this.groupTitle, required this.isGFC});
 
   @override
   _MessagingPageState createState() => _MessagingPageState();
@@ -94,9 +95,11 @@ class _MessagingPageState extends State<MessagingPage> {
                         onPressed: () {
                           Navigator.of(context).push(
                             PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                  AddMemberPage(groupID: widget.groupId),
-                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      AddMemberPage(groupID: widget.groupId),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
                                 var begin = const Offset(1.0, 0.0);
                                 var end = Offset.zero;
                                 var curve = Curves.ease;
@@ -166,15 +169,19 @@ class _MessagingPageState extends State<MessagingPage> {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start, // aligns the children at the start
+                            crossAxisAlignment: CrossAxisAlignment
+                                .start, // aligns the children at the start
                             children: [
                               const CircleAvatar(
                                 child: Icon(Icons.person),
                               ),
-                              const SizedBox(width: 10), // add some space between the avatar and the text
+                              const SizedBox(
+                                  width:
+                                      10), // add some space between the avatar and the text
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start, // aligns the text to the start
+                                  crossAxisAlignment: CrossAxisAlignment
+                                      .start, // aligns the text to the start
                                   children: [
                                     Row(
                                       children: [
@@ -184,7 +191,8 @@ class _MessagingPageState extends State<MessagingPage> {
                                               : message['sender'],
                                           style: const TextStyle(
                                               fontSize: 12,
-                                              color: Colors.grey), // smaller, grey text
+                                              color: Colors
+                                                  .grey), // smaller, grey text
                                         ),
                                         const Spacer(),
                                         Text(
@@ -244,14 +252,19 @@ class _MessagingPageState extends State<MessagingPage> {
                       onPressed: () async {
                         if (_messageController.text.isNotEmpty) {
                           await _groupService.sendMessage(
-                            widget.groupId,
-                            _messageController.text,
-                            _auth.currentUser!.email!
-                          );
+                              widget.groupId,
+                              _messageController.text,
+                              _auth.currentUser!.email!);
                           String nicknameTemp = _messageController.text;
                           _messageController.clear();
-                          String nickname = await NicknameFetcher().fetchNickname(_auth.currentUser!.uid).first;
-                          await NotificationService().sendPersonalisedFCMMessage('$nickname: $nicknameTemp', widget.groupId, widget.groupTitle ?? 'Group Message');
+                          String nickname = await NicknameFetcher()
+                              .fetchNickname(_auth.currentUser!.uid)
+                              .first;
+                          await NotificationService()
+                              .sendPersonalisedFCMMessage(
+                                  '$nickname: $nicknameTemp',
+                                  widget.groupId,
+                                  widget.groupTitle ?? 'Group Message');
                         }
                       },
                     ),
