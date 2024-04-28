@@ -1,17 +1,10 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:logger/logger.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:getwidget/getwidget.dart';
-import 'package:malachapp/components/MyText1.dart';
 import 'package:malachapp/auth/auth_service.dart';
-import 'package:malachapp/components/reloadable_widget.dart';
 import 'package:malachapp/pages/Events/add_event.dart';
 import 'package:malachapp/pages/Events/event_design_page.dart';
 import 'package:malachapp/services/storage_service.dart';
@@ -19,7 +12,7 @@ import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class EventList extends StatefulWidget {
-  EventList({Key? key}) : super(key: key);
+  EventList({super.key});
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late String eventId;
@@ -82,7 +75,7 @@ class _EventListState extends State<EventList> {
         });
       }
     } catch (e) {
-      print("Error checking user enrollment: $e");
+      debugPrint("Error checking user enrollment: $e");
     }
   }
 
@@ -110,10 +103,10 @@ class _EventListState extends State<EventList> {
         : const Color.fromARGB(255, 0, 174, 184);
     final color2 = themeProvider.currentThemeKey == 'light'
         ? const Color.fromARGB(255, 133, 196, 255)
-        : Color.fromARGB(255, 235, 137, 0);
+        : const Color.fromARGB(255, 235, 137, 0);
     final color2Pressed = themeProvider.currentThemeKey == 'light'
-        ? Color.fromARGB(255, 96, 124, 151)
-        : Color.fromARGB(255, 133, 100, 54);
+        ? const Color.fromARGB(255, 96, 124, 151)
+        : const Color.fromARGB(255, 133, 100, 54);
 
     return Material(
       elevation: 3,
@@ -134,7 +127,7 @@ class _EventListState extends State<EventList> {
               ),
             ),
           );
-          print("Event ${snapshot.id} tapped");
+          debugPrint("Event ${snapshot.id} tapped");
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +185,7 @@ class _EventListState extends State<EventList> {
                       right: 8,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 119, 191, 163),
+                          color: const Color.fromARGB(255, 119, 191, 163),
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Padding(
@@ -207,8 +200,8 @@ class _EventListState extends State<EventList> {
                               const SizedBox(width: 4),
                               Text(
                                 formattedDate, // replace with the formatted event date
-                                style: TextStyle(
-                                  color: const Color.fromARGB(255, 221, 231, 199),
+                                style: const TextStyle(
+                                  color: Color.fromARGB(255, 221, 231, 199),
                                   fontWeight: FontWeight.w800,
                                   fontSize: 10,
                                 ),
@@ -379,7 +372,7 @@ class _EventListState extends State<EventList> {
                     visible: data['isEnrollAvailable'] == true &&
                         !past!, // show the button only if isEnrollAvailable is true
                     child: Center(
-                      child: Container(
+                      child: SizedBox(
                         width: 160,
                         child: ElevatedButton(
                           onPressed: () {
@@ -467,8 +460,9 @@ class _EventListState extends State<EventList> {
               child: StreamBuilder(
                 stream: EventList()._db.collection('events').snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData)
+                  if (!snapshot.hasData) {
                     return const CircularProgressIndicator();
+                  }
                   final events = snapshot.data!.docs;
                   final currentDate = DateTime.now();
 
