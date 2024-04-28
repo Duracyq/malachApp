@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_admin/firebase_admin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:malachapp/auth/admin/admin_createuser_teacher.dart';
 import 'package:malachapp/components/my_button.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
@@ -91,7 +93,6 @@ class _AddTeacherToListPageState extends State<AddTeacherToListPage> {
 
   Future<void> _addTeacher() async {
     final db = FirebaseFirestore.instance;
-    final auth = FirebaseAuth.instance;
 
     String convertToRoman(String input) {
       return input.runes.map((rune) {
@@ -141,10 +142,7 @@ class _AddTeacherToListPageState extends State<AddTeacherToListPage> {
     }).then((value) => debugPrint('Teacher added: ${_nameController.text} ${_surnameController.text}'));
 
     try {
-      await auth.createUserWithEmailAndPassword(
-        email: '$nameInRoman.$surnameInRoman@malachowianka.edu.pl',
-        password: '$nameInRoman.$surnameInRoman',
-      ).then((value) => debugPrint('User created: $nameInRoman.$surnameInRoman@malachowianka.edu.pl'));
+      await createUser(nameInRoman, surnameInRoman);
     } on Exception catch (e) {
       debugPrint('Error: $e');
     }
