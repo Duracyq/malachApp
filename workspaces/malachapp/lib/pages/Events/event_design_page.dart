@@ -92,18 +92,18 @@ class _EventDesignPageState extends State<EventDesignPage> {
           children: [
             for (var value in tags)
               Padding(
-                padding: const EdgeInsets.all(6.0),
+                padding: const EdgeInsets.all(2.0),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.blue,
-                      borderRadius: BorderRadius.circular(30)),
+                      borderRadius: BorderRadius.circular(10)),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                     child: Visibility(
                       visible: tags.isNotEmpty,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 8),
+                            vertical: 2, horizontal: 4),
                         child: Wrap(
                           children: [
                             Text(
@@ -194,105 +194,42 @@ class _EventDesignPageState extends State<EventDesignPage> {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  // Expanded(
-                                  //   child: GFShimmer(
-                                  //     child: const MyText(
-                                  //         text: "Event Name",
-                                  //         rozmiar: 24,
-                                  //         waga: FontWeight.bold),
-                                  //     showGradient: true,
-                                  //     gradient: LinearGradient(
-                                  //       begin: Alignment.bottomRight,
-                                  //       end: Alignment.centerLeft,
-                                  //       stops: const <double>[
-                                  //         0,
-                                  //         0.3,
-                                  //         0.6,
-                                  //         0.9,
-                                  //         1,
-                                  //       ],
-                                  //       colors: [
-                                  //         Colors.teal.withOpacity(0.1),
-                                  //         Colors.teal.withOpacity(0.3),
-                                  //         Colors.teal.withOpacity(0.5),
-                                  //         Colors.teal.withOpacity(0.7),
-                                  //         Colors.teal.withOpacity(0.9),
-                                  //       ],
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  MyText1(
-                                    text: snapshot.data!['eventName'] ??
-                                        "Event Name",
-                                    rozmiar: 24,
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.green.withOpacity(0.2),
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
-                                      child: Text(
-                                        formattedDate, // replace with the event date
-                                        style: const TextStyle(
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.w800,
-                                            fontSize: 16),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
                               const SizedBox(height: 10),
-                              Text(
-                                snapshot.data!['description'] ?? "Description",
-                                style: const TextStyle(
-                                  fontSize: 16,
+                              Center(
+                                child: MyText1(
+                                  text: snapshot.data!['eventName'] ??
+                                      "Event Name",
+                                  rozmiar: 24,
                                 ),
                               ),
                               const SizedBox(height: 10),
-                              // const Row(
-                              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              //   children: [
-                              //     Text(
-                              //       'Jakies dane',
-                              //       style: TextStyle(
-                              //         fontSize: 16,
-                              //       ),
-                              //     ),
-                              //     Text(
-                              //       'Jakies dane',
-                              //       style: TextStyle(
-                              //         fontSize: 16,
-                              //       ),
-                              //     ),
-                              //   ],
-                              // ),
-                              // const SizedBox(height: 10),
-                              // const Row(
-                              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              //   children: [
-                              //     Text(
-                              //       'Jakies dane',
-                              //       style: TextStyle(
-                              //         fontSize: 16,
-                              //       ),
-                              //     ),
-                              //     Text(
-                              //       'Jakies dane',
-                              //       style: TextStyle(
-                              //         fontSize: 16,
-                              //       ),
-                              //     ),
-                              //   ],
-                              // ),
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.2),
+                                    borderRadius:
+                                        BorderRadius.circular(10)),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 4, horizontal: 8),
+                                  child: Text(
+                                    formattedDate, // replace with the event date
+                                    style: const TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  snapshot.data!['description'] ?? "Description",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
                             ],
                           ),
                         ),

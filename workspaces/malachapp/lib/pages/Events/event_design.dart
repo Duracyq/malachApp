@@ -111,6 +111,9 @@ class _EventListState extends State<EventList> {
     final color2 = themeProvider.currentThemeKey == 'light'
         ? const Color.fromARGB(255, 133, 196, 255)
         : Color.fromARGB(255, 235, 137, 0);
+    final color2Pressed = themeProvider.currentThemeKey == 'light'
+        ? Color.fromARGB(255, 96, 124, 151)
+        : Color.fromARGB(255, 133, 100, 54);
 
     return Material(
       elevation: 3,
@@ -398,8 +401,7 @@ class _EventListState extends State<EventList> {
                                 //   },
                                 // ),
                                 isUserEnrolled
-                                    ? MaterialStateProperty.all<Color>(
-                                        Colors.transparent)
+                                    ? MaterialStateProperty.all<Color>(color2Pressed)
                                     : MaterialStateProperty.all<Color>(color2),
                             fixedSize: MaterialStateProperty.all<Size>(
                               const Size(118, 25),
