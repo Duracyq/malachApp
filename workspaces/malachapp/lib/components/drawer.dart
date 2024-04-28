@@ -6,6 +6,7 @@ import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/herb.dart';
 import 'package:malachapp/pages/Messages/group_page.dart';
 import 'package:malachapp/pages/Messages/messaging_page.dart';
+import 'package:malachapp/pages/TeachersTab/teacher_list_page.dart';
 import 'package:malachapp/pages/founders_page.dart';
 import 'package:malachapp/pages/notification_archive.dart';
 import 'package:malachapp/pages/profile_page.dart';
@@ -124,7 +125,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.terminal_rounded),
+            leading: const Icon(Icons.people),
+            title: const Text('Teachers'),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: ((context) => TeacherListPage()))
+            )
+          ),
+          ListTile(
+            leading: const Icon(Icons.info_outlined),
             title: const Text('Founders '),
             onTap: () {
               Navigator.of(context).push(

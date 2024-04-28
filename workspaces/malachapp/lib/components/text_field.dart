@@ -10,6 +10,7 @@ class MyTextField extends StatelessWidget {
   final bool? obscureText;
   final TextEditingController controller;
   final TextInputType? keyboardType;
+  final ValueChanged<String>? onChanged;
 
   /// Creates a new instance of [MyTextField].
   ///
@@ -23,6 +24,7 @@ class MyTextField extends StatelessWidget {
     this.obscureText,
     required this.controller,
     this.keyboardType,
+    this.onChanged,
   });
 
 
@@ -32,6 +34,7 @@ class MyTextField extends StatelessWidget {
       obscureText: obscureText ?? false,
       controller: controller,
       keyboardType: keyboardType ?? TextInputType.text,
+      onChanged: onChanged,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         hintText: hintText,
