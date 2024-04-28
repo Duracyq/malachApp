@@ -11,6 +11,7 @@ class MyTextField extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
+  final Icon? icon;
 
   /// Creates a new instance of [MyTextField].
   ///
@@ -25,6 +26,7 @@ class MyTextField extends StatelessWidget {
     required this.controller,
     this.keyboardType,
     this.onChanged,
+    this.icon,
   });
 
 
@@ -38,6 +40,7 @@ class MyTextField extends StatelessWidget {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         hintText: hintText,
+        icon: icon,
       ),
     );
   }
