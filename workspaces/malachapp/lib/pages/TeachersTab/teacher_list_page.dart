@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/components/text_field.dart';
 import 'package:malachapp/pages/TeachersTab/add_teacher_to_the_list.dart';
+import 'package:malachapp/pages/TeachersTab/teacher_tab.dart';
 
 class TeacherListPage extends StatefulWidget {
   @override
@@ -129,7 +130,11 @@ class _TeacherListPageState extends State<TeacherListPage> {
                                       subtitle: Text(mapData['subject'].join(', ')),
                                     trailing: const Icon(Icons.arrow_forward),
                                     onTap: () {
-                                      // Handle teacher item tap
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => TeacherTab(teacherSnapshot: snapshot.data!.docs[index])
+                                        ),
+                                      );
                                     },
                                   );
                                 } else {
