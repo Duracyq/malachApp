@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:malachapp/components/my_button.dart';
@@ -91,24 +92,65 @@ class _AddTeacherToListPageState extends State<AddTeacherToListPage> {
   Future<void> _addTeacher() async {
     final db = FirebaseFirestore.instance;
     final auth = FirebaseAuth.instance;
+
+    String convertToRoman(String input) {
+      return input.runes.map((rune) {
+        switch(rune) {
+          case 261: {
+            return 'a';
+          }
+          case 263: {
+            return 'c';
+          }
+          case 281: {
+            return 'e';
+          }
+          case 322: {
+            return 'l';
+          }
+          case 324: {
+            return 'n';
+          }
+          case 243: {
+            return 'o';
+          }
+          case 347: {
+            return 's';
+          }
+          case 378: {
+            return 'z';
+          }
+          case 380: {
+            return 'z';
+          }
+          default: {
+            return String.fromCharCode(rune);
+          }
+        }
+      }).join().toLowerCase();
+    }
+
+    final String nameInRoman = convertToRoman(_nameController.text.toLowerCase());
+    final String surnameInRoman = convertToRoman(_surnameController.text.toLowerCase());
+
     await db.collection('teachersList').add({
       'name': _nameController.text,
       'surname': _surnameController.text,
       'subject': _subjects,
-      'accountMail': '${_nameController.text.toLowerCase()}.${_surnameController.text.toLowerCase()}@malachowianka.edu.pl',
+      'accountMail': '$nameInRoman.$surnameInRoman@malachowianka.edu.pl',
     }).then((value) => debugPrint('Teacher added: ${_nameController.text} ${_surnameController.text}'));
-    if (_nameController.text.isNotEmpty && _surnameController.text.isNotEmpty) {
-      final user = db.collection('teachersList').where('accountMail', isEqualTo: '${_nameController.text.toLowerCase()}.${_surnameController.text.toLowerCase()}@malachowianka.edu.pl').get().then((value) => debugPrint('Teacher exists: ${_nameController.text} ${_surnameController.text}'));
-      if (user == null) {
-        await auth.createUserWithEmailAndPassword(
-          email: '${_nameController.text.toLowerCase()}.${_surnameController.text.toLowerCase()}@malachowianka.edu.pl',
-          password: '${_nameController.text.toLowerCase()}.${_surnameController.text.toLowerCase()}',
-        ).then((value) => debugPrint('User created: ${_nameController.text.toLowerCase()}.${_surnameController.text.toLowerCase()}@malachowianka.edu.pl'));
-      } else {
-        debugPrint('User already exists: ${_nameController.text.toLowerCase()}.${_surnameController.text.toLowerCase()}@malachowianka.edu.pl');
-      }
+
+    try {
+      await auth.createUserWithEmailAndPassword(
+        email: '$nameInRoman.$surnameInRoman@malachowianka.edu.pl',
+        password: '$nameInRoman.$surnameInRoman',
+      ).then((value) => debugPrint('User created: $nameInRoman.$surnameInRoman@malachowianka.edu.pl'));
+    } on Exception catch (e) {
+      debugPrint('Error: $e');
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
