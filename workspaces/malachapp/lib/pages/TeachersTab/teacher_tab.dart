@@ -1,5 +1,8 @@
+import 'package:firebase_admin/firebase_admin.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:malachapp/auth/auth_service.dart';
 import 'package:malachapp/pages/TeachersTab/workhours_selector.dart';
 
 class TeacherTab extends StatefulWidget {
@@ -30,15 +33,24 @@ class _TeacherTabState extends State<TeacherTab> {
           ListTile(
             title: Text('Email: ${widget.teacherSnapshot['accountMail']}'),
           ),
-          ListTile(
-            title: const Text('work hours creator'),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => WorkHoursCreator(teacherId: widget.teacherId,),
+          FutureBuilder(
+            future: AuthService().isAdmin(),
+            builder: (context, futureSnapshot) {
+              return Visibility(
+                visible: futureSnapshot.hasData && futureSnapshot.data == true || widget.teacherSnapshot['accountMail'] == FirebaseAuth.instance.currentUser!.email,
+                child: ListTile(
+                  title: const Text('Ustaw godziny pracy'),
+                  subtitle: Text('DEBUG: isAdmin: ${futureSnapshot.data} | teacherMail: ${(widget.teacherSnapshot['accountMail'] == FirebaseAuth.instance.currentUser!.email)}'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => WorkHoursCreator(teacherId: widget.teacherId,),
+                      ),
+                    );
+                  },
                 ),
               );
-            },
+            }
           )
         ],
       ),

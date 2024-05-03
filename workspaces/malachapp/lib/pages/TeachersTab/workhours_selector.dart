@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logger/logger.dart';
 import 'package:malachapp/components/my_button.dart';
 
 class WorkHoursCreator extends StatefulWidget {
@@ -16,7 +19,7 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
   void initState() {
     super.initState();
     teacherId = widget.teacherId;
-    db.collection('teacherList').doc(teacherId).get().then((value) {
+    db.collection('teachersList').doc(teacherId).get().then((value) {
       setState(() {
         _workHours['Monday']['start'] = value['workHours']['Monday']['start'];
         _workHours['Monday']['end'] = value['workHours']['Monday']['end'];
@@ -100,11 +103,9 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
             _workHours[_getDayOfWeek(index + 1)]['end'] = '${selectedTime.hour}:${selectedTime.minute}';
           });
       }
-    }).then((_) => db.collection('teacherList').doc('teacherId').update({
-      'workHours': _workHours,
-    }));
+    });
   }
-
+  final Logger logger = Logger();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,7 +119,7 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: const WorkHoursInstructions()),
+                  const Expanded(child: WorkHoursInstructions()),
                   const SizedBox(height: 20.0),
                   Align(
                     alignment: Alignment.center,
@@ -138,17 +139,18 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Expanded(child: const WorkHoursInstructions()),
             Expanded(
               child: ListView.builder(
                 itemCount: 5,
+                physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(_getDayOfWeek(index + 1)),
                     onTap: () {
                       _showTimePickerDialog(index);
                     },
-                    subtitle: Column(
+                    subtitle: Wrap(
+                      alignment: WrapAlignment.spaceEvenly,
                       children: [
                         Text(
                           'Start time: ${_workHours[_getDayOfWeek(index + 1)]['start']}',
@@ -164,9 +166,20 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
             ),
             MyButton(
               onTap: () {
-                db.collection('teacherList').doc('teacherId').update({
-                  'workHours': _workHours,
-                }).then((value) => Navigator.of(context).pop());
+                try {
+                  logger.d(_workHours);
+                  db.collection('teachersList').doc(teacherId).update({
+                    'workHours': _workHours,
+                  }).then((value) => Navigator.of(context).pop());
+                } on Exception catch (e) {
+                  try {
+                    db.collection('teachersList').doc(teacherId).set({
+                      'workHours': _workHours,
+                    }).then((value) => Navigator.of(context).pop());
+                  } on Exception catch (e) {
+                    logger.e(e);
+                  }
+                }
               },
               text: 'Save',
             ),
