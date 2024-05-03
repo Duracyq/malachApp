@@ -156,14 +156,16 @@ Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> dat
                       );
                     } else {
                       // Other elements, the post tiles
-                      return SizedBox(
-                        height:  455, // nie zmieniaj tej wartości!!!!!
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: Column(
-                            children: [
-                              _buildPostTile(context),
-                            ],
+                      return Flexible(
+                        child: SizedBox(
+                          height: screenHeight - 255, // nie zmieniaj tej wartości!!!!!
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Column(
+                              children: [
+                                _buildPostTile(context),
+                              ],
+                            ),
                           ),
                         ),
                       );

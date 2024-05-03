@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class WorkHoursCreator extends StatefulWidget {
-  final teacherId;
-  WorkHoursCreator({required this.teacherId});
+  final String teacherId;
+  const WorkHoursCreator({super.key, required this.teacherId});
   @override
   _WorkHoursCreatorState createState() => _WorkHoursCreatorState();
 }
 
 class _WorkHoursCreatorState extends State<WorkHoursCreator> {
   final FirebaseFirestore db = FirebaseFirestore.instance;
-  late var teacherId;
+  late String teacherId;
   @override
   void initState() {
     super.initState();
     teacherId = widget.teacherId;
-    db.collection('teacherList').doc('teacherId').get().then((value) {
+    db.collection('teacherList').doc(teacherId).get().then((value) {
       setState(() {
         _workHours['Monday']['start'] = value['workHours']['Monday']['start'];
         _workHours['Monday']['end'] = value['workHours']['Monday']['end'];

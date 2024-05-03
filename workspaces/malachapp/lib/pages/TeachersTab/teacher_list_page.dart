@@ -141,6 +141,7 @@ class _TeacherListPageState extends State<TeacherListPage> {
                                   return const SizedBox.shrink();
                                 }
                               }
+                              return const SizedBox.shrink();
                             },
                           ),                
                         ],

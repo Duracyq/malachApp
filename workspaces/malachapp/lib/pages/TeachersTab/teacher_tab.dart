@@ -4,7 +4,7 @@ import 'package:malachapp/pages/TeachersTab/workhours_selector.dart';
 
 class TeacherTab extends StatefulWidget {
   final DocumentSnapshot teacherSnapshot;
-  final teacherId;
+  final String teacherId;
 
   TeacherTab({required this.teacherSnapshot, required this.teacherId});
 
@@ -17,7 +17,7 @@ class _TeacherTabState extends State<TeacherTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Teacher Tab'),
+        title: const Text('Teacher Tab'),
       ),
       body: Column(
         children: [
