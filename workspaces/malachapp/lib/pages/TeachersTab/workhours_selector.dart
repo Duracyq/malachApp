@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:malachapp/components/my_button.dart';
 
 class WorkHoursCreator extends StatefulWidget {
   final String teacherId;
@@ -73,6 +74,14 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
     showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      helpText: 'Start time',
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+
     ).then((selectedTime) {
       if (selectedTime != null) {
         setState(() {
@@ -80,13 +89,16 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
               '${selectedTime.hour}:${selectedTime.minute}';
         });
       }
-    }).then((_) => showTimePicker(context: context, initialTime: TimeOfDay.now()))
-        .then((selectedTime) {
-      if (selectedTime != null) {
-        setState(() {
-          _workHours[_getDayOfWeek(index + 1)]['end'] =
-              '${selectedTime.hour}:${selectedTime.minute}';
-        });
+    }).then((_) => showTimePicker(context: context, initialTime: TimeOfDay.now(), helpText: 'End time', builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },)).then((selectedTime) {
+        if (selectedTime != null) {
+          setState(() {
+            _workHours[_getDayOfWeek(index + 1)]['end'] = '${selectedTime.hour}:${selectedTime.minute}';
+          });
       }
     }).then((_) => db.collection('teacherList').doc('teacherId').update({
       'workHours': _workHours,
@@ -98,11 +110,35 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Work Hours Creator'),
+        actions: [
+          IconButton(onPressed: () => showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Jak używać?'),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: const WorkHoursInstructions()),
+                  const SizedBox(height: 20.0),
+                  Align(
+                    alignment: Alignment.center,
+                    child: MyButton(
+                      onTap: () => Navigator.of(context).pop(),
+                      text: 'Zamknij',
+                    ),
+                  ),
+                ],
+                ),
+              scrollable: false,
+            ),
+          ), icon: const Icon(Icons.help)),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Expanded(child: const WorkHoursInstructions()),
             Expanded(
               child: ListView.builder(
                 itemCount: 5,
@@ -126,8 +162,79 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
                 },
               ),
             ),
+            MyButton(
+              onTap: () {
+                db.collection('teacherList').doc('teacherId').update({
+                  'workHours': _workHours,
+                }).then((value) => Navigator.of(context).pop());
+              },
+              text: 'Save',
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class WorkHoursInstructions extends StatelessWidget {
+  const WorkHoursInstructions({Key? key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Ustaw godziny pracy:',
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10.0),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Text(
+                  '📅 Zobaczysz listę dni (od poniedziałku do piątku).',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  '👉 Dotknij dnia, dla którego chcesz ustawić godziny pracy.',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  '🕒 Wyskoczy okno, w którym zostaniesz poproszony o wybranie godziny rozpoczęcia. Wybierz godziny rozpoczęcia pracy dla tego dnia.',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  '🔚 Pojawi się kolejne okno do wyboru godziny zakończenia. Wybierz godziny zakończenia pracy dla tego dnia.',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  '🔄 Powtórz dla innych dni: Postępuj tak samo dla każdego dnia, dla którego chcesz ustawić godziny pracy.',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.0),
+          Text(
+            '💾 Zapisz: Gdy ustalisz godziny pracy dla wszystkich dni, poszukaj przycisku oznaczonego jako "Zapisz". Wciśnij go, aby zapisać zmiany.',
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
