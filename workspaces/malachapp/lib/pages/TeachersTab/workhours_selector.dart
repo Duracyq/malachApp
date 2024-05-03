@@ -84,27 +84,35 @@ class _WorkHoursCreatorState extends State<WorkHoursCreator> {
           child: child!,
         );
       },
-
     ).then((selectedTime) {
       if (selectedTime != null) {
         setState(() {
           _workHours[_getDayOfWeek(index + 1)]['start'] =
-              '${selectedTime.hour}:${selectedTime.minute}';
+              '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}';
         });
       }
-    }).then((_) => showTimePicker(context: context, initialTime: TimeOfDay.now(), helpText: 'End time', builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },)).then((selectedTime) {
-        if (selectedTime != null) {
-          setState(() {
-            _workHours[_getDayOfWeek(index + 1)]['end'] = '${selectedTime.hour}:${selectedTime.minute}';
-          });
+    }).then((_) {
+      return showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+        helpText: 'End time',
+        builder: (BuildContext context, Widget? child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          );
+        },
+      );
+    }).then((selectedTime) {
+      if (selectedTime != null) {
+        setState(() {
+          _workHours[_getDayOfWeek(index + 1)]['end'] =
+              '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}';
+        });
       }
     });
   }
+
   final Logger logger = Logger();
   @override
   Widget build(BuildContext context) {
