@@ -26,85 +26,82 @@ class _HomeHomeWidgetState extends State<HomeHomeWidget> {
   PageController pageController = PageController();
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
-  String userId = FirebaseAuth.instance.currentUser!.uid;  
+  String userId = FirebaseAuth.instance.currentUser!.uid;
 
   Widget _buildPostTile(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.currentThemeKey == 'dark';
 
     return StreamBuilder<QuerySnapshot>(
-        stream: _db.collection('posts').snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-            }
-            var data = snapshot.data!.docs;
-            return Flexible(
-                fit: FlexFit.loose,
-                child: ListView.builder(
-                    itemCount: data.length,
-                    itemBuilder: (context, index) {
-                        return buildPostCard(context, index, data, isDarkMode);
-                    },
-                ),
-            );
+      stream: _db.collection('posts').snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
         }
+        var data = snapshot.data!.docs;
+        return ListView.builder(
+          itemCount: data.length,
+          itemBuilder: (context, index) {
+            return buildPostCard(context, index, data, isDarkMode);
+          },
+        );
+      }
     );
-}
+  }
 
-Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> data, bool isDarkMode) {
+  Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> data, bool isDarkMode) {
     return GestureDetector(
-        onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Post3(snapshot: data[index]),
-                ),
-            );
-        },
-        child: Card(
-            margin: const EdgeInsets.only(bottom: 10, left: 8, right: 8),
-            borderOnForeground: true,
-            elevation: 1,
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-                children: [
-                    Ink.image(
-                        image: data[index]['mainImageUrl'] != '' ? CachedNetworkImageProvider(data[index]['mainImageUrl']) : const CachedNetworkImageProvider('https://firebasestorage.googleapis.com/v0/b/malachapp.appspot.com/o/favicon.png?alt=media&token=5b974a23-3b18-4a6d-a41b-4a9e78dd91b0'),
-                        height: 100,
-                        fit: BoxFit.cover,
-                        colorFilter: isDarkMode
-                            ? ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.darken)
-                            : null,
-                    ),
-                    Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                                MyText1(text: data[index]['title'].toString(), rozmiar: 40),
-                            ],
-                        ),
-                    ),
-                    Divider(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        thickness: 1,
-                        indent: 15,
-                        endIndent: 15,
-                    ),
-                    Padding(
-                        padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
-                        child: MyText2(text: data[index]['description'].toString(), rozmiar: 18),
-                    ),
-                    const SizedBox(height: 10),
-                ],
-            ),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Post3(snapshot: data[index]),
+          ),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 10, left: 8, right: 8),
+        borderOnForeground: true,
+        elevation: 1,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
+        child: Column(
+          children: [
+            Ink.image(
+              image: data[index]['mainImageUrl'] != '' ? CachedNetworkImageProvider(data[index]['mainImageUrl']) : const CachedNetworkImageProvider('https://firebasestorage.googleapis.com/v0/b/malachapp.appspot.com/o/favicon.png?alt=media&token=5b974a23-3b18-4a6d-a41b-4a9e78dd91b0'),
+              height: 100,
+              fit: BoxFit.cover,
+              colorFilter: isDarkMode
+                  ? ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.darken)
+                  : null,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  MyText1(text: data[index]['title'].toString(), rozmiar: 40),
+                ],
+              ),
+            ),
+            Divider(
+              color: isDarkMode ? Colors.white : Colors.black,
+              thickness: 1,
+              indent: 15,
+              endIndent: 15,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
+              child: MyText2(text: data[index]['description'].toString(), rozmiar: 18),
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
     );
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,36 +134,32 @@ Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> dat
                       // First element, the carousel
                       return Padding(
                         padding: const EdgeInsets.all(6.0),
-                        child: GFCarousel(
-                          items: _buildCarouselItems(screenWidth, color),
-                          pauseAutoPlayOnTouch: const Duration(seconds: 1),
-                          height: itemHeight,
-                          aspectRatio: 16 / 9,
-                          viewportFraction: 0.9,
-                          autoPlay: true,
-                          autoPlayInterval: const Duration(seconds: 8),
-                          autoPlayAnimationDuration: const Duration(seconds: 1),
-                          autoPlayCurve: Curves.fastOutSlowIn,
-                          enlargeMainPage: true,
-                          hasPagination: true,
-                          initialPage: 0,
-                          enableInfiniteScroll: true,
-                          scrollDirection: Axis.horizontal,
+                        child: SingleChildScrollView(
+                          child: GFCarousel(
+                            items: _buildCarouselItems(screenWidth, color),
+                            pauseAutoPlayOnTouch: const Duration(seconds: 1),
+                            height: itemHeight,
+                            aspectRatio: 16 / 9,
+                            viewportFraction: 0.9,
+                            autoPlay: true,
+                            autoPlayInterval: const Duration(seconds: 8),
+                            autoPlayAnimationDuration: const Duration(seconds: 1),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                            enlargeMainPage: true,
+                            hasPagination: true,
+                            initialPage: 0,
+                            enableInfiniteScroll: true,
+                            scrollDirection: Axis.horizontal,
+                          ),
                         ),
                       );
                     } else {
                       // Other elements, the post tiles
-                      return Flexible(
-                        child: SizedBox(
-                          height: screenHeight - 255, // nie zmieniaj tej wartości!!!!!
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Column(
-                              children: [
-                                _buildPostTile(context),
-                              ],
-                            ),
-                          ),
+                      return SizedBox(
+                        height: screenHeight - 255,
+                        child: Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: _buildPostTile(context),
                         ),
                       );
                     }
@@ -227,12 +220,7 @@ Widget buildPostCard(BuildContext context, int index, List<DocumentSnapshot> dat
                         text: "Witaj ",
                         rozmiar: 33,
                       ),
-                      // const MyText1(
-                      //   text: "Szymon",
-                      //   rozmiar: 33,
-                      // ),
-                      NicknameFetcher()
-                          .buildNickname(context, userId),
+                      NicknameFetcher().buildNickname(context, userId),
                       Text(
                         "!",
                         style: GoogleFonts.nunito(
