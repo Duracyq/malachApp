@@ -26,7 +26,6 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   List<Map<String, dynamic>> notifications = [];
   final Logger logger = Logger();
 
-
   String? _currentToken;
   bool _savingNotification = false;
 
@@ -80,13 +79,6 @@ class _NotificationArchiveState extends State<NotificationArchive> {
     _retrieveNotifications();
   }
 
-  // String extractTopicFromNotification() {
-
-  //   String topic = messagePayload['message']['topic'] as String;
-  //   return topic;
-  // }
-
-
   Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     final topic = message.data['topic'] ?? 'Unknown';
     if (message.notification != null && message.from != _currentToken) {
@@ -101,38 +93,29 @@ class _NotificationArchiveState extends State<NotificationArchive> {
   Future<void> _storeNotification(String title, String notification, String topic) async {
     if (_savingNotification) return;
     _savingNotification = true;
-    
+
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
     final String formattedDate = formatter.format(now);
     final String uniqueKey = _generateUniqueKey(title, notification, topic, formattedDate);
-    
+
     logger.d("Attempting to store notification with key: $uniqueKey");
-    
+
     final Map<String, dynamic> notificationData = {
       "title": title,
       "notification": notification,
       "topic": topic,
       "timestamp": formattedDate,
     };
-    
+
     logger.d("Storing notification with key: $uniqueKey and data: $notificationData");
     await _prefs.setString(uniqueKey, jsonEncode(notificationData));
     _savingNotification = false;
     _retrieveNotifications();
   }
 
-
-
-
-  // Helper method to generate a unique key (this is a simple version, consider a hash for more complexity)
   String _generateUniqueKey(String title, String notification, String topic, String formattedDate) {
     return "$title-$notification-$topic-$formattedDate";
-  }
-
-  // Check if a unique key already exists in the storage
-  Future<bool> _uniqueKeyExists(String uniqueKey) async {
-    return _prefs.containsKey(uniqueKey);
   }
 
   Future<bool> _isNotificationAlreadyStored(String title, String notification, String topic) async {
@@ -151,71 +134,60 @@ class _NotificationArchiveState extends State<NotificationArchive> {
 
   Future<void> _retrieveNotifications() async {
     final List<Map<String, dynamic>> parsedNotifications = [];
-    _prefs.getKeys().forEach((key) async {
+    for (var key in _prefs.getKeys()) {
       final String? value = _prefs.getString(key);
       if (value != null) {
         try {
           final Map<String, dynamic> decodedData = jsonDecode(value);
-          parsedNotifications.add(decodedData);
+          if (decodedData.containsKey('title') && decodedData.containsKey('notification') && decodedData.containsKey('topic') && decodedData.containsKey('timestamp')) {
+            parsedNotifications.add(decodedData);
+          }
         } catch (e) {
           logger.e("Error decoding notification data for key $key: $e");
         }
       }
-    });
+    }
 
-    // Ensure the sorting operation is correct
     parsedNotifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
     logger.d("Retrieved ${parsedNotifications.length} notifications");
 
     if (mounted) {
-      _setHasNotifications(true);
+      _setHasNotifications(parsedNotifications.isNotEmpty);
       setState(() {
         notifications = parsedNotifications;
       });
     }
   }
 
-
-
   Future<void> migrateDataIfNeeded() async {
-    _prefs.getKeys().forEach((key) async {
+    for (var key in _prefs.getKeys()) {
       final value = _prefs.getString(key);
       if (value != null) {
         try {
           final dynamic decodedData = jsonDecode(value);
-          // No need to re-encode if it's already in the correct format
           if (decodedData is! Map<String, dynamic>) {
             if (decodedData is bool) {
               final Map<String, dynamic> newData = {'isEnabled': decodedData};
               await _prefs.setString(key, jsonEncode(newData));
             }
-            // Consider other types if necessary
           }
         } catch (e) {
-          // Handle potential errors, perhaps the value was not JSON encoded
           logger.e("Error during migration for key $key: $e");
         }
       }
-    });
+    }
   }
 
   void _deleteNotification(int index) async {
     String key = notifications[index]['key']!;
     await _prefs.remove(key);
     _retrieveNotifications();
-    _setHasNotifications(false);
-
+    _setHasNotifications(notifications.isNotEmpty);
   }
 
   Future<void> _refresh() async {
     await _retrieveNotifications();
   }
-
-  // String _formatTimestamp(String timestamp) {
-  //   var dateTime = DateTime.fromMillisecondsSinceEpoch(int.tryParse(timestamp) ?? 0);
-  //   var formatter = DateFormat('yyyy-MM-dd HH:mm');
-  //   return formatter.format(dateTime);
-  // }
 
   Widget _buildNotificationDescription(BuildContext context, String notification) {
     if (notification.length > 200) {
@@ -236,55 +208,48 @@ class _NotificationArchiveState extends State<NotificationArchive> {
         child: notifications.isEmpty
             ? const Text('No notifications saved.')
             : ReloadableWidget(
-              onRefresh: _refresh,
-              child: ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  final notification = notifications[index];
-                  // Ensure key is never null
-                  final String itemKey = notification['key'] ?? 'item_$index';
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(6.0, 2.0, 6.0, 0),
-                    child: Card(
-                      child: Dismissible(
-                        key: Key(itemKey),
-                        onDismissed: (direction) {
-                          _deleteNotification(index);
-                        },
-                        background: Container(
-                          color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 16.0),
-                          child: const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        child: ListTile(
-                          title: Text(
-                            notification['title'] ?? 'No Title', // Use ?? to provide a fallback
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                onRefresh: _refresh,
+                child: ListView.builder(
+                  itemCount: notifications.length,
+                  itemBuilder: (context, index) {
+                    final notification = notifications[index];
+                    final String itemKey = notification['key'] ?? 'item_$index';
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(6.0, 2.0, 6.0, 0),
+                      child: Card(
+                        child: Dismissible(
+                          key: Key(itemKey),
+                          onDismissed: (direction) {
+                            _deleteNotification(index);
+                          },
+                          background: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: const Icon(Icons.delete, color: Colors.white),
                           ),
+                          child: ListTile(
+                            title: Text(
+                              notification['title'] ?? 'No Title',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildNotificationDescription(context, notification['notification']), 
+                                _buildNotificationDescription(context, notification['notification']),
                                 const SizedBox(height: 4),
-                                // Text(
-                                //   'Topic: ${notification['topic'] ?? 'Unknown'}', // Already correctly handled
-                                //   style: const TextStyle(fontSize: 12, color: Colors.grey),
-                                // ),
-                                // SizedBox(height: 4),
                                 Text(
-                                  'Saved at: ${notification['timestamp']}', // Safe parsing with fallback
+                                  'Saved at: ${notification['timestamp']}',
                                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                                 ),
                                 Text(
-                                  'Topic: ${notification['topic'] ?? ''}', // Already correctly handled
+                                  'Topic: ${notification['topic'] ?? ''}',
                                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                                 ),
                               ],
                             ),
-                                  
                             onTap: () {
-                              if(notification['notification'].toString().split('').length >= 100) {
+                              if (notification['notification'].toString().length >= 100) {
                                 showDialog(
                                   context: context,
                                   builder: (context) {
@@ -298,39 +263,49 @@ class _NotificationArchiveState extends State<NotificationArchive> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: Text('Zamknij', style: TextStyle(color: themeColor),),
+                                          child: Text('Close', style: TextStyle(color: themeColor)),
                                         ),
                                         Visibility(
-                                          visible: notification['topic'] != {'all', 'polls', 'posts', 'events'},
+                                          visible: !['all', 'polls', 'posts', 'events'].contains(notification['topic']),
                                           child: TextButton(
                                             onPressed: () => Navigator.of(context).push(
-                                              MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
+                                              MaterialPageRoute(
+                                                builder: ((context) => MessagingPage(
+                                                      groupTitle: notification['title'],
+                                                      groupId: notification['topic'] ?? '',
+                                                      isGFC: false,
+                                                    )),
+                                              ),
                                             ),
-                                            child: Text('Otwórz czat', style: TextStyle(color: themeColor)),
+                                            child: Text('Open Chat', style: TextStyle(color: themeColor)),
                                           ),
-                                        )
+                                        ),
                                       ],
                                     );
                                   },
                                 );
-                              }
-                              if(notification['topic'] != {'all', 'polls', 'posts', 'events'}) {
+                              } else if (!['all', 'polls', 'posts', 'events'].contains(notification['topic'])) {
                                 Navigator.of(context).push(
-                                  MaterialPageRoute(builder: ((context) => MessagingPage(groupTitle: notification['title'], groupId: notification['topic'] ?? '', isGFC: false,)))
+                                  MaterialPageRoute(
+                                    builder: ((context) => MessagingPage(
+                                          groupTitle: notification['title'],
+                                          groupId: notification['topic'] ?? '',
+                                          isGFC: false,
+                                        )),
+                                  ),
                                 );
                               }
                             },
                           ),
                         ),
                       ),
-                  );
+                    );
                   },
                 ),
-            ),
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // This button deletes all notifications
           _prefs.clear().then((_) {
             setState(() {
               notifications.clear();
