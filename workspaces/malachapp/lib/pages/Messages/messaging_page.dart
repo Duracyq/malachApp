@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:malachapp/services/nickname_fetcher.dart';
 import 'package:malachapp/services/notification_service.dart';
 import 'package:malachapp/services/subscribe_to_noti.dart';
+import 'package:malachapp/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class MessagingPage extends StatefulWidget {
@@ -69,6 +70,18 @@ class _MessagingPageState extends State<MessagingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    final color =
+        themeProvider.currentThemeKey == 'light' ? Colors.white : Colors.black;
+    final color1 = themeProvider.currentThemeKey == 'light'
+        ? Colors.grey.withOpacity(0.5)
+        // : Colors.grey.withOpacity(0.2);
+        : Colors.blueGrey;
+    final color2 = themeProvider.currentThemeKey == 'light'
+        ? Color.fromARGB(255, 133, 196, 255)
+        : Colors.blueGrey;
+
     return FutureBuilder(
       future: isAdminAsync(),
       builder: (context, snapshot) {
@@ -217,17 +230,24 @@ class _MessagingPageState extends State<MessagingPage> {
                   },
                 ),
               ),
+              const SizedBox(height: 5),
               Container(
                 padding: const EdgeInsets.all(8.0),
+                margin: const EdgeInsets.only(
+                  left: 4.0,
+                  right: 4.0,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: color,
+
+                  ///!!!!!!!!!
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
+                      color: color1,
+                      spreadRadius: 1,
                       blurRadius: 5,
-                      offset: const Offset(0, 3),
+                      // offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -248,7 +268,7 @@ class _MessagingPageState extends State<MessagingPage> {
                       ),
                     )),
                     IconButton(
-                      icon: const Icon(Icons.send, color: Colors.blue),
+                      icon: Icon(Icons.send, color: color2),
                       onPressed: () async {
                         if (_messageController.text.isNotEmpty) {
                           await _groupService.sendMessage(
@@ -271,7 +291,7 @@ class _MessagingPageState extends State<MessagingPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
             ],
           ),
         );

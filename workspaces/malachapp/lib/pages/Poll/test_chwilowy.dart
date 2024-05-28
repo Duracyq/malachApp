@@ -52,7 +52,7 @@ class QuestionCard extends StatelessWidget {
         children: [
           Text(
             question.question,
-            style: Theme.of(context).textTheme.headline6,
+            // style: Theme.of(context).textTheme.,
           ),
           SizedBox(height: 20),
           ...question.options
