@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:malachapp/auth/auth_service.dart';
+import 'package:malachapp/pages/Messages/banned_words.dart';
 import 'package:malachapp/pages/add_group_page.dart';
 import 'package:malachapp/pages/notification_subs_page.dart';
 import 'package:malachapp/services/group_service.dart';
@@ -271,6 +272,18 @@ class _MessagingPageState extends State<MessagingPage> {
                       icon: Icon(Icons.send, color: color2),
                       onPressed: () async {
                         if (_messageController.text.isNotEmpty) {
+                          String message =
+                              _messageController.text.toLowerCase();
+
+                          for (String word in bannedWords) {
+                            String pattern = word.split('').join('\\W*');
+                            RegExp regExp = RegExp(pattern);
+
+                            if (regExp.hasMatch(message)) {
+                              print('Twoja wiadomość zawiera obraźliwe słowo.');
+                              return;
+                            }
+                          }
                           await _groupService.sendMessage(
                               widget.groupId,
                               _messageController.text,
