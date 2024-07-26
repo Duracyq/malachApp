@@ -1,15 +1,15 @@
-Duracyq Software License
+# MalachApp's Software License
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use the Software for personal purposes only, subject to the following conditions:
+1. **Personal Use Only**: The Software is authorized for personal use only. No company, institution, or any other entity may use the Software without explicit written permission from the author.
+2. **No Modifications**: Users are not permitted to modify, merge, publish, distribute, sublicense, or sell copies of the Software. Any derivative works or adaptations are strictly prohibited.
+3. **Non-Commercial Use**: The Software must not be used for any commercial purposes. This includes, but is not limited to:
+  - Selling or distributing the Software for a fee.
+  - Using the Software as part of a product or service for which you charge a fee.
+  - Using the Software in a commercial environment or for commercial research.
+4. **Commercial Use**: Any commercial use of the Software requires a signed authorization form from the author. Users must contact the author to obtain written permission for any commercial exploitation of the Software.
+5. **No Warranty**: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+6. **Violation and Legal Action**: Any unauthorized use of the Software in violation of this license will be subject to legal action. The authors reserve the right to seek damages and other remedies available under the law.
+By using the Software, you agree to comply with the terms of this license.
 
-Copyright (c) 2024 Duracyq
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, limited solely to the following rights:
-    - Use: The right to use the Software for personal or commercial purposes.
-    - Copy: The right to copy or download the Software for backup or archival purposes.
-
-All other rights, including but not limited to the rights to modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, are expressly reserved by the copyright holder and are not granted by this license.
-
-The exercising of the granted rights is subject to the following conditions:
-
-    - The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Szymon Kajak and Wiktor Żabka
+2024
