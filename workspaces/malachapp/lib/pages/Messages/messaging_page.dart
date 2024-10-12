@@ -269,14 +269,15 @@ class _MessagingPageState extends State<MessagingPage> {
                       ),
                     )),
                     IconButton(
-                      icon: Icon(Icons.send, color: color2),
-                      onPressed: () async {
-                        if (_messageController.text.isNotEmpty) {
-                          String message =
-                              _messageController.text.toLowerCase();
+                        icon: Icon(Icons.send, color: color2),
+                        onPressed: () async {
+                          if (_messageController.text.isNotEmpty) {
+                            String message =
+                                _messageController.text.toLowerCase();
 
-                          for (String word in bannedWords) {
-                            String pattern = word.split('').join('\\W*');
+                            String pattern = bannedWords
+                                .map((word) => word.split('').join('\\W*'))
+                                .join('|');
                             RegExp regExp = RegExp(pattern);
 
                             if (regExp.hasMatch(message)) {
@@ -298,9 +299,7 @@ class _MessagingPageState extends State<MessagingPage> {
                                   '$nickname: $nicknameTemp',
                                   widget.groupId,
                                   widget.groupTitle ?? 'Group Message');
-                        }
-                      },
-                    ),
+                        }),
                   ],
                 ),
               ),
